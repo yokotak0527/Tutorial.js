@@ -1,9 +1,18 @@
-    constructor(){
-      if(first) setup.call(this);
+    /**
+    * @method Tutorial.changeConfig
+    * @desc   change Tutorial.js configuration
+    * @param  {(String|Object[])} name
+    * @param  {String} name.name
+    * @param  {*} name.val
+    * @param  {*}                 [val]
+    */
+    static changeConfig(name, val){
+      let confArr = Array.isArray(name) ? name : [{'name' : name, 'val' : val}];
+      confArr.forEach( obj => conf[obj.name] = obj.val );
     }
-    publicFunc(){
-      console.log('public function');
-    }
-    static staticFunc(){
-      console.log('static function');
+    /**
+    * @function myFunction
+    */
+    test(){
+
     }

@@ -1,3 +1,6 @@
+/**
+* @autor WITHPROJECTS inc.
+*/
 "use strict";
 {
   let first           = true;
@@ -36,5 +39,17 @@
     conf.$parent.append(conf.template());
     first = false;
   };
-  // ===========================================================================
+  /**
+  * @class  Tutorial
+  * @param  {Object}   [param]                   - Tutorial instance setting parameter
+  * @param  {Boolean}  [param.auto  = false]     - auto start.
+  * @param  {Boolean}  [param.skip  = true]      - use skip button.
+  * @param  {Boolean}  [param.pager = true]      - use pager.
+  * @param  {Boolean}  [param.controller = true] - use controller.
+  * @param  {Object[]} [param.step]
+  * @return Tutorial
+  */
   class Tutorial{
+    constructor(param){
+      if(first) setup.call(this);
+    }

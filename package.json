@@ -1,5 +1,5 @@
 {
-  "name": "tutorial",
+  "name": "TutorialJS",
   "version": "0.0.1",
   "description": "This provide introduction function on your web site and service, and so on.",
   "homepage": "http://www.withprojects.co.jp/lib/tutorial.js/",
@@ -28,6 +28,7 @@
     "gulp-babel": "^6.1.2",
     "gulp-cli": "^1.2.2",
     "gulp-concat": "^2.6.0",
+    "gulp-jsdoc": "^0.1.5",
     "gulp-pleeease": "^2.0.2",
     "gulp-plumber": "^1.1.0",
     "gulp-rename": "^1.2.2",

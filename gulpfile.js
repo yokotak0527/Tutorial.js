@@ -10,6 +10,11 @@ const sourcemaps = require('gulp-sourcemaps');
 const pleeease   = require('gulp-pleeease');
 const uglify     = require('gulp-uglify');
 const rename     = require('gulp-rename');
+const jsdoc      = require('gulp-jsdoc');
+let packageJson  = require('./package.json');
+
+packageJson.name = 'Tutorial.js';
+// console.log(packageJson.version);
 
 let concatJSList = [
   'assets/js/header.js',
@@ -57,9 +62,34 @@ gulp.task('minify', ()=>{
     .pipe(gulp.dest('dest'))
 });
 // -----------------------------------------------------------------------------
+gulp.task('jsdoc', ()=>{
+  return gulp.src('dest/Tutorial.js')
+    .pipe(jsdoc.parser({
+      'name'    : packageJson.name,
+      'version' : packageJson.version
+    }))
+    .pipe(jsdoc.generator(
+      'doc',
+      null,
+      {
+        'outputSourceFiles' : false
+      }
+    ))
+    //.pipe(jsdoc.generator(
+    //  'doc',
+    //  {
+    //    'path'       : '',
+    //    'systemName' : packageJson.name,
+    //    'theme'      : 'cosmo'
+    //  },{
+    //    'outputSourceFiles' : false
+    //  }
+    //))
+});
+// -----------------------------------------------------------------------------
 gulp.task('watch', ()=>{
   gulp.watch('assets/sass/**/*.sass', ['build:sass']);
   gulp.watch('assets/js/**/*.js',     ['build:js']);
 });
 // -----------------------------------------------------------------------------
-gulp.task('publish', ['build:js', 'minify', 'build:sass']);
+gulp.task('publish', ['build:js', 'jsdoc', 'minify', 'build:sass']);
