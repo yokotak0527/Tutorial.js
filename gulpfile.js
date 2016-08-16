@@ -12,8 +12,11 @@ const uglify     = require('gulp-uglify');
 const rename     = require('gulp-rename');
 
 let concatJSList = [
+  'assets/js/header.js',
   'assets/js/core.js',
-  'assets/js/events.js'
+  'assets/js/events.js',
+  'assets/js/utils.js',
+  'assets/js/footer.js'
 ];
 // -----------------------------------------------------------------------------
 gulp.task('build:js', ()=>{
