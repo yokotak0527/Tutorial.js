@@ -1,0 +1,1 @@
+{"version":3,"sources":["partial/_test.sass"],"names":[],"mappings":"AAAA,EACE,WACA,oBAAA,AAAe,qBAAf,AAAe,oBAAf,AAAe,YAAA,CAAG","file":"Tutorial.css","sourcesContent":["a {\n  color : #F00;\n  display : flex; }\n"],"sourceRoot":"/source/"}
