@@ -1,11 +1,18 @@
-    ///**
-    //* @memberof Tutorial
-    //* @instance
-    //* @method hoge
-    //*/
+    // =========================================================================
+    /**
+    * @function name2index
+    *
+    * @memberof Tutorial
+    * @instance
+    * @return {Number|Number[]}
+    */
     name2index(name = ''){
-      // if typeof name != 'string' then return -1
-      // for val, i in @step then if val.name is name then return i
+      let _   = privateMap.get(this);
+      let arr = [];
+      _.step.forEach((el, i)=>{
+        if(typeof el === 'object' && el.name === name) arr.push(i);
+      });
+      return arr.length > 1 ? arr : arr.length === 1 ? arr[0] : -1;
     }
     isActive(){
       // return @stepIsActive

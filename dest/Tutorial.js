@@ -1,5 +1,7 @@
 "use strict";
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -9,6 +11,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var privateMap = new WeakMap();
     // ===========================================================================
     var first = true;
+    var TutorialID = 0;
     var conf = Object.create(null);
     conf.mode = 'focus'; // focus | arrow
     conf.resizeInterval = 250;
@@ -31,6 +34,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       conf.$parent.append(conf.template());
       first = false;
     };
+    // ===========================================================================
+    var adjustStepNum = function adjustStepNum() {};
 
     var Tutorial = function () {
 
@@ -53,6 +58,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (first) setup.call(this);
         var _ = Object.create(null);
         _.step = [];
+        _.active = false;
+        // @stepNum       = 0     # stepの総数
+        // @stepPointer   = 0     # 現在のステップの位置
+        // @stepIsActive  = false # ステップが表示されているか
+        this.id = TutorialID;
+        TutorialID++;
         // make private properties
         privateMap.set(this, _);
       }
@@ -85,16 +96,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           steps.forEach(function (obj) {
             return _.step.push(obj);
           });
+          adjustStepNum.call(this);
           return this;
         }
         // =========================================================================
         /**
+        * @function remove
         *
+        * @memberof Tutorial
+        * @instance
         */
 
       }, {
         key: 'remove',
-        value: function remove(step) {}
+        value: function remove(order) {
+          var _ = privateMap.get(this);
+          order = typeof order === 'string' ? this.name2index(order) : order;
+          console.log(order);
+
+          adjustStepNum.call(this);
+        }
         /**
         *
         */
@@ -139,19 +160,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         key: 'destory',
         value: function destory(tutorial) {}
 
-        ///**
-        //* @memberof Tutorial
-        //* @instance
-        //* @method hoge
-        //*/
+        // =========================================================================
+        /**
+        * @function name2index
+        *
+        * @memberof Tutorial
+        * @instance
+        * @return {Number|Number[]}
+        */
 
       }, {
         key: 'name2index',
         value: function name2index() {
-          // if typeof name != 'string' then return -1
-          // for val, i in @step then if val.name is name then return i
-
           var name = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+          var _ = privateMap.get(this);
+          var arr = [];
+          _.step.forEach(function (el, i) {
+            if ((typeof el === 'undefined' ? 'undefined' : _typeof(el)) === 'object' && el.name === name) arr.push(i);
+          });
+          return arr.length > 1 ? arr : arr.length === 1 ? arr[0] : -1;
         }
       }, {
         key: 'isActive',

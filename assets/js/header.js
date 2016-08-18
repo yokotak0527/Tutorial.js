@@ -3,6 +3,7 @@
   let privateMap = new WeakMap();
   // ===========================================================================
   let first           = true;
+  let TutorialID      = 0;
   let conf            = Object.create(null);
   conf.mode           = 'focus'; // focus | arrow
   conf.resizeInterval = 250;
@@ -41,4 +42,8 @@
     conf.$parent.append(conf.template());
     first = false;
   };
+  // ===========================================================================
+  let adjustStepNum = function(){
+
+  }
   class Tutorial{

@@ -28,9 +28,17 @@
   <script>
     Tutorial.changeConfig('skipLabel', 'スキップ');
     var tutorial = new Tutorial();
-    tutorial.add({
-      name : 'step1'
-    });
+    tutorial.add([
+      {
+        name : 'step1'
+      },
+      {
+        name : 'step2'
+      },
+      {
+        name : 'step1'
+      }
+    ]).remove('step3');
   </script>
 </body>
 </html>

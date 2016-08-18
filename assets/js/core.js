@@ -14,7 +14,13 @@
     constructor(param){
       if(first) setup.call(this);
       let _  = Object.create(null);
-      _.step = [];
+      _.step    = [];
+      _.active  = false;
+      // @stepNum       = 0     # stepの総数
+      // @stepPointer   = 0     # 現在のステップの位置
+      // @stepIsActive  = false # ステップが表示されているか
+      this.id = TutorialID;
+      TutorialID++;
       // make private properties
       privateMap.set(this, _);
     }
@@ -44,14 +50,22 @@
       let steps = Array.isArray(step) ? step : [step];
       let _     = privateMap.get(this);
       steps.forEach( obj => _.step.push(obj) );
+      adjustStepNum.call(this);
       return this;
     }
     // =========================================================================
     /**
+    * @function remove
     *
+    * @memberof Tutorial
+    * @instance
     */
-    remove(step){
+    remove(order){
+      let _ = privateMap.get(this);
+      order = typeof order === 'string' ? this.name2index(order) : order;
+      console.log(order);
 
+      adjustStepNum.call(this);
     }
     /**
     *
