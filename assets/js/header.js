@@ -1,8 +1,7 @@
-/**
-* @autor WITHPROJECTS inc.
-*/
 "use strict";
 {
+  let privateMap = new WeakMap();
+  // ===========================================================================
   let first           = true;
   let conf            = Object.create(null);
   conf.mode           = 'focus'; // focus | arrow
@@ -13,6 +12,7 @@
   conf.nextLabel      = 'Next';
   conf.endLabel       = 'End';
   conf.$parent        = null;
+  conf.$scroll        = null;
   conf.template       = ()=> `
 <div class="tutorial">
  <div class="content-wrap">
@@ -33,23 +33,12 @@
 </div>
 `;
   Object.seal(conf);
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
+  // called when first instance.
   let setup = function(){
     if(conf.$parent === null) conf.$parent = $('body');
+    if(conf.$scroll === null) conf.$scroll = $('body');
     conf.$parent.append(conf.template());
     first = false;
   };
-  /**
-  * @class  Tutorial
-  * @param  {Object}   [param]                   - Tutorial instance setting parameter
-  * @param  {Boolean}  [param.auto  = false]     - auto start.
-  * @param  {Boolean}  [param.skip  = true]      - use skip button.
-  * @param  {Boolean}  [param.pager = true]      - use pager.
-  * @param  {Boolean}  [param.controller = true] - use controller.
-  * @param  {Object[]} [param.step]
-  * @return Tutorial
-  */
   class Tutorial{
-    constructor(param){
-      if(first) setup.call(this);
-    }

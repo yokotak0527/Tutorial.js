@@ -27,7 +27,7 @@ let concatJSList = [
 gulp.task('build:js', ()=>{
   return gulp.src(concatJSList)
     .pipe(plumber())
-    .pipe(concat('Tutorial.js'))
+    .pipe(concat(packageJson.name))
     .pipe(babel({
       'minified' : false,
       'comments' : true,
@@ -56,35 +56,25 @@ gulp.task('build:sass', ()=>{
 });
 // -----------------------------------------------------------------------------
 gulp.task('minify', ()=>{
-  return gulp.src('dest/Tutorial.js')
+  return gulp.src(path.join('dest', packageJson.name))
     .pipe(uglify({ 'preserveComments' : 'license' }))
     .pipe(rename('Tutorial.min.js'))
     .pipe(gulp.dest('dest'))
 });
 // -----------------------------------------------------------------------------
 gulp.task('jsdoc', ()=>{
-  return gulp.src('dest/Tutorial.js')
+  return gulp.src(path.join('dest', packageJson.name))
     .pipe(jsdoc.parser({
       'name'    : packageJson.name,
       'version' : packageJson.version
     }))
-    .pipe(jsdoc.generator(
-      'doc',
-      null,
-      {
-        'outputSourceFiles' : false
-      }
-    ))
-    //.pipe(jsdoc.generator(
-    //  'doc',
-    //  {
-    //    'path'       : '',
-    //    'systemName' : packageJson.name,
-    //    'theme'      : 'cosmo'
-    //  },{
-    //    'outputSourceFiles' : false
-    //  }
-    //))
+    .pipe(jsdoc.generator( 'doc', null, { 'outputSourceFiles' : false } ))
+    // {
+      // 'path'       : 'ink-docstrap',
+      // 'systemName' : packageJson.name + ' Document',
+      // 'copyright'  : packageJson.author,
+      // 'theme'      : 'minami'
+    // },
 });
 // -----------------------------------------------------------------------------
 gulp.task('watch', ()=>{
