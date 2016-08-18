@@ -62,8 +62,7 @@
     */
     remove(order){
       let _ = privateMap.get(this);
-      order = typeof order === 'string' ? this.name2index(order) : order;
-      console.log(order);
+      order = typeof order === 'string' ? this.indexFrom(order) : order;
 
       adjustStepNum.call(this);
     }

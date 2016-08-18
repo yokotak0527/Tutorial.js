@@ -111,8 +111,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         key: 'remove',
         value: function remove(order) {
           var _ = privateMap.get(this);
-          order = typeof order === 'string' ? this.name2index(order) : order;
-          console.log(order);
+          order = typeof order === 'string' ? this.indexFrom(order) : order;
 
           adjustStepNum.call(this);
         }
@@ -162,18 +161,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         // =========================================================================
         /**
-        * @function name2index
+        * @function indexFrom
         *
         * @memberof Tutorial
         * @instance
-        * @return {Number|Number[]}
+        * @param    {String} name - step name.
+        * @return   {Number|Number[]}
         */
 
       }, {
-        key: 'name2index',
-        value: function name2index() {
-          var name = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-
+        key: 'indexFrom',
+        value: function indexFrom(name) {
+          if (typeof name !== 'string') return -1;
           var _ = privateMap.get(this);
           var arr = [];
           _.step.forEach(function (el, i) {
@@ -181,6 +180,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           });
           return arr.length > 1 ? arr : arr.length === 1 ? arr[0] : -1;
         }
+        // =========================================================================
+        /**
+        * @function isActive
+        *
+        * @memberof Tutorial
+        * @instance
+        * @return {Number|Number[]}
+        */
+
       }, {
         key: 'isActive',
         value: function isActive() {
