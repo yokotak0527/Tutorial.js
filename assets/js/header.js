@@ -44,6 +44,7 @@
   };
   // ===========================================================================
   let adjustStepNum = function(){
-
+    let _ = privateMap.get(this);
+    _.num = _.step.length;
   }
   class Tutorial{

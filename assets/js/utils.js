@@ -1,13 +1,13 @@
     // =========================================================================
     /**
-    * @function indexFrom
+    * @function indexByName
     *
     * @memberof Tutorial
     * @instance
     * @param    {String} name - step name.
     * @return   {Number|Number[]}
     */
-    indexFrom(name){
+    indexByName(name){
       if(typeof name !== 'string') return -1;
       let _   = privateMap.get(this);
       let arr = [];
@@ -25,5 +25,6 @@
     * @return {Number|Number[]}
     */
     isActive(){
-      // return @stepIsActive
+      let _ = privateMap.get(this);
+      return _.active;
     }

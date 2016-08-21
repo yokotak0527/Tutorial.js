@@ -11,18 +11,24 @@
     *
     * @return Tutorial
     */
-    constructor(param){
+    constructor(param = {}){
       if(first) setup.call(this);
       let _  = Object.create(null);
       _.step    = [];
       _.active  = false;
+      _.num     = 0; // step num
+      _.pointer = 0;
+      _.roop    = typeof param.roop === 'boolean' ? param.roop : false;
       // @stepNum       = 0     # stepの総数
       // @stepPointer   = 0     # 現在のステップの位置
       // @stepIsActive  = false # ステップが表示されているか
-      this.id = TutorialID;
+      this.id   = TutorialID;
       TutorialID++;
       // make private properties
       privateMap.set(this, _);
+
+      adjustStepNum.call(this);
+      if(param.step) this.addStep(param.step);
     }
     // =========================================================================
     /**
@@ -62,15 +68,14 @@
     */
     remove(order){
       let _ = privateMap.get(this);
-      order = typeof order === 'string' ? this.indexFrom(order) : order;
+      order = typeof order === 'string' ? this.indexByName(order) : order;
 
       adjustStepNum.call(this);
     }
     /**
     *
     */
-    change(step){
-
+    change(name, step){
     }
 
     /**

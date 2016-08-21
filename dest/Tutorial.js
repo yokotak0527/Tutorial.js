@@ -35,7 +35,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       first = false;
     };
     // ===========================================================================
-    var adjustStepNum = function adjustStepNum() {};
+    var adjustStepNum = function adjustStepNum() {
+      var _ = privateMap.get(this);
+      _.num = _.step.length;
+    };
 
     var Tutorial = function () {
 
@@ -52,13 +55,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       *
       * @return Tutorial
       */
-      function Tutorial(param) {
+      function Tutorial() {
+        var param = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
         _classCallCheck(this, Tutorial);
 
         if (first) setup.call(this);
         var _ = Object.create(null);
         _.step = [];
         _.active = false;
+        _.num = 0; // step num
+        _.pointer = 0;
+        _.roop = typeof param.roop === 'boolean' ? param.roop : false;
         // @stepNum       = 0     # stepの総数
         // @stepPointer   = 0     # 現在のステップの位置
         // @stepIsActive  = false # ステップが表示されているか
@@ -66,6 +74,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         TutorialID++;
         // make private properties
         privateMap.set(this, _);
+
+        adjustStepNum.call(this);
+        if (param.step) this.addStep(param.step);
       }
       // =========================================================================
       /**
@@ -111,7 +122,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         key: 'remove',
         value: function remove(order) {
           var _ = privateMap.get(this);
-          order = typeof order === 'string' ? this.indexFrom(order) : order;
+          order = typeof order === 'string' ? this.indexByName(order) : order;
 
           adjustStepNum.call(this);
         }
@@ -121,7 +132,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'change',
-        value: function change(step) {}
+        value: function change(name, step) {}
 
         /**
         *
@@ -161,7 +172,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         // =========================================================================
         /**
-        * @function indexFrom
+        * @function indexByName
         *
         * @memberof Tutorial
         * @instance
@@ -170,8 +181,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         */
 
       }, {
-        key: 'indexFrom',
-        value: function indexFrom(name) {
+        key: 'indexByName',
+        value: function indexByName(name) {
           if (typeof name !== 'string') return -1;
           var _ = privateMap.get(this);
           var arr = [];
@@ -192,7 +203,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'isActive',
         value: function isActive() {
-          // return @stepIsActive
+          var _ = privateMap.get(this);
+          return _.active;
         }
       }], [{
         key: 'changeConfig',
