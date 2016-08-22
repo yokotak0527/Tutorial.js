@@ -71,15 +71,21 @@
       if(order === undefined){
         _.step = [];
       }else{
-        if(typeof order === 'string') order = this.indexByName(order);
         if(!Array.isArray(order)) order = [order];
-        // order.forEach((val)=>{
-        //  if(typeof val === 'string') val = [this.indexByName(val)];
-        //  _.step.splice(val, val)
-        // });
+        order = order.map((val)=> typeof val === 'string' ? this.indexByName(val) : val );
+        let newStep = _.step.filter((val, i)=>{
+          let flg = true;
+          for(let _i=0, _l=order.length; _i<_l; _i++){
+            if(order[_i] === i){
+              flg = false;
+              break;
+            }
+          }
+          if(flg) return val;
+        });
+        _.step = newStep;
       }
-      // console.log(_.step);
-      // adjustStepNum.call(this);
+      adjustStepNum.call(this);
       return this;
     }
     /**

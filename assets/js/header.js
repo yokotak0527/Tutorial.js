@@ -15,6 +15,7 @@
   conf.$parent        = null;
   conf.$scroll        = null;
   conf.zIndex         = 9000;
+  conf.$              = $;
   conf.template       = ()=> `
 <div class="tutorial">
  <div class="content-wrap center-middle">
@@ -44,6 +45,7 @@
   // ================================================================================
   // called when first instance.
   let setup = function(){
+    let $ = conf.$;
     if(conf.$parent === null) conf.$parent = $('body');
     if(conf.$scroll === null) conf.$scroll = $('body');
     let $cnt = $(conf.template());

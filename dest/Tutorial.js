@@ -23,6 +23,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     conf.$parent = null;
     conf.$scroll = null;
     conf.zIndex = 9000;
+    conf.$ = $;
     conf.template = function () {
       return '\n<div class="tutorial">\n <div class="content-wrap center-middle">\n   <ol class="pager">\n    <li><span class="active">1</span></li>\n    <li><span>2</span></li>\n    <li><span>3</span></li>\n    <li><span>4</span></li>\n    <li><span>5</span></li>\n   </ol>\n   <div class="content"></div>\n   <div class="controller">\n     <ul class="left">\n       <li class="skip"><span>' + conf.skipLabel + '</span></li>\n     </ul>\n     <ul class="right">\n       <li class="prev"><span>' + conf.prevLabel + '</span></li>\n       <li class="next"><span>' + conf.nextLabel + '</span></li>\n       <li class="end"><span>' + conf.endLabel + '</span></li>\n     </ul>\n   </div>\n </div>\n <div class="bg"></div>\n</div>\n';
     };
@@ -30,6 +31,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     // ================================================================================
     // called when first instance.
     var setup = function setup() {
+      var $ = conf.$;
       if (conf.$parent === null) conf.$parent = $('body');
       if (conf.$scroll === null) conf.$scroll = $('body');
       var $cnt = $(conf.template());
@@ -124,21 +126,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'remove',
         value: function remove() {
+          var _this = this;
+
           var order = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
           var _ = privateMap.get(this);
           if (order === undefined) {
             _.step = [];
           } else {
-            if (typeof order === 'string') order = this.indexByName(order);
             if (!Array.isArray(order)) order = [order];
-            // order.forEach((val)=>{
-            //  if(typeof val === 'string') val = [this.indexByName(val)];
-            //  _.step.splice(val, val)
-            // });
+            order = order.map(function (val) {
+              return typeof val === 'string' ? _this.indexByName(val) : val;
+            });
+            var newStep = _.step.filter(function (val, i) {
+              var flg = true;
+              for (var _i = 0, _l = order.length; _i < _l; _i++) {
+                if (order[_i] === i) {
+                  flg = false;
+                  break;
+                }
+              }
+              if (flg) return val;
+            });
+            _.step = newStep;
           }
-          // console.log(_.step);
-          // adjustStepNum.call(this);
+          adjustStepNum.call(this);
           return this;
         }
         /**
