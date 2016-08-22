@@ -66,11 +66,21 @@
     * @memberof Tutorial
     * @instance
     */
-    remove(order){
+    remove(order = undefined){
       let _ = privateMap.get(this);
-      order = typeof order === 'string' ? this.indexByName(order) : order;
-
-      adjustStepNum.call(this);
+      if(order === undefined){
+        _.step = [];
+      }else{
+        if(typeof order === 'string') order = this.indexByName(order);
+        if(!Array.isArray(order)) order = [order];
+        // order.forEach((val)=>{
+        //  if(typeof val === 'string') val = [this.indexByName(val)];
+        //  _.step.splice(val, val)
+        // });
+      }
+      // console.log(_.step);
+      // adjustStepNum.call(this);
+      return this;
     }
     /**
     *

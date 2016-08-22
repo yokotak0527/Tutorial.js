@@ -22,19 +22,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     conf.endLabel = 'End';
     conf.$parent = null;
     conf.$scroll = null;
+    conf.zIndex = 9000;
     conf.template = function () {
-      return '\n<div class="tutorial">\n <div class="content-wrap">\n   <ol class="pager"></ol>\n   <div class="content"></div>\n   <div class="controller">\n     <ul class="left">\n       <li class="skip"><span>' + conf.skipLabel + '</span></li>\n     </ul>\n     <ul class="right">\n       <li class="prev"><span>' + conf.prevLabel + '</span></li>\n       <li class="next"><span>' + conf.nextLabel + '</span></li>\n       <li class="end"><span>' + conf.endLabel + '</span></li>\n     </ul>\n   </div>\n </div>\n <div class="bg"></div>\n</div>\n';
+      return '\n<div class="tutorial">\n <div class="content-wrap center-middle">\n   <ol class="pager">\n    <li><span class="active">1</span></li>\n    <li><span>2</span></li>\n    <li><span>3</span></li>\n    <li><span>4</span></li>\n    <li><span>5</span></li>\n   </ol>\n   <div class="content"></div>\n   <div class="controller">\n     <ul class="left">\n       <li class="skip"><span>' + conf.skipLabel + '</span></li>\n     </ul>\n     <ul class="right">\n       <li class="prev"><span>' + conf.prevLabel + '</span></li>\n       <li class="next"><span>' + conf.nextLabel + '</span></li>\n       <li class="end"><span>' + conf.endLabel + '</span></li>\n     </ul>\n   </div>\n </div>\n <div class="bg"></div>\n</div>\n';
     };
     Object.seal(conf);
-    // ===========================================================================
+    // ================================================================================
     // called when first instance.
     var setup = function setup() {
       if (conf.$parent === null) conf.$parent = $('body');
       if (conf.$scroll === null) conf.$scroll = $('body');
-      conf.$parent.append(conf.template());
+      var $cnt = $(conf.template());
+      $cnt.css('z-index', conf.zIndex);
+      conf.$parent.append($cnt);
       first = false;
     };
-    // ===========================================================================
+    // ================================================================================
     var adjustStepNum = function adjustStepNum() {
       var _ = privateMap.get(this);
       _.num = _.step.length;
@@ -120,11 +123,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'remove',
-        value: function remove(order) {
-          var _ = privateMap.get(this);
-          order = typeof order === 'string' ? this.indexByName(order) : order;
+        value: function remove() {
+          var order = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
-          adjustStepNum.call(this);
+          var _ = privateMap.get(this);
+          if (order === undefined) {
+            _.step = [];
+          } else {
+            if (typeof order === 'string') order = this.indexByName(order);
+            if (!Array.isArray(order)) order = [order];
+            // order.forEach((val)=>{
+            //  if(typeof val === 'string') val = [this.indexByName(val)];
+            //  _.step.splice(val, val)
+            // });
+          }
+          // console.log(_.step);
+          // adjustStepNum.call(this);
+          return this;
         }
         /**
         *
@@ -197,7 +212,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         *
         * @memberof Tutorial
         * @instance
-        * @return {Number|Number[]}
+        * @return {Boolean}
         */
 
       }, {

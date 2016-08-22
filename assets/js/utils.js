@@ -22,7 +22,7 @@
     *
     * @memberof Tutorial
     * @instance
-    * @return {Number|Number[]}
+    * @return {Boolean}
     */
     isActive(){
       let _ = privateMap.get(this);

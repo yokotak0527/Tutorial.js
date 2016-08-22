@@ -6,29 +6,53 @@
   <script src="./lib/js/jquery-2.2.4.min.js"></script>
   <script src="./Tutorial.js"></script>
   <link rel="stylesheet" href="./Tutorial.css">
+  <style>
+    *{
+      margin  : 0;
+      padding : 0;
+    }
+    html{ height : 100% }
+    body{
+      background : #CCC;
+      width      : 100%;
+      height     : 100%;
+      position   : relative;
+    }
+    .wrap{
+      width          : 200%;
+      height         : 200%;
+      letter-spacing : -0.4em;
+    }
+    .wrap section{
+      width          : 50%;
+      height         : 50%;
+      letter-spacing : normal;
+      box-sizing     : border-box;
+      padding        : 20px;
+      display        : inline-block;
+    }
+    .wrap div{
+      background : #FFF;
+      height     : 100%;
+      box-sizing : border-box;
+      padding    : 20px;
+    }
+
+  </style>
 </head>
 <body>
-  <header class="f__header">
-    <h1>Tutorial.js</h1>
-    <h2>demo</h2>
-  </header>
-  <nav class="f__nav">
-    <h1>menu</h1>
-    <ul>
-      <li><a href="">test1</a></li>
-    </ul>
-  </nav>
-  <article class="f__main">
-    <section>
-
-    </section>
-  </article>
-
-
+  <div class="wrap">
+    <section><div>
+      <h1>Tutorial.js</h1>
+    </div></section>
+  </div>
   <script>
     Tutorial.changeConfig('skipLabel', 'スキップ');
     var tutorial = new Tutorial();
     tutorial.add([
+      {
+        name : 'step0'
+      },
       {
         name : 'step1'
       },
@@ -36,9 +60,12 @@
         name : 'step2'
       },
       {
-        name : 'step1'
+        name : 'step3'
+      },
+      {
+        name : 'step4'
       }
-    ]).remove('step2');
+    ]).remove([0,2]);
     console.log(tutorial.isActive());
   </script>
 </body>

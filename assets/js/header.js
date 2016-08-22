@@ -14,10 +14,17 @@
   conf.endLabel       = 'End';
   conf.$parent        = null;
   conf.$scroll        = null;
+  conf.zIndex         = 9000;
   conf.template       = ()=> `
 <div class="tutorial">
- <div class="content-wrap">
-   <ol class="pager"></ol>
+ <div class="content-wrap center-middle">
+   <ol class="pager">
+    <li><span class="active">1</span></li>
+    <li><span>2</span></li>
+    <li><span>3</span></li>
+    <li><span>4</span></li>
+    <li><span>5</span></li>
+   </ol>
    <div class="content"></div>
    <div class="controller">
      <ul class="left">
@@ -34,15 +41,17 @@
 </div>
 `;
   Object.seal(conf);
-  // ===========================================================================
+  // ================================================================================
   // called when first instance.
   let setup = function(){
     if(conf.$parent === null) conf.$parent = $('body');
     if(conf.$scroll === null) conf.$scroll = $('body');
-    conf.$parent.append(conf.template());
+    let $cnt = $(conf.template());
+    $cnt.css('z-index', conf.zIndex);
+    conf.$parent.append($cnt);
     first = false;
   };
-  // ===========================================================================
+  // ================================================================================
   let adjustStepNum = function(){
     let _ = privateMap.get(this);
     _.num = _.step.length;
