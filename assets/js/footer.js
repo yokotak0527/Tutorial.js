@@ -1,3 +1,2 @@
-  }
   window.Tutorial = Tutorial;
 }

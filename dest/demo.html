@@ -49,7 +49,7 @@
   <script>
     Tutorial.changeConfig('skipLabel', 'スキップ');
     var tutorial = new Tutorial();
-    tutorial.add([
+    tutorial.addStep([
       {
         name : 'step0'
       },
@@ -65,8 +65,15 @@
       {
         name : 'step4'
       }
-    ]).remove([0,'step2']);
-    console.log(tutorial.isActive());
+    ]).removeStep([0,'step2']);
+    // console.log(tutorial);
+    tutorial.addEventListener('resize', function(){
+      console.log(this);
+    });
+    var tutorial2 = new Tutorial();
+    tutorial2.addEventListener('resize', function(e){
+      console.log(e);
+    });
   </script>
 </body>
 </html>

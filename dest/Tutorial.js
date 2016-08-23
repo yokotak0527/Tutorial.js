@@ -8,129 +8,203 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 {
   (function () {
-    var privateMap = new WeakMap();
-    // ===========================================================================
-    var first = true;
-    var TutorialID = 0;
-    var conf = Object.create(null);
-    conf.mode = 'focus'; // focus | arrow
-    conf.resizeInterval = 250;
-    conf.scrollSpeed = 500;
-    conf.skipLabel = 'Skip';
-    conf.prevLabel = 'Prev';
-    conf.nextLabel = 'Next';
-    conf.endLabel = 'End';
-    conf.$parent = null;
-    conf.$scroll = null;
-    conf.zIndex = 9000;
-    conf.$ = $;
-    conf.template = function () {
-      return '\n<div class="tutorial">\n <div class="content-wrap center-middle">\n   <ol class="pager">\n    <li><span class="active">1</span></li>\n    <li><span>2</span></li>\n    <li><span>3</span></li>\n    <li><span>4</span></li>\n    <li><span>5</span></li>\n   </ol>\n   <div class="content"></div>\n   <div class="controller">\n     <ul class="left">\n       <li class="skip"><span>' + conf.skipLabel + '</span></li>\n     </ul>\n     <ul class="right">\n       <li class="prev"><span>' + conf.prevLabel + '</span></li>\n       <li class="next"><span>' + conf.nextLabel + '</span></li>\n       <li class="end"><span>' + conf.endLabel + '</span></li>\n     </ul>\n   </div>\n </div>\n <div class="bg"></div>\n</div>\n';
+    var __privateMap = new WeakMap();
+
+    var __first = true;
+    var __TutorialID = 0;
+    var __conf = Object.create(null);
+    __conf.mode = 'focus'; // focus | arrow
+    __conf.resizeInterval = 250;
+    __conf.scrollSpeed = 500;
+    __conf.skipLabel = 'Skip';
+    __conf.prevLabel = 'Prev';
+    __conf.nextLabel = 'Next';
+    __conf.endLabel = 'End';
+    __conf.$ = $;
+    __conf.$window = null;
+    __conf.$parent = null;
+    __conf.$scroll = null;
+    __conf.zIndex = 9000;
+    __conf.template = function () {
+      return '\n<div class="tutorial">\n<div class="content-wrap center-middle">\n <ol class="pager">\n  <li><span class="active">1</span></li>\n  <li><span>2</span></li>\n  <li><span>3</span></li>\n  <li><span>4</span></li>\n  <li><span>5</span></li>\n </ol>\n <div class="content"></div>\n <div class="controller">\n   <ul class="left">\n     <li class="skip"><span>' + __conf.skipLabel + '</span></li>\n   </ul>\n   <ul class="right">\n     <li class="prev"><span>' + __conf.prevLabel + '</span></li>\n     <li class="next"><span>' + __conf.nextLabel + '</span></li>\n     <li class="end"><span>' + __conf.endLabel + '</span></li>\n   </ul>\n </div>\n</div>\n<div class="bg"></div>\n</div>\n';
     };
-    Object.seal(conf);
-    // ================================================================================
-    // called when first instance.
-    var setup = function setup() {
-      var $ = conf.$;
-      if (conf.$parent === null) conf.$parent = $('body');
-      if (conf.$scroll === null) conf.$scroll = $('body');
-      var $cnt = $(conf.template());
-      $cnt.css('z-index', conf.zIndex);
-      conf.$parent.append($cnt);
-      first = false;
-    };
-    // ================================================================================
-    var adjustStepNum = function adjustStepNum() {
-      var _ = privateMap.get(this);
+    __conf.eventNames = ['resize', 'scroll'];
+    Object.seal(__conf);
+
+    var __listener = Object.create(null);
+    __listener.resize = Object.create(null);
+    __listener.scroll = Object.create(null);
+    {
+      var e = ['AddStep', 'RemoveStep', 'ChangeStep', 'Show', 'Next', 'Prev', 'Hide', 'Destory', 'Skip'];
+      e.forEach(function (val, i) {
+        __listener['before' + val] = Object.create(null);
+        __listener['after' + val] = Object.create(null);
+      });
+    }
+    Object.seal(__listener);
+
+    var __instanceList = Object.create(null);
+
+    var __adjustStepNum = function __adjustStepNum() {
+      var _ = __privateMap.get(this);
       _.num = _.step.length;
     };
 
-    var Tutorial = function () {
+    var __addEventListenerRelation = function __addEventListenerRelation() {
+      var _ = __privateMap.get(this);
+      var id = 'instance-' + this.id;
+      var globalListener = __listener;
+      var localListener = _.listener;
+      for (var key in globalListener) {
+        globalListener[key][id] = localListener[key];
+      }
+    };
+    var __removeEventListenerRelation = function __removeEventListenerRelation() {
+      var _ = __privateMap.get(this);
+      var id = 'instance-' + this.id;
+      var globalListener = __listener;
+      var localListener = _.listener;
+      for (var key in globalListener) {
+        delete globalListener[key][id];
+      }
+    };
 
-      // =========================================================================
-      /**
-      * @constructor Tutorial
-      *
-      * @param  {Object}   [param]                   - Tutorial instance setting parameter
-      * @param  {Boolean}  [param.auto  = false]     - auto start.
-      * @param  {Boolean}  [param.skip  = true]      - use skip button.
-      * @param  {Boolean}  [param.pager = true]      - use pager.
-      * @param  {Boolean}  [param.controller = true] - use controller.
-      * @param  {Object[]} [param.step]
-      *
-      * @return Tutorial
-      */
+    var Tutorial = function () {
+      _createClass(Tutorial, null, [{
+        key: 'changeConfig',
+
+
+        /**
+        * @function Tutorial.changeConfig
+        *
+        * @desc  change Tutorial.js configuration.
+        * @param {(String|Object[])} name
+        * @param {String}            name.name
+        * @param {*}                 name.val
+        * @param {*}                 [val]
+        */
+        value: function changeConfig(key, val) {
+          var confArr = Array.isArray(key) ? key : [{ 'key': key, 'val': val }];
+          confArr.forEach(function (obj) {
+            return __conf[obj.key] = obj.val;
+          });
+        }
+
+        /**
+        * @constructor Tutorial
+        *
+        * @param  {Object}   [param]                   - Tutorial instance setting parameter
+        * @param  {Boolean}  [param.auto  = false]     - auto start.
+        * @param  {Boolean}  [param.skip  = true]      - use skip button.
+        * @param  {Boolean}  [param.pager = true]      - use pager.
+        * @param  {Boolean}  [param.controller = true] - use controller.
+        * @param  {Object[]} [param.step]
+        *
+        * @return Tutorial
+        */
+
+      }]);
+
       function Tutorial() {
         var param = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
         _classCallCheck(this, Tutorial);
 
-        if (first) setup.call(this);
+        var conf = __conf;
+        var $ = conf.$;
+        if (__first) {
+          (function () {
+            if (conf.$window === null) conf.$window = $(window);
+            if (conf.$parent === null) conf.$parent = $('body');
+            if (conf.$scroll === null) conf.$scroll = $('body');
+            var $cnt = $(conf.template());
+            $cnt.css('z-index', conf.zIndex);
+            conf.$parent.append($cnt);
+            // add resize events =======================================================
+            var resizeTimer = null;
+            conf.$window.on('resize', function (e) {
+              if (resizeTimer) clearTimeout(resizeTimer);
+              resizeTimer = setTimeout(function () {
+                var w = conf.$window.innerWidth();
+                var h = conf.$window.innerHeight();
+                var listener = __listener['resize'];
+                for (var instance in listener) {
+                  var self = __instanceList[instance];
+                  for (var key in listener[instance]) {
+                    listener[instance][key].call(self, e, { w: w, h: h });
+                  }
+                }
+              }, conf.resizeInterval);
+            });
+            __first = false;
+          })();
+        }
+        // private member ============================================================
         var _ = Object.create(null);
         _.step = [];
         _.active = false;
         _.num = 0; // step num
-        _.pointer = 0;
+        _.pointer = param.startStep ? param.startStep : 0;
+        _.animation = typeof param.animation === 'boolean' ? param.animation : true;
         _.roop = typeof param.roop === 'boolean' ? param.roop : false;
+        _.listener = Object.create(null);
+        Object.keys(__listener).forEach(function (val, i) {
+          return _.listener[val] = Object.create(null);
+        });
+        Object.seal(_.listener);
         // @stepNum       = 0     # stepの総数
         // @stepPointer   = 0     # 現在のステップの位置
         // @stepIsActive  = false # ステップが表示されているか
-        this.id = TutorialID;
-        TutorialID++;
-        // make private properties
-        privateMap.set(this, _);
 
-        adjustStepNum.call(this);
+        // class member ==============================================================
+        this.id = __TutorialID;
+        // ===========================================================================
+        __TutorialID++;
+        // make private properties
+        __instanceList['instance-' + this.id] = this;
+        __privateMap.set(this, _);
+
+        __addEventListenerRelation.call(this);
+        // __removeEventListenerRelation.call(this);
+        __adjustStepNum.call(this);
         if (param.step) this.addStep(param.step);
       }
-      // =========================================================================
+
       /**
-      * @function Tutorial.changeConfig
+      * @function addStep
       *
-      * @desc  change Tutorial.js configuration.
-      * @param {(String|Object[])} name
-      * @param {String}            name.name
-      * @param {*}                 name.val
-      * @param {*}                 [val]
+      * @memberof Tutorial
+      * @instance
+      * @param    {Object | Object[]} step
       */
 
 
       _createClass(Tutorial, [{
-        key: 'add',
-
-        // =========================================================================
-        /**
-        * @function add
-        *
-        * @memberof Tutorial
-        * @instance
-        * @param    {Object | Object[]} step
-        */
-        value: function add(step) {
+        key: 'addStep',
+        value: function addStep(step) {
           var steps = Array.isArray(step) ? step : [step];
-          var _ = privateMap.get(this);
+          var _ = __privateMap.get(this);
           steps.forEach(function (obj) {
             return _.step.push(obj);
           });
-          adjustStepNum.call(this);
+          __adjustStepNum.call(this);
           return this;
         }
-        // =========================================================================
+
         /**
-        * @function remove
+        * @function removeStep
         *
         * @memberof Tutorial
         * @instance
+        * @param    {String | Number | Array.<String|Number>} order
         */
 
       }, {
-        key: 'remove',
-        value: function remove() {
+        key: 'removeStep',
+        value: function removeStep(order) {
           var _this = this;
 
-          var order = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
-
-          var _ = privateMap.get(this);
+          var _ = __privateMap.get(this);
           if (order === undefined) {
             _.step = [];
           } else {
@@ -150,16 +224,35 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             });
             _.step = newStep;
           }
-          adjustStepNum.call(this);
+          __adjustStepNum.call(this);
           return this;
         }
+
+        /**
+        * @function changeeStep
+        *
+        * @memberof Tutorial
+        * @instance
+        * @param {String | Number} order
+        * @param {Object}          step
+        */
+
+      }, {
+        key: 'changeStep',
+        value: function changeStep(order, step) {
+          var _ = __privateMap.get(this);
+          order = typeof order === 'string' ? this.indexByName(order) : order;
+          if (order < 0) return;
+          _.step[order] = step;
+        }
+
         /**
         *
         */
 
       }, {
-        key: 'change',
-        value: function change(name, step) {}
+        key: 'prev',
+        value: function prev(step) {}
 
         /**
         *
@@ -168,13 +261,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'next',
         value: function next(step) {}
+
         /**
+        * @function hide
         *
+        * @memberof Tutorial
+        * @instance
         */
 
       }, {
-        key: 'prev',
-        value: function prev(step) {}
+        key: 'hide',
+        value: function hide(step) {}
+
         /**
         *
         */
@@ -182,22 +280,62 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'show',
         value: function show(step) {}
+
         /**
+        * @function addEventListener
         *
+        * @memberof Tutorial
+        * @instance
+        * @param    {String}   eventName
+        * @param    {String}   [name]
+        * @param    {Function} callback
+        
+        * @return {String} - event listener name.
         */
 
       }, {
-        key: 'hide',
-        value: function hide(step) {}
+        key: 'addEventListener',
+        value: function addEventListener(eventName, name, callback) {
+          var _ = __privateMap.get(this);
+          var conf = __conf;
+          var listener = _.listener;
+          if (typeof name === 'function') {
+            callback = name;
+            name = 'el-' + this.id + '-' + Math.random().toString(36).slice(-10);
+          }
+          if (!listener[eventName]) return '';
+          listener[eventName][name] = callback;
+          return name;
+        }
+
         /**
+        * @function removeEventListener
         *
+        * @memberof Tutorial
+        * @instance
+        * @param    {String}   eventName
+        * @param    {String}   [name]
         */
 
       }, {
-        key: 'destory',
-        value: function destory(tutorial) {}
+        key: 'removeEventListener',
+        value: function removeEventListener(eventName, name) {}
 
-        // =========================================================================
+        /**
+        * @function isActive
+        *
+        * @memberof Tutorial
+        * @instance
+        * @return {Boolean}
+        */
+
+      }, {
+        key: 'isActive',
+        value: function isActive() {
+          var _ = __privateMap.get(this);
+          return _.active;
+        }
+
         /**
         * @function indexByName
         *
@@ -211,35 +349,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         key: 'indexByName',
         value: function indexByName(name) {
           if (typeof name !== 'string') return -1;
-          var _ = privateMap.get(this);
+          var _ = __privateMap.get(this);
           var arr = [];
           _.step.forEach(function (el, i) {
             if ((typeof el === 'undefined' ? 'undefined' : _typeof(el)) === 'object' && el.name === name) arr.push(i);
           });
           return arr.length > 1 ? arr : arr.length === 1 ? arr[0] : -1;
-        }
-        // =========================================================================
-        /**
-        * @function isActive
-        *
-        * @memberof Tutorial
-        * @instance
-        * @return {Boolean}
-        */
-
-      }, {
-        key: 'isActive',
-        value: function isActive() {
-          var _ = privateMap.get(this);
-          return _.active;
-        }
-      }], [{
-        key: 'changeConfig',
-        value: function changeConfig(key, val) {
-          var confArr = Array.isArray(key) ? key : [{ 'key': key, 'val': val }];
-          confArr.forEach(function (obj) {
-            return conf[obj.key] = obj.val;
-          });
         }
       }]);
 

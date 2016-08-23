@@ -18,9 +18,24 @@ packageJson.name = 'Tutorial.js';
 
 let concatJSList = [
   'assets/js/header.js',
-  'assets/js/core.js',
-  'assets/js/events.js',
-  'assets/js/utils.js',
+  'assets/js/static-private-properties.js',
+  'assets/js/static-private-method.adjustStepNum.js',
+  'assets/js/static-private-method.eventListenerRelation.js',
+  'assets/js/class-start.js',
+  'assets/js/static-method.changeConfig.js',
+  'assets/js/constructor.js',
+  'assets/js/method.addStep.js',
+  'assets/js/method.removeStep.js',
+  'assets/js/method.changeStep.js',
+  'assets/js/method.prev.js',
+  'assets/js/method.next.js',
+  'assets/js/method.hide.js',
+  'assets/js/method.show.js',
+  'assets/js/method.addEventListener.js',
+  'assets/js/method.removeEventListener.js',
+  'assets/js/method.isActive.js',
+  'assets/js/method.indexByName.js',
+  'assets/js/class-end.js',
   'assets/js/footer.js'
 ];
 // -----------------------------------------------------------------------------
