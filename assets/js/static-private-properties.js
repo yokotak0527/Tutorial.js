@@ -1,5 +1,8 @@
 let __first           = true;
 let __TutorialID      = 0;
+/** ============================================================================
+*
+*/
 let __conf            = Object.create(null);
 __conf.mode           = 'focus'; // focus | arrow
 __conf.resizeInterval = 250;
@@ -43,7 +46,9 @@ __conf.eventNames = [
   'scroll'
 ];
 Object.seal(__conf);
-
+/** ============================================================================
+*
+*/
 let __listener    = Object.create(null);
 __listener.resize = Object.create(null);
 __listener.scroll = Object.create(null);
@@ -65,5 +70,12 @@ __listener.scroll = Object.create(null);
   });
 }
 Object.seal(__listener);
-
+/** ============================================================================
+*
+*/
 let __instanceList = Object.create(null);
+/** ============================================================================
+*
+*/
+
+let __activeInstance;

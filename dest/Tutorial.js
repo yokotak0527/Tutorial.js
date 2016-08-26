@@ -12,6 +12,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     var __first = true;
     var __TutorialID = 0;
+    /** ============================================================================
+    *
+    */
     var __conf = Object.create(null);
     __conf.mode = 'focus'; // focus | arrow
     __conf.resizeInterval = 250;
@@ -30,7 +33,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     };
     __conf.eventNames = ['resize', 'scroll'];
     Object.seal(__conf);
-
+    /** ============================================================================
+    *
+    */
     var __listener = Object.create(null);
     __listener.resize = Object.create(null);
     __listener.scroll = Object.create(null);
@@ -42,8 +47,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       });
     }
     Object.seal(__listener);
-
+    /** ============================================================================
+    *
+    */
     var __instanceList = Object.create(null);
+    /** ============================================================================
+    *
+    */
+
+    var __activeInstance = void 0;
 
     var __adjustStepNum = function __adjustStepNum() {
       var _ = __privateMap.get(this);
@@ -112,15 +124,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         var conf = __conf;
         var $ = conf.$;
+
         if (__first) {
           (function () {
+
             if (conf.$window === null) conf.$window = $(window);
             if (conf.$parent === null) conf.$parent = $('body');
             if (conf.$scroll === null) conf.$scroll = $('body');
+
+            // add HTML
             var $cnt = $(conf.template());
             $cnt.css('z-index', conf.zIndex);
             conf.$parent.append($cnt);
-            // add resize events =======================================================
+
+            // add resize event.
             var resizeTimer = null;
             conf.$window.on('resize', function (e) {
               if (resizeTimer) clearTimeout(resizeTimer);
@@ -136,38 +153,59 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
               }, conf.resizeInterval);
             });
+
+            // add click skip btn event.
+            $('.controller .skip span', $cnt).on('click', function (e) {
+              if (__activeInstance) __activeInstance.skip();
+            });
+
+            // add click prev btn event.
+            $('.controller .prev span', $cnt).on('click', function (e) {
+              if (__activeInstance) __activeInstance.prev();
+            });
+
+            // add click next btn event.
+            $('.controller .next span', $cnt).on('click', function (e) {
+              if (__activeInstance) __activeInstance.next();
+            });
+
+            // add click end btn event.
+            $('.controller .end span', $cnt).on('click', function (e) {
+              if (__activeInstance) __activeInstance.end();
+            });
+
             __first = false;
           })();
         }
-        // private member ============================================================
+
+        // set private member.
         var _ = Object.create(null);
         _.step = [];
         _.active = false;
-        _.num = 0; // step num
+        _.num = 0;
         _.pointer = param.startStep ? param.startStep : 0;
         _.animation = typeof param.animation === 'boolean' ? param.animation : true;
         _.roop = typeof param.roop === 'boolean' ? param.roop : false;
+        _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
         _.listener = Object.create(null);
         Object.keys(__listener).forEach(function (val, i) {
           return _.listener[val] = Object.create(null);
         });
         Object.seal(_.listener);
-        // @stepNum       = 0     # stepの総数
-        // @stepPointer   = 0     # 現在のステップの位置
-        // @stepIsActive  = false # ステップが表示されているか
-
-        // class member ==============================================================
-        this.id = __TutorialID;
-        // ===========================================================================
-        __TutorialID++;
-        // make private properties
-        __instanceList['instance-' + this.id] = this;
         __privateMap.set(this, _);
 
+        // set instance member.
+        this.id = __TutorialID;
+
+        __instanceList['instance-' + this.id] = this.id;
+
         __addEventListenerRelation.call(this);
-        // __removeEventListenerRelation.call(this);
         __adjustStepNum.call(this);
+
+        // if param has step property. set step to private member
         if (param.step) this.addStep(param.step);
+
+        __TutorialID++;
       }
 
       /**
@@ -274,12 +312,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function hide(step) {}
 
         /**
+        * @function show
         *
+        * @memberof Tutorial
+        * @instance
+        * @return {Number | String} [order]
         */
 
       }, {
         key: 'show',
-        value: function show(step) {}
+        value: function show(order) {}
+        // let _ = privateMap.get(this);
+        // order = order || _.pointer;
+
+
+        // _.animation
+
 
         /**
         * @function addEventListener
