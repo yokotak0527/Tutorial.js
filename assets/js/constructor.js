@@ -24,6 +24,7 @@ constructor(param = {}){
     let $cnt = $(conf.template());
     $cnt.css('z-index', conf.zIndex);
     conf.$parent.append($cnt);
+    __$content = $('.content' ,$cnt);
 
     // add resize event.
     let resizeTimer = null;

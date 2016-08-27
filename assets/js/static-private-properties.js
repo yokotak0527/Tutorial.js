@@ -78,4 +78,6 @@ let __instanceList = Object.create(null);
 *
 */
 
+let __$content;
+
 let __activeInstance;

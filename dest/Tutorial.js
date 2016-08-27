@@ -55,6 +55,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     *
     */
 
+    var __$content = void 0;
+
     var __activeInstance = void 0;
 
     var __adjustStepNum = function __adjustStepNum() {
@@ -136,6 +138,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             var $cnt = $(conf.template());
             $cnt.css('z-index', conf.zIndex);
             conf.$parent.append($cnt);
+            __$content = $('.content', $cnt);
 
             // add resize event.
             var resizeTimer = null;
@@ -309,7 +312,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'hide',
-        value: function hide(step) {}
+        value: function hide(step) {
+          if (!__activeInstance || __activeInstance !== this) return this;
+          var _ = __privateMap.get(this);
+          __$content.empty();
+          __activeInstance = undefined;
+          return this;
+        }
 
         /**
         * @function show
@@ -321,13 +330,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'show',
-        value: function show(order) {}
-        // let _ = privateMap.get(this);
-        // order = order || _.pointer;
+        value: function show(order) {
+          if (__activeInstance && __activeInstance === this) __activeInstance.hide();
+
+          var _ = __privateMap.get(this);
+          var oldPointer = _.pointer;
+          _.pointer = order || _.pointer;
+          order = order || _.pointer;
+
+          __activeInstance = this;
+
+          // let _ = privateMap.get(this);
+
+          // this.id
+          // let _ = privateMap.get(this);
+          // order = order || _.pointer;
 
 
-        // _.animation
-
+          // _.animation
+        }
 
         /**
         * @function addEventListener
