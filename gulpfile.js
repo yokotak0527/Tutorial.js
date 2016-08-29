@@ -34,6 +34,7 @@ let concatJSList = [
   'assets/js/method.addEventListener.js',
   'assets/js/method.removeEventListener.js',
   'assets/js/method.isActive.js',
+  'assets/js/method.isFire.js',
   'assets/js/method.indexByName.js',
   'assets/js/class-end.js',
   'assets/js/footer.js'

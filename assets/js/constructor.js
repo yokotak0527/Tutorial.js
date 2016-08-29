@@ -70,6 +70,7 @@ constructor(param = {}){
   let _       = Object.create(null);
   _.step      = [];
   _.active    = false;
+  _.fire      = false;
   _.num       = 0;
   _.pointer   = param.startStep ? param.startStep : 0;
   _.animation = typeof param.animation === 'boolean' ? param.animation : true;

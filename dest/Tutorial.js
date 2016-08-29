@@ -185,6 +185,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var _ = Object.create(null);
         _.step = [];
         _.active = false;
+        _.fire = false;
         _.num = 0;
         _.pointer = param.startStep ? param.startStep : 0;
         _.animation = typeof param.animation === 'boolean' ? param.animation : true;
@@ -293,7 +294,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'prev',
-        value: function prev(step) {}
+        value: function prev(step) {
+          var _ = __privateMap.get(this);
+
+          this.show(_.pointer);
+          return this;
+        }
 
         /**
         *
@@ -301,7 +307,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'next',
-        value: function next(step) {}
+        value: function next(step) {
+          var _ = __privateMap.get(this);
+          // _.active = true;
+          this.show(_.pointer);
+          return this;
+        }
 
         /**
         * @function hide
@@ -313,10 +324,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'hide',
         value: function hide(step) {
-          if (!__activeInstance || __activeInstance !== this) return this;
+          if (!__activeInstance) return this;
           var _ = __privateMap.get(this);
           __$content.empty();
           __activeInstance = undefined;
+          _.active = false;
           return this;
         }
 
@@ -331,17 +343,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'show',
         value: function show(order) {
-          if (__activeInstance && __activeInstance === this) __activeInstance.hide();
 
+          //if(__activeInstance && __activeInstance !== this) __activeInstance.hide();
+          //
           var _ = __privateMap.get(this);
+          var $ = __conf.$;
+          var d = new $.Deferred();
           var oldPointer = _.pointer;
           _.pointer = order || _.pointer;
           order = order || _.pointer;
 
+          _.active = true;
+
+          d.done(function () {
+            console.log("ddd");
+          });
+
+          // if((__activeInstance && __activeInstance === this)){
+          // console.log("ok");
+          // }
+
           __activeInstance = this;
-
-          // let _ = privateMap.get(this);
-
           // this.id
           // let _ = privateMap.get(this);
           // order = order || _.pointer;
@@ -403,6 +425,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function isActive() {
           var _ = __privateMap.get(this);
           return _.active;
+        }
+
+        /**
+        * @function isFire
+        *
+        * @memberof Tutorial
+        * @instance
+        * @return {Boolean}
+        */
+
+      }, {
+        key: 'isFire',
+        value: function isFire() {
+          var _ = __privateMap.get(this);
+          return _.fire;
         }
 
         /**

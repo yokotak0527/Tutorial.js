@@ -5,9 +5,10 @@
 * @instance
 */
 hide(step){
-  if(!__activeInstance || __activeInstance !== this) return this;
+  if(!__activeInstance) return this;
   let _ = __privateMap.get(this);
   __$content.empty();
   __activeInstance = undefined;
+  _.active = false;
   return this;
 }
