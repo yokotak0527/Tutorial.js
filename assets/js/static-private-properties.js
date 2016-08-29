@@ -16,6 +16,7 @@ __conf.$window        = null;
 __conf.$parent        = null;
 __conf.$scroll        = null;
 __conf.zIndex         = 9000;
+__conf.focusBGColor   = 'rgba(0, 0, 0, 0.5)';
 __conf.template       = ()=> `
 <div class="tutorial">
 <div class="content-wrap center-middle">
@@ -79,5 +80,6 @@ let __instanceList = Object.create(null);
 */
 
 let __$content;
-
 let __activeInstance;
+
+let __canvasParam = Object.create(null);

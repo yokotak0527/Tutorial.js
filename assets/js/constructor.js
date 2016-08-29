@@ -13,7 +13,34 @@
 constructor(param = {}){
   let conf = __conf;
   let $    = conf.$;
+  // ---------------------------------------------------------------------------
+  // set private member.
+  let _       = Object.create(null);
+  _.step      = [];
+  _.active    = false;
+  _.fire      = false;
+  _.num       = 0;
+  _.pointer   = param.startStep ? param.startStep : 0;
+  _.animation = typeof param.animation === 'boolean' ? param.animation : true;
+  _.roop      = typeof param.roop === 'boolean' ? param.roop : false;
+  _.pointer   = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
+  _.listener  = Object.create(null);
+  Object.keys(__listener).forEach((val, i)=> _.listener[val] = Object.create(null) );
+  Object.seal(_.listener);
+  __privateMap.set(this, _);
 
+  // ---------------------------------------------------------------------------
+  // set instance member.
+  this.id = __TutorialID;
+
+  __instanceList['instance-'+this.id] = this.id;
+
+  // ---------------------------------------------------------------------------
+  // set event relation.
+  __addEventListenerRelation.call(this);
+  __adjustStepNum.call(this);
+
+  // if first instance
   if(__first){
 
     if(conf.$window === null) conf.$window = $(window);
@@ -23,8 +50,14 @@ constructor(param = {}){
     // add HTML
     let $cnt = $(conf.template());
     $cnt.css('z-index', conf.zIndex);
+    $('.content-wrap', $cnt).css('z-index', conf.zIndex+2);
+    $('.bg', $cnt).css('z-index', conf.zIndex+1);
     conf.$parent.append($cnt);
     __$content = $('.content' ,$cnt);
+    if(conf.mode === 'focus'){
+      $cnt.addClass('focus');
+      __canvasBGSetup($('.bg', $cnt));
+    }
 
     // add resize event.
     let resizeTimer = null;
@@ -65,32 +98,7 @@ constructor(param = {}){
 
     __first = false;
   }
-
-  // set private member.
-  let _       = Object.create(null);
-  _.step      = [];
-  _.active    = false;
-  _.fire      = false;
-  _.num       = 0;
-  _.pointer   = param.startStep ? param.startStep : 0;
-  _.animation = typeof param.animation === 'boolean' ? param.animation : true;
-  _.roop      = typeof param.roop === 'boolean' ? param.roop : false;
-  _.pointer   = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
-  _.listener  = Object.create(null);
-  Object.keys(__listener).forEach((val, i)=> _.listener[val] = Object.create(null) );
-  Object.seal(_.listener);
-  __privateMap.set(this, _);
-
-  // set instance member.
-  this.id = __TutorialID;
-
-  __instanceList['instance-'+this.id] = this.id;
-
-  __addEventListenerRelation.call(this);
-  __adjustStepNum.call(this);
-
   // if param has step property. set step to private member
   if(param.step) this.addStep(param.step);
-
   __TutorialID++;
 }

@@ -28,6 +28,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.$parent = null;
     __conf.$scroll = null;
     __conf.zIndex = 9000;
+    __conf.focusBGColor = 'rgba(0, 0, 0, 0.5)';
     __conf.template = function () {
       return '\n<div class="tutorial">\n<div class="content-wrap center-middle">\n <ol class="pager">\n  <li><span class="active">1</span></li>\n  <li><span>2</span></li>\n  <li><span>3</span></li>\n  <li><span>4</span></li>\n  <li><span>5</span></li>\n </ol>\n <div class="content"></div>\n <div class="controller">\n   <ul class="left">\n     <li class="skip"><span>' + __conf.skipLabel + '</span></li>\n   </ul>\n   <ul class="right">\n     <li class="prev"><span>' + __conf.prevLabel + '</span></li>\n     <li class="next"><span>' + __conf.nextLabel + '</span></li>\n     <li class="end"><span>' + __conf.endLabel + '</span></li>\n   </ul>\n </div>\n</div>\n<div class="bg"></div>\n</div>\n';
     };
@@ -56,12 +57,64 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     */
 
     var __$content = void 0;
-
     var __activeInstance = void 0;
+
+    var __canvasParam = Object.create(null);
+
+    var __animate = Object.create(null);
+
+    __animate.show = function (deferred) {
+      //let _    = __privateMap.get(this);
+      //let $    = __conf.$;
+      //let $cnt = __$content;
+      //deferred.resolve();
+    };
+
+    __animate.hide = function () {};
+    __animate.move = function () {};
 
     var __adjustStepNum = function __adjustStepNum() {
       var _ = __privateMap.get(this);
       _.num = _.step.length;
+    };
+
+    var __canvasBGSetup = function __canvasBGSetup($parent) {
+      var conf = __conf;
+      var $ = conf.$;
+      var $win = conf.$window;
+      var $canvas = $('<canvas>');
+
+      var param = __canvasParam;
+      param.w = 0;
+      param.h = 0;
+      param.bgColor = conf.focusBGColor;
+      param.rect = [[0, 0, 0, 0]]; // x, y, w, h
+      param.$cvs = $canvas;
+      param.cvs = param.$cvs[0];
+      param.ctx = param.cvs.getContext('2d');
+
+      $win.on('resize', function () {
+        var timer = null;
+        var w = null;
+        var h = null;
+        return function () {
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(function () {
+            w = $win.innerWidth();
+            h = $win.innerHeight();
+            param.cvs.width = w;
+            param.cvs.height = h;
+            param.ctx.fillStyle = param.bgColor;
+            param.ctx.clearRect(0, 0, w, h);
+            param.ctx.fillRect(0, 0, w, h);
+            if (param.rect) param.rect.forEach(function (val) {
+              return param.ctx.clearRect(val[0], val[1], val[2], val[3]);
+            });
+          }, conf.resizeInterval);
+        };
+      }());
+
+      $parent.append($canvas);
     };
 
     var __addEventListenerRelation = function __addEventListenerRelation() {
@@ -126,7 +179,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         var conf = __conf;
         var $ = conf.$;
+        // ---------------------------------------------------------------------------
+        // set private member.
+        var _ = Object.create(null);
+        _.step = [];
+        _.active = false;
+        _.fire = false;
+        _.num = 0;
+        _.pointer = param.startStep ? param.startStep : 0;
+        _.animation = typeof param.animation === 'boolean' ? param.animation : true;
+        _.roop = typeof param.roop === 'boolean' ? param.roop : false;
+        _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
+        _.listener = Object.create(null);
+        Object.keys(__listener).forEach(function (val, i) {
+          return _.listener[val] = Object.create(null);
+        });
+        Object.seal(_.listener);
+        __privateMap.set(this, _);
 
+        // ---------------------------------------------------------------------------
+        // set instance member.
+        this.id = __TutorialID;
+
+        __instanceList['instance-' + this.id] = this.id;
+
+        // ---------------------------------------------------------------------------
+        // set event relation.
+        __addEventListenerRelation.call(this);
+        __adjustStepNum.call(this);
+
+        // if first instance
         if (__first) {
           (function () {
 
@@ -137,8 +219,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // add HTML
             var $cnt = $(conf.template());
             $cnt.css('z-index', conf.zIndex);
+            $('.content-wrap', $cnt).css('z-index', conf.zIndex + 2);
+            $('.bg', $cnt).css('z-index', conf.zIndex + 1);
             conf.$parent.append($cnt);
             __$content = $('.content', $cnt);
+            if (conf.mode === 'focus') {
+              $cnt.addClass('focus');
+              __canvasBGSetup($('.bg', $cnt));
+            }
 
             // add resize event.
             var resizeTimer = null;
@@ -180,35 +268,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             __first = false;
           })();
         }
-
-        // set private member.
-        var _ = Object.create(null);
-        _.step = [];
-        _.active = false;
-        _.fire = false;
-        _.num = 0;
-        _.pointer = param.startStep ? param.startStep : 0;
-        _.animation = typeof param.animation === 'boolean' ? param.animation : true;
-        _.roop = typeof param.roop === 'boolean' ? param.roop : false;
-        _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
-        _.listener = Object.create(null);
-        Object.keys(__listener).forEach(function (val, i) {
-          return _.listener[val] = Object.create(null);
-        });
-        Object.seal(_.listener);
-        __privateMap.set(this, _);
-
-        // set instance member.
-        this.id = __TutorialID;
-
-        __instanceList['instance-' + this.id] = this.id;
-
-        __addEventListenerRelation.call(this);
-        __adjustStepNum.call(this);
-
         // if param has step property. set step to private member
         if (param.step) this.addStep(param.step);
-
         __TutorialID++;
       }
 
@@ -349,15 +410,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           var _ = __privateMap.get(this);
           var $ = __conf.$;
           var d = new $.Deferred();
-          var oldPointer = _.pointer;
-          _.pointer = order || _.pointer;
-          order = order || _.pointer;
+
+          if (__activeInstance && __activeInstance === this) __$content.empty();
+
+          // let oldPointer = _.pointer;
+          // _.pointer      = order || _.pointer;
+          // order = order || _.pointer;
+
 
           _.active = true;
 
-          d.done(function () {
-            console.log("ddd");
-          });
+          __animate.show.call(this, d);
+
+          d.done(function () {});
 
           // if((__activeInstance && __activeInstance === this)){
           // console.log("ok");
