@@ -4,4 +4,6 @@
 * @memberof Tutorial
 * @instance
 */
-destory(){}
+destory(){
+  
+}

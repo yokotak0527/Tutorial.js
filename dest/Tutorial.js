@@ -19,6 +19,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.mode = 'focus'; // focus | arrow
     __conf.resizeInterval = 250;
     __conf.scrollSpeed = 500;
+    __conf.fadeinSpeed = 500;
+    __conf.fadeoutSpeed = 500;
+    __conf.animationFPS = 60;
     __conf.skipLabel = 'Skip';
     __conf.prevLabel = 'Prev';
     __conf.nextLabel = 'Next';
@@ -64,10 +67,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var __animate = Object.create(null);
 
     __animate.show = function (deferred) {
+      var time = arguments.length <= 1 || arguments[1] === undefined ? -1 : arguments[1];
+
+      time = time < 0 ? __conf.fadeinSpeed : time;
+
       //let _    = __privateMap.get(this);
       //let $    = __conf.$;
       //let $cnt = __$content;
-      //deferred.resolve();
+      deferred.resolve();
     };
 
     __animate.hide = function () {};
@@ -134,6 +141,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       for (var key in globalListener) {
         delete globalListener[key][id];
       }
+    };
+
+    var __changePointer = function __changePointer(order) {
+      var _ = __privateMap.get(this);
+      if (this.isFire) return order;
+      order = typeof order === 'string' ? this.name2index(order) : typeof order === 'number' ? order : _.pointer;
+      order = this.getPointer() < order ? this.getPointer() - 1 : order;
+      order = order < 0 ? 0 : order;
+      _.pointer = order;
+      return _.pointer;
     };
 
     var Tutorial = function () {
@@ -404,37 +421,54 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'show',
         value: function show(order) {
+          var animationDisable = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-          //if(__activeInstance && __activeInstance !== this) __activeInstance.hide();
-          //
+
           var _ = __privateMap.get(this);
           var $ = __conf.$;
           var d = new $.Deferred();
 
+          if (this.isFire) this.fastForward();
+
+          order = __changePointer.call(this, order);
+          var step = _.step[order];
+          console.log(step);
+
           if (__activeInstance && __activeInstance === this) __$content.empty();
-
-          // let oldPointer = _.pointer;
-          // _.pointer      = order || _.pointer;
-          // order = order || _.pointer;
-
+          if (__activeInstance && __activeInstance !== this) __activeInstance.destroy();
 
           _.active = true;
 
-          __animate.show.call(this, d);
+          d.done(function () {
+            console.log("dds");
+          });
 
-          d.done(function () {});
+          __activeInstance = this;
+
+          if (animationDisable || !_.animation) __animate.show.call(this, d, 0);else __animate.show.call(this, d);
 
           // if((__activeInstance && __activeInstance === this)){
           // console.log("ok");
           // }
 
-          __activeInstance = this;
+
           // this.id
           // let _ = privateMap.get(this);
           // order = order || _.pointer;
 
 
           // _.animation
+        }
+
+        /**
+        *
+        */
+
+      }, {
+        key: 'getPointer',
+        value: function getPointer() {
+          var _ = __privateMap.get(this);
+          return _.step.length;
         }
 
         /**
