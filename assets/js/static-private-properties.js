@@ -45,26 +45,26 @@ __conf.template       = ()=> `
 <div class="bg"></div>
 </div>
 `;
-__conf.eventNames = [
-  'resize',
-  'scroll',
-  'beforeAddStep',
-  'afterAddStep',
-  'beforeRemoveStep',
-  'afterRemoveStep',
-  'beforeChangeStep',
-  'afterChangeStep',
-  'beforeShow',
-  'afterShow',
-  'beforeNext',
-  'afterNext',
-  'beforePrev',
-  'afterPrev',
-  'beforeHide',
-  'afterHide',
-  'beforeDestory',
-  'afterDestory',
-  'beforeSkip',
-  'afterSkip'
+__conf.defaultEventConf = [
+  ['resize',           false],
+  ['scroll',           false],
+  ['beforeAddStep',    false],
+  ['afterAddStep',     false],
+  ['beforeRemoveStep', false],
+  ['afterRemoveStep',  false],
+  ['beforeChangeStep', false],
+  ['afterChangeStep',  false],
+  ['beforeShow',       false],
+  ['afterShow',        false],
+  ['beforeNext',       false],
+  ['afterNext',        false],
+  ['beforePrev',       false],
+  ['afterPrev',        false],
+  ['beforeHide',       false],
+  ['afterHide',        false],
+  ['beforeDestory',    false],
+  ['afterDestory',     false],
+  ['beforeSkip',       false],
+  ['afterSkip',        false]
 ];
 Object.seal(__conf);

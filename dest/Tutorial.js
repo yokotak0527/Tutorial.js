@@ -116,8 +116,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       /*
       * @function addEventListener
       * @memberof CustomEvent
-      * @param    {String}   [name]   -
-      * @param    {Function} callback -
+      * @param    {String | Function} name       -
+      * @param    {Function}          [callback] -
       * @return   String
       */
 
@@ -133,7 +133,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return name;
         }
         /*
-        *
+        * @function addEventListener
+        * @memberof CustomEvent
+        * @return   CustomEvent
         */
 
       }, {
@@ -147,11 +149,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return this;
         }
         /*
-        *
-        * @param {Object}   param        -
-        * @param {Function} paam.func    -
-        * @param {*}        [param.ags]  -
-        * @param {*}        [param.this] -
+        * @function addEventListener
+        * @memberof CustomEvent
+        * @param    {Object}   param        -
+        * @param    {Function} paam.func    -
+        * @param    {*}        [param.ags]  -
+        * @param    {*}        [param.this] -
+        * @return   CustomEvent
         */
 
       }, {
@@ -167,7 +171,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return this;
         }
         /*
-        *
+        * @function addEventListener
+        * @memberof CustomEvent
+        * @return   CustomEvent
         */
 
       }, {
@@ -181,11 +187,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return this;
         }
         /*
-        *
-        * @param {Object}   param        -
-        * @param {Function} paam.func    -
-        * @param {*}        [param.ags]  -
-        * @param {*}        [param.this] -
+        * @function addEventListener
+        * @memberof CustomEvent
+        * @param    {Object}   param        -
+        * @param    {Function} paam.func    -
+        * @param    {*}        [param.ags]  -
+        * @param    {*}        [param.this] -
+        * @return   CustomEvent
         */
 
       }, {
@@ -197,7 +205,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return this;
         }
         /*
-        *
+        * @function addEventListener
+        * @memberof CustomEvent
+        * @return   CustomEvent
         */
 
       }, {
@@ -215,31 +225,41 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return CustomEvent;
     }();
 
-    //class CustomEvent{
-    //  constructor(){
-    //    
-    //  }
-    //}
-
-
-    var EventList = function () {
+    var EventContainer = function () {
       /*
-      *
+      * @constructor EventContainer
+      * @param       {String}                      name                       - event container name
+      * @param       {CustomEvent | CustomEvent[]} [triggerHookParam = false] -
+      * @return      EventContainer
       */
-      function EventList(name, list) {
-        _classCallCheck(this, EventList);
+      function EventContainer(name) {
+        var mediator = arguments.length <= 1 || arguments[1] === undefined ? new EventMediator() : arguments[1];
+        var list = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-        if (EventList.instance[name]) return EventList.getInstance(name);
+        _classCallCheck(this, EventContainer);
 
+        if (EventContainer.instance[name]) return EventContainer.getInstance(name);
         this.name = name;
+        this.mediator = mediator;
         this.list = Object.create(null);
 
+        var _ = Object.create(null);
+        _.relationList = Object.create(null);
+        _.otherContainers = Object.create(null);
+        // _.otherContainers = Object.create(null);
+        __privateMap.set(this, _);
+        // _.relationTargets = Object.create(null);
+        // this.relationList = Object.create(null);
+        // this.other = Object.create(null);
         if (list) this.addEvent(list);
-
-        EventList.instance[name] = this;
+        this.mediator.addContainer(this.name, this);
+        EventContainer.instance[name] = this;
       }
       /*
-      *
+      * @function addEvent
+      * @memberof EventContainer
+      * @param    {CustomEvent | CustomEvent[]} event -
+      * @return   EventContainer
       */
 
       /*
@@ -247,162 +267,195 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       */
 
 
-      _createClass(EventList, [{
+      _createClass(EventContainer, [{
         key: 'addEvent',
-        value: function addEvent(list) {
+        value: function addEvent(event) {
           var _this2 = this;
 
-          list = typeof list === 'string' ? [list] : list;
-          list.forEach(function (name) {
-
-            _this2.list[name] = Object.create(null);
+          if (!Array.isArray(event)) event = [event];
+          event.forEach(function (val) {
+            return _this2.list[val.name] = val;
           });
           return this;
         }
         /*
-        *
+        * @function removeEvent
+        * @memberof EventContainer
+        * @param    {String}       [name] -
+        * @return   EventContainer
         */
 
       }, {
         key: 'removeEvent',
-        value: function removeEvent() {
-          var _this3 = this;
-
-          var list = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-
-          if (typeof list === 'boolean') {
+        value: function removeEvent(name) {
+          if (!name) {
             this.list = Object.create(null);
-            return this;
+          } else {
+            if (this.list[name]) delete this.list[name];
           }
-          list = typeof list === 'string' ? [list] : list;
-          list.forEach(function (name) {
-            if (_this3.list[name]) delete _this3.list[name];
-          });
           return this;
         }
         /*
-        *
+        * @function addEventListener
+        * @memberof EventContainer
+        * @param    {String}            eventName    -
+        * @param    {String | Function} listenerName -
+        * @param    {Function}          [callback]   -
+        * @return   String
         */
-        // addEventListener(type, name, callback){
-        // }
-        // /*
-        // *
-        // */
-        // removeEventListener(type){
-        // }
+
+      }, {
+        key: 'addEventListener',
+        value: function addEventListener(eventName, listenerName, callback) {
+          if (!this.list[eventName]) return this;
+          var name = '';
+          if (callback) {
+            name = this.list[eventName].addEventListener(listenerName, callback);
+          } else {
+            name = this.list[eventName].addEventListener(listenerName);
+          }
+          return name;
+        }
         /*
-        *
+        * @function removeEventListener
+        * @memberof EventContainer
+        * @param    {String}            eventName      -
+        * @param    {String}            [listenerName] -
+        * @return   EventContainer
+        */
+
+      }, {
+        key: 'removeEventListener',
+        value: function removeEventListener(eventName, listenerName) {
+          if (!this.list[eventName]) return this;
+          if (!listenerName) {
+            this.list[eventName].removeEventListener();
+          } else {
+            this.list[eventName].removeEventListener(listenerName);
+          }
+          return this;
+        }
+        /*
+        * @function trigger
+        * @memberof EventContainer
+        * @param    {String}       eventName
+        * @return   EventContainer
         */
 
       }, {
         key: 'trigger',
-        value: function trigger(name) {
-          if (!this.list[name]) return false;
+        value: function trigger(eventName) {
+          var _ = __privateMap.get(this);
+          var relationList = _.relationList;
+          // console.log(relationList);
+          if (this.list[eventName]) this.list[eventName].trigger();
+          for (var containerName in relationList) {
+            if (relationList[containerName][eventName]) relationList[containerName][eventName].trigger();
+          }
+
+          return this;
+        }
+        /*
+        * @function addRelation
+        * @memberof EventContainer
+        * イベントコンテナと他のイベントコンテナを親-子の関係で紐付ける。
+        * 第1引数に親となるイベントコンテナ、第2引数に親が持っている紐付けるイベント名
+        * @param    {EventContainer}    target    - parent EventContainer
+        * @param    {String | String[]} eventList - event name of parent EventContainer to relate container.
+        * @return   EventContainer
+        */
+
+      }, {
+        key: 'addRelation',
+        value: function addRelation(target, eventList) {
+          var _this3 = this;
+
+          var _target = __privateMap.get(target);
+          var _ = __privateMap.get(this);
+          var relationList = _target.relationList;
+
+          if (!relationList[this.name]) relationList[this.name] = Object.create(null);
+          relationList = relationList[this.name];
+
+          eventList = typeof eventList === 'string' ? [eventList] : eventList;
+          eventList.forEach(function (name) {
+            if (target.list[name]) relationList[name] = _this3.list[name];
+          });
+          _.otherContainers[target.name] = target;
+        }
+        /*
+        * @function removeRelation
+        * @memberof EventContainer
+        * @param    {EventContainer} target -
+        * @return   EventContainer
+        */
+
+      }, {
+        key: 'removeRelation',
+        value: function removeRelation(target, eventList) {
+          var _target = __privateMap.get(target);
+          var _ = __privateMap.get(this);
+          var relationList = _target.relationList;
+
+          if (eventList === undefined) eventList = Object.keys(this.list);
+          eventList = typeof eventList === 'string' ? [eventList] : eventList;
+          relationList = relationList[this.name];
+          eventList.forEach(function (name) {
+            if (relationList[name]) delete relationList[name];
+          });
+          if (!Object.keys(relationList).length) {
+            delete _target.relationList[this.name];
+            delete _.otherContainers[target.name];
+          }
+          return this;
+        }
+        /*
+        * @function removeAllRelation
+        * @memberof EventContainer
+        * @return   EventContainer
+        */
+
+      }, {
+        key: 'removeAllRelation',
+        value: function removeAllRelation(target) {
+          var _ = __privateMap.get(this);
+          if (target) {
+            this.removeRelation(target);
+          } else {
+            for (var key in _.otherContainers) {
+              this.removeRelation(_.otherContainers[key]);
+            }
+          }
+          return this;
         }
       }]);
 
-      return EventList;
+      return EventContainer;
     }();
-    //   static instance = undefined;
-    //   /**
-    //   *
-    //   */
-    //   static getInstance = ()=>{
-    //     return EventMediator.instance || false;
-    //   };
-    //   /**
-    //   *
-    //   */
-    //   constructor(){
-    //     if(EventMediator.instance) return EventMediator.instance;
-    //     this.list = Object.create(null);
-    //     // this.listener = Object.create(null);
-    //     // eventNames.forEach( (val, i)=> this.listener[val] = Object.create(null) );
-    //     // Object.seal(this.listener);
-    //   }
-    //   /**
-    //   *
-    //   */
-    //   addEvent(id, eventNames){
-    //     eventNames = typeof eventName === 'string' ? [eventNames] : eventNames;
-    //     this.list[id] = Object.create(null);
-    //     eventNames.forEach((name)=> this.list[id][name] = Object.create(null) );
-    //   }
-    //   /**
-    //   *
-    //   */
-    //   removeEvent(id){
-    //     if(this.list[id]) delete this.list[id];
-    //   }
-    //   /**
-    //   *
-    //   */
-    //
-    //     //getEventNames(){
-    //     //  return Object.keys(this.listener);
-    //     //}
-    //     ///**
-    //     //*
-    //     //*/
-    //     //trigger(name){
-    //     //  if(!this.listener[name]) return;
-    //     //  console.log(this.listener);
-    //     //  for(let key in this.listener[name]){
-    //     //    for(let func in this.listener[name][key]){
-    //     //      this.listener[name][key][func]();
-    //     //    }
-    //     //    // console.log(key);
-    //     //    // console.log(this.listener[name][key]);
-    //     //  }
-    //     //}
-    //     ///**
-    //     //*
-    //     //*/
-    //     //addListenerRelation(name, localListener){
-    //     //  let globalListener = this.listener;
-    //     //  for(let key in globalListener){
-    //     //    if(!localListener[key]) continue;
-    //     //    globalListener[key][name] = localListener[key];
-    //     //  }
-    //     //  // console.log(globalListener);
-    //     //  // for(let key in globalListener) globalListener[key][name] = localListener[key];
-    //     //}
-    //     ///**
-    //     //*
-    //     //*/
-    //     //removeListenerRelation(name, localListener){
-    //     //  let globalListener = this.listener;
-    //     //  for(let key in globalListener){
-    //     //    if(!localListener[key]) continue;
-    //     //    delete globalListener[key][name];
-    //     //  }
-    //     //  console.log(globalListener);
-    //     //    // let globalListener = this.listener;
-    //     //    // for(let key in globalListener) delete globalListener[key][id];
-    //     //}
-    // }
 
-    EventList.instance = Object.create(null);
+    EventContainer.instance = Object.create(null);
 
-    EventList.getInstance = function (name) {
-      if (EventList.instance[name]) return EventList.instance[name];
+    EventContainer.getInstance = function (name) {
+      if (EventContainer.instance[name]) return EventContainer.instance[name];
+      return new EventContainer(name);
     };
 
     var EventMediator = function () {
       /**
-      *
+      * @constructor EventMediator
       */
       function EventMediator() {
         _classCallCheck(this, EventMediator);
 
         if (EventMediator.instance) return EventMediator.instance;
-        this.list = Object.create(null);
-        // this.listener = Object.create(null);
-        // eventNames.forEach( (val, i)=> this.listener[val] = Object.create(null) );
-        // Object.seal(this.listener);
+        this.containerList = Object.create(null);
       }
-      /**
-      *
+      /*
+      * @function addContainer
+      * @memberof EventMediator
+      * @param    {string}         name      -
+      * @param    {EventContainer} container -
+      * @return   EventMediator
       */
 
       /**
@@ -411,28 +464,45 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
       _createClass(EventMediator, [{
-        key: 'addEvent',
-        value: function addEvent(id, eventNames) {
-          var _this4 = this;
-
-          eventNames = typeof eventName === 'string' ? [eventNames] : eventNames;
-          this.list[id] = Object.create(null);
-          eventNames.forEach(function (name) {
-            return _this4.list[id][name] = Object.create(null);
-          });
+        key: 'addContainer',
+        value: function addContainer(name, container) {
+          this.containerList[name] = container;
+          return this;
         }
-        /**
-        *
+        /*
+        * @function removeContainer
+        * @memberof EventMediator
+        * @return   EventMediator
         */
 
       }, {
-        key: 'removeEvent',
-        value: function removeEvent(id) {
-          if (this.list[id]) delete this.list[id];
+        key: 'removeContainer',
+        value: function removeContainer(name) {
+          if (this.containerList[name]) delete this.containerList[name];
+          return this;
         }
-        /**
-        *
+        /*
+        * @function addRelation
+        * @memberof EventMediator
+        * @return   EventMediator
         */
+
+      }, {
+        key: 'addRelation',
+        value: function addRelation() {
+          return this;
+        }
+        /*
+        * @function removeRelation
+        * @memberof EventMediator
+        * @return   EventMediator
+        */
+
+      }, {
+        key: 'removeRelation',
+        value: function removeRelation() {
+          return this;
+        }
 
         //getEventNames(){
         //  return Object.keys(this.listener);
@@ -485,7 +555,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     EventMediator.instance = undefined;
 
     EventMediator.getInstance = function () {
-      return EventMediator.instance || false;
+      return EventMediator.instance || new EventMediator();
     };
 
     var DOMManager = function () {
@@ -758,7 +828,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.template = function () {
       return '\n<div class="tutorial">\n<div class="content-wrap center-middle">\n <ol class="pager">\n  <li><span class="active">1</span></li>\n  <li><span>2</span></li>\n  <li><span>3</span></li>\n  <li><span>4</span></li>\n  <li><span>5</span></li>\n </ol>\n <div class="content"></div>\n <div class="controller">\n   <ul class="left">\n     <li class="skip"><span>' + __conf.skipLabel + '</span></li>\n   </ul>\n   <ul class="right">\n     <li class="prev"><span>' + __conf.prevLabel + '</span></li>\n     <li class="next"><span>' + __conf.nextLabel + '</span></li>\n     <li class="end"><span>' + __conf.endLabel + '</span></li>\n   </ul>\n </div>\n</div>\n<div class="bg"></div>\n</div>\n';
     };
-    __conf.eventNames = ['resize', 'scroll', 'beforeAddStep', 'afterAddStep', 'beforeRemoveStep', 'afterRemoveStep', 'beforeChangeStep', 'afterChangeStep', 'beforeShow', 'afterShow', 'beforeNext', 'afterNext', 'beforePrev', 'afterPrev', 'beforeHide', 'afterHide', 'beforeDestory', 'afterDestory', 'beforeSkip', 'afterSkip'];
+    __conf.defaultEventConf = [['resize', false], ['scroll', false], ['beforeAddStep', false], ['afterAddStep', false], ['beforeRemoveStep', false], ['afterRemoveStep', false], ['beforeChangeStep', false], ['afterChangeStep', false], ['beforeShow', false], ['afterShow', false], ['beforeNext', false], ['afterNext', false], ['beforePrev', false], ['afterPrev', false], ['beforeHide', false], ['afterHide', false], ['beforeDestory', false], ['afterDestory', false], ['beforeSkip', false], ['afterSkip', false]];
     Object.seal(__conf);
 
     var __animate = Object.create(null);
@@ -869,62 +939,60 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var $ = conf.$;
         var instanceMed = new InstanceMediator();
 
-        // let gEventList = new EventList('global', conf.eventNames);
+        // set default global events
+        if (__first) {
+          (function () {
+            var events = [];
+            conf.defaultEventConf.forEach(function (val) {
+              var name = val[0];
+              var triggerHook = val[1];
+              events.push(new CustomEvent(name, triggerHook));
+            });
+            new EventContainer('global', new EventMediator(), events);
+          })();
+        }
+        // ---------------------------------------------------------------------------
+        // set instance member.
+        this.id = 'tutorial-' + __TutorialID;
+        // ---------------------------------------------------------------------------
+        // set private member.
+        var _ = Object.create(null);
+        _.step = [];
+        _.active = false;
+        _.fire = false;
+        _.num = 0;
+        _.pointer = param.startStep ? param.startStep : 0;
+        _.animation = typeof param.animation === 'boolean' ? param.animation : true;
+        _.roop = typeof param.roop === 'boolean' ? param.roop : false;
+        // _.listener  = Object.create(null);
+        if (param.step) {
+          this.addStep(param.step);
+          _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
+        }
 
-        // gEventList.removeEvent(['resize', 'scroll']);
-
-        var a = new CustomEvent('test');
-        a.addTriggerHook({
-          'func': function func(ags) {
-            return ags;
-          },
-          'ags': { a: 1, b: 2 },
-          'this': $
+        var events = [];
+        conf.defaultEventConf.forEach(function (val) {
+          var name = val[0];
+          var triggerHook = val[1];
+          events.push(new CustomEvent(name, triggerHook));
         });
+        _.event = new EventContainer(this.id, new EventMediator(), events);
 
-        var addName = a.addEventListener('hoge', function (param) {
-          console.log(param);
+        _.event.addEventListener('resize', function (param) {
+          console.log('ok');
         });
-        a.removeEventListener(addName);
-        a.trigger();
+        // _.event.trigger('resize');
 
-        // console.log(gEventList);
-        // let globalEventList =
-        // let
-        // let observer      = new EventObserver();
-        // let commonEvent   = new CustomEvent();
-        // commonEvent.addEvent(conf.eventNames);
+        var gEvent = EventContainer.getInstance('global');
+        _.event.addRelation(gEvent, 'resize');
+        if (__first) _.event.removeAllRelation();
+        // _.event.addRelation(gEvent, 'resize');
 
-        // let eventMed      = new EventMediator();
-        // eventMed.addEvent('master', conf.eventNames);
-        //
-        //   // conf.eventNames
-        //
-        //
-        //   // ---------------------------------------------------------------------------
-        //   // set private member.
-        //   let _       = Object.create(null);
-        //   _.step      = [];
-        //   _.active    = false;
-        //   _.fire      = false;
-        //   _.num       = 0;
-        //   _.pointer   = param.startStep ? param.startStep : 0;
-        //   _.animation = typeof param.animation === 'boolean' ? param.animation : true;
-        //   _.roop      = typeof param.roop === 'boolean' ? param.roop : false;
-        //   _.listener  = Object.create(null);
-        //   if(param.step){
-        //     this.addStep(param.step);
-        //     _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
-        //   }
-        //
-        //   // eventMgr.getEventNames().forEach((val, i)=> _.listener[val] = Object.create(null) );
-        //
+        gEvent.trigger('resize');
+
         //   // Object.seal(_.listener);
         //   __privateMap.set(this, _);
         //
-        //   // ---------------------------------------------------------------------------
-        //   // set instance member.
-        //   this.id = 'tutorial-'+__TutorialID;
         //
         //   // console.log(_.listener);
         //   // eventMgr.addListenerRelation(this.id, _.listener);
@@ -998,8 +1066,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         //     //  if(__activeInstance) __activeInstance.end();
         //     //});
         //
-        //     __first = false;
-        //   }
+        if (__first) __first = false;
         __TutorialID++;
       }
 
@@ -1035,7 +1102,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'removeStep',
         value: function removeStep(order) {
-          var _this5 = this;
+          var _this4 = this;
 
           var _ = __privateMap.get(this);
           if (order === undefined) {
@@ -1043,7 +1110,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           } else {
             if (!Array.isArray(order)) order = [order];
             order = order.map(function (val) {
-              return typeof val === 'string' ? _this5.indexByName(val) : val;
+              return typeof val === 'string' ? _this4.indexByName(val) : val;
             });
             var newStep = _.step.filter(function (val, i) {
               var flg = true;

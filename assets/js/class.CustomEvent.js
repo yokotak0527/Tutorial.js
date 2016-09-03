@@ -22,8 +22,8 @@ class CustomEvent{
   /*
   * @function addEventListener
   * @memberof CustomEvent
-  * @param    {String}   [name]   -
-  * @param    {Function} callback -
+  * @param    {String | Function} name       -
+  * @param    {Function}          [callback] -
   * @return   String
   */
   addEventListener(name, callback){
@@ -35,7 +35,9 @@ class CustomEvent{
     return name;
   }
   /*
-  *
+  * @function addEventListener
+  * @memberof CustomEvent
+  * @return   CustomEvent
   */
   removeEventListener(name){
     if(!name){
@@ -46,11 +48,13 @@ class CustomEvent{
     return this;
   }
   /*
-  *
-  * @param {Object}   param        -
-  * @param {Function} paam.func    -
-  * @param {*}        [param.ags]  -
-  * @param {*}        [param.this] -
+  * @function addEventListener
+  * @memberof CustomEvent
+  * @param    {Object}   param        -
+  * @param    {Function} paam.func    -
+  * @param    {*}        [param.ags]  -
+  * @param    {*}        [param.this] -
+  * @return   CustomEvent
   */
   addTriggerHook(param = {}){
     let _ = __privateMap.get(this);
@@ -61,7 +65,9 @@ class CustomEvent{
     return this;
   }
   /*
-  *
+  * @function addEventListener
+  * @memberof CustomEvent
+  * @return   CustomEvent
   */
   removeTriggerHook(){
     let _ = __privateMap.get(this);
@@ -72,18 +78,22 @@ class CustomEvent{
     return this;
   }
   /*
-  *
-  * @param {Object}   param        -
-  * @param {Function} paam.func    -
-  * @param {*}        [param.ags]  -
-  * @param {*}        [param.this] -
+  * @function addEventListener
+  * @memberof CustomEvent
+  * @param    {Object}   param        -
+  * @param    {Function} paam.func    -
+  * @param    {*}        [param.ags]  -
+  * @param    {*}        [param.this] -
+  * @return   CustomEvent
   */
   changeTriggerHook(param = {}){
     this.addTriggerHook(param);
     return this;
   }
   /*
-  *
+  * @function addEventListener
+  * @memberof CustomEvent
+  * @return   CustomEvent
   */
   trigger(){
     let _     = __privateMap.get(this);

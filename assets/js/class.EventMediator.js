@@ -4,35 +4,51 @@ class EventMediator{
   *
   */
   static getInstance = ()=>{
-    return EventMediator.instance || false;
+    return EventMediator.instance || new EventMediator();
   };
   /**
-  *
+  * @constructor EventMediator
   */
   constructor(){
     if(EventMediator.instance) return EventMediator.instance;
-    this.list = Object.create(null);
-    // this.listener = Object.create(null);
-    // eventNames.forEach( (val, i)=> this.listener[val] = Object.create(null) );
-    // Object.seal(this.listener);
+    this.containerList = Object.create(null);
   }
-  /**
-  *
+  /*
+  * @function addContainer
+  * @memberof EventMediator
+  * @param    {string}         name      -
+  * @param    {EventContainer} container -
+  * @return   EventMediator
   */
-  addEvent(id, eventNames){
-    eventNames = typeof eventName === 'string' ? [eventNames] : eventNames;
-    this.list[id] = Object.create(null);
-    eventNames.forEach((name)=> this.list[id][name] = Object.create(null) );
+  addContainer(name, container){
+    this.containerList[name] = container;
+    return this;
   }
-  /**
-  *
+  /*
+  * @function removeContainer
+  * @memberof EventMediator
+  * @return   EventMediator
   */
-  removeEvent(id){
-    if(this.list[id]) delete this.list[id];
+  removeContainer(name){
+    if(this.containerList[name]) delete this.containerList[name];
+    return this;
   }
-  /**
-  *
+  /*
+  * @function addRelation
+  * @memberof EventMediator
+  * @return   EventMediator
   */
+  addRelation(){
+    return this;
+  }
+  /*
+  * @function removeRelation
+  * @memberof EventMediator
+  * @return   EventMediator
+  */
+  removeRelation(){
+    return this;
+  }
 
     //getEventNames(){
     //  return Object.keys(this.listener);
