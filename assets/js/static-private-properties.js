@@ -47,42 +47,24 @@ __conf.template       = ()=> `
 `;
 __conf.eventNames = [
   'resize',
-  'scroll'
+  'scroll',
+  'beforeAddStep',
+  'afterAddStep',
+  'beforeRemoveStep',
+  'afterRemoveStep',
+  'beforeChangeStep',
+  'afterChangeStep',
+  'beforeShow',
+  'afterShow',
+  'beforeNext',
+  'afterNext',
+  'beforePrev',
+  'afterPrev',
+  'beforeHide',
+  'afterHide',
+  'beforeDestory',
+  'afterDestory',
+  'beforeSkip',
+  'afterSkip'
 ];
 Object.seal(__conf);
-/** ============================================================================
-*
-*/
-let __listener    = Object.create(null);
-__listener.resize = Object.create(null);
-__listener.scroll = Object.create(null);
-{
-  let e = [
-    'AddStep',
-    'RemoveStep',
-    'ChangeStep',
-    'Show',
-    'Next',
-    'Prev',
-    'Hide',
-    'Destory',
-    'Skip'
-  ];
-  e.forEach((val, i)=>{
-    __listener['before'+val] = Object.create(null);
-    __listener['after'+val]  = Object.create(null);
-  });
-}
-Object.seal(__listener);
-/** ============================================================================
-*
-*/
-let __instanceList = Object.create(null);
-/** ============================================================================
-*
-*/
-
-let __$content;
-let __activeInstance;
-
-let __canvasParam = Object.create(null);

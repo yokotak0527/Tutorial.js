@@ -11,16 +11,15 @@ show(order, animationDisable = false){
   let $ = __conf.$;
   let d = new $.Deferred();
 
-  if(this.isFire) this.fastForward();
+  // if(this.isFire) this.stop();
 
   order = __changePointer.call(this, order);
   let step = _.step[order];
-  console.log(step);
 
   if(__activeInstance && __activeInstance === this) __$content.empty();
   if(__activeInstance && __activeInstance !== this) __activeInstance.destroy();
 
-
+  _.fire   = true;
   _.active = true;
 
   d.done(()=>{
@@ -29,8 +28,8 @@ show(order, animationDisable = false){
 
   __activeInstance = this;
 
-  if(animationDisable || !_.animation) __animate.show.call(this, d, 0);
-  else __animate.show.call(this, d);
+  if(animationDisable || !_.animation) __animate.show.call(this, step, d, 0);
+  else __animate.show.call(this, step, d);
 
 
   // if((__activeInstance && __activeInstance === this)){
