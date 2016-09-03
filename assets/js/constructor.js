@@ -16,7 +16,6 @@ constructor(param = {}){
   let conf            = __conf;
   let $               = conf.$;
   let instanceMed     = new InstanceMediator();
-
   // set default global events
   if(__first){
     let events = [];
@@ -27,9 +26,12 @@ constructor(param = {}){
     });
     new EventContainer('global', events);
   }
+  let globalEvent = EventContainer.getInstance('global');
+
   // ---------------------------------------------------------------------------
   // set instance member.
   this.id = 'tutorial-'+__TutorialID;
+
   // ---------------------------------------------------------------------------
   // set private member.
   let _       = Object.create(null);
@@ -40,7 +42,6 @@ constructor(param = {}){
   _.pointer   = param.startStep ? param.startStep : 0;
   _.animation = typeof param.animation === 'boolean' ? param.animation : true;
   _.roop      = typeof param.roop === 'boolean' ? param.roop : false;
-  // _.listener  = Object.create(null);
   if(param.step){
     this.addStep(param.step);
     _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
@@ -53,47 +54,31 @@ constructor(param = {}){
     events.push(new CustomEvent(name, triggerHook));
   });
   _.event = new EventContainer(this.id, events);
+  _.event.addRelation(globalEvent, ['resize', 'scroll']);
 
-  _.event.addEventListener('resize', (param)=>{
-    console.log('ok');
-  });
-  // _.event.trigger('resize');
+  __privateMap.set(this, _);
 
-  let gEvent = EventContainer.getInstance('global');
-  _.event.addRelation(gEvent, 'resize');
-  if(__first) _.event.removeAllRelation();
-  // _.event.addRelation(gEvent, 'resize');
+  // ---------------------------------------------------------------------------
+  // make DOM
+  if(__first){
+    if(conf.$window === null) conf.$window = $(window);
+    if(conf.$parent === null) conf.$parent = $('body');
+    if(conf.$scroll === null) conf.$scroll = $('body');
 
-  gEvent.trigger('resize');
+    let domCtrl = new DOMController({
+      '$'         : $,
+      '$window'   : conf.$window,
+      '$template' : $(conf.template()),
+      'zIndex'    : conf.zIndex,
+      '$parent'   : conf.$parent
+    });
 
-//   // Object.seal(_.listener);
-//   __privateMap.set(this, _);
-//
-//
-//   // console.log(_.listener);
-//   // eventMgr.addListenerRelation(this.id, _.listener);
-//
-//   // _.listener['resize']['test'] = ()=>{
-//     // console.log('ok');
-//   // };
-//
-//
-//   // eventMgr.trigger('resize');
-//   // eventMgr.removeListenerRelation(this.id, _.listener);
-//   // instanceMgr.addInstance(this.id, this, eventMgr);
-//
-//   // ---------------------------------------------------------------------------
-//   // set event relation.
-//   __addEventListenerRelation.call(this);
-//   __adjustStepNum.call(this);
-//
-//   // if first instance
-//   if(__first){
-//
-//     if(conf.$window === null) conf.$window = $(window);
-//     if(conf.$parent === null) conf.$parent = $('body');
-//     if(conf.$scroll === null) conf.$scroll = $('body');
-//
+    if(conf.mode === 'focus') domCtrl.addMode('focus', conf.focusBGColor, conf.resizeInterval);
+
+    // console.log(domCtrl.get$obj('bg'));
+
+    __first = false;
+  }
 //     let domCtrl = new DOMController({
 //       '$'         : $,
 //       '$window'   : conf.$window,
@@ -142,6 +127,5 @@ constructor(param = {}){
 //     //  if(__activeInstance) __activeInstance.end();
 //     //});
 //
-  if(__first) __first = false;
   __TutorialID++;
 }

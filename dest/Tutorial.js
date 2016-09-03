@@ -434,12 +434,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return new EventContainer(name);
     };
 
-    var DOMManager = function () {
+    var DOMController = function () {
       /**
       *
       */
-      function DOMManager(param) {
-        _classCallCheck(this, DOMManager);
+      function DOMController(param) {
+        _classCallCheck(this, DOMController);
 
         if (DOMController.instance) return DOMController.instance;
 
@@ -457,6 +457,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$contentWrap = $('.content-wrap', this.$template);
         this.$content = $('.content', this.$template);
         this.$bg = $('.bg', this.$template);
+        this.$pager = $('.pager', this.$template);
+        this.$controller = $('.pager', this.$template);
         this.$parent = $parent;
         $template.css({
           'z-index': zIndex,
@@ -490,6 +492,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
       /**
       *
+      * @param  {String} name -
+      * @return jQuery Object
       */
 
       /**
@@ -497,7 +501,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       */
 
 
-      _createClass(DOMManager, [{
+      _createClass(DOMController, [{
         key: 'get$obj',
         value: function get$obj(name) {
           switch (name) {
@@ -505,12 +509,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               return this.$template;
               break;
             case 'content-wrap':
+              return this.$contentWrap;
+            case 'content-set':
+              return this.$contentWrap;
               break;
             case 'controller':
+              return this.$controller;
               break;
             case 'pager':
+              return this.$pager;
               break;
             case 'bg':
+              return this.$bg;
               break;
           }
         }
@@ -535,71 +545,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
       }]);
 
-      return DOMManager;
+      return DOMController;
     }();
-    //
-    // // class BGCanvas{
-    // //   static instance = undefined;
-    // //   /**
-    // //   *
-    // //   */
-    // //   static getInstance = ()=>{
-    // //     return BGCanvas.instance || false;
-    // //   };
-    // //   /**
-    // //   *
-    // //   */
-    // //   constructor($param){
-    // //     if(BGCanvas.instance) return BGCanvas.instance;
-    // //
-    // //     let {
-    // //       $,
-    // //       $window,
-    // //       $parent,
-    // //       bgColor        = '0x000000',
-    // //       resizeInterval = 250
-    // //     } = $param;
-    // //     $window = $window ? $(window) : $window;
-    // //
-    // //     this.$              = $;
-    // //     this.$window        = $window;
-    // //     this.$parent        = $parent;
-    // //     this.bgColor        = bgColor;
-    // //     this.$cvs           = $('<canvas>');
-    // //     this.cvs            = this.$cvs[0];
-    // //     this.ctx            = this.cvs.getContext('2d');
-    // //     this.resizeInterval = resizeInterval;
-    // //     this.timer          = null;
-    // //
-    // //     this.cvs.width     = $window.innerWidth();
-    // //     this.cvs.height    = $window.innerHeight();
-    // //
-    // //     $window.on('resize', ()=>{
-    // //       if(this.timer) clearTimeout(this.timer);
-    // //       this.timer = setTimeout(()=>{
-    // //         this.cvs.width  = this.$window.innerWidth();
-    // //         this.cvs.height = this.$window.innerHeight();
-    // //         this.draw();
-    // //       }, this.resizeInterval);
-    // //     });
-    // //     this.$parent.append(this.$cvs);
-    // //     BGCanvas.instance = this;
-    // //     return this;
-    // //   }
-    // //   /**
-    // //   *
-    // //   */
-    // //   draw(rect = false){
-    // //     this.ctx.fillStyle = this.bgColor;
-    // //     this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
-    // //     this.ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
-    // //     if(rect) rect.forEach((val)=> ctx.clearRect(val[0], val[1], val[2], val[3]) );
-    // //   }
-    // // }
 
-    DOMManager.instance = undefined;
+    DOMController.instance = undefined;
 
-    DOMManager.getInstance = function () {
+    DOMController.getInstance = function () {
       return DOMController.instance || false;
     };
 
@@ -814,7 +765,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var conf = __conf;
         var $ = conf.$;
         var instanceMed = new InstanceMediator();
-
         // set default global events
         if (__first) {
           (function () {
@@ -827,9 +777,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             new EventContainer('global', events);
           })();
         }
+        var globalEvent = EventContainer.getInstance('global');
+
         // ---------------------------------------------------------------------------
         // set instance member.
         this.id = 'tutorial-' + __TutorialID;
+
         // ---------------------------------------------------------------------------
         // set private member.
         var _ = Object.create(null);
@@ -840,7 +793,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         _.pointer = param.startStep ? param.startStep : 0;
         _.animation = typeof param.animation === 'boolean' ? param.animation : true;
         _.roop = typeof param.roop === 'boolean' ? param.roop : false;
-        // _.listener  = Object.create(null);
         if (param.step) {
           this.addStep(param.step);
           _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
@@ -853,47 +805,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           events.push(new CustomEvent(name, triggerHook));
         });
         _.event = new EventContainer(this.id, events);
+        _.event.addRelation(globalEvent, ['resize', 'scroll']);
 
-        _.event.addEventListener('resize', function (param) {
-          console.log('ok');
-        });
-        // _.event.trigger('resize');
+        __privateMap.set(this, _);
 
-        var gEvent = EventContainer.getInstance('global');
-        _.event.addRelation(gEvent, 'resize');
-        if (__first) _.event.removeAllRelation();
-        // _.event.addRelation(gEvent, 'resize');
+        // ---------------------------------------------------------------------------
+        // make DOM
+        if (__first) {
+          if (conf.$window === null) conf.$window = $(window);
+          if (conf.$parent === null) conf.$parent = $('body');
+          if (conf.$scroll === null) conf.$scroll = $('body');
 
-        gEvent.trigger('resize');
+          var domCtrl = new DOMController({
+            '$': $,
+            '$window': conf.$window,
+            '$template': $(conf.template()),
+            'zIndex': conf.zIndex,
+            '$parent': conf.$parent
+          });
 
-        //   // Object.seal(_.listener);
-        //   __privateMap.set(this, _);
-        //
-        //
-        //   // console.log(_.listener);
-        //   // eventMgr.addListenerRelation(this.id, _.listener);
-        //
-        //   // _.listener['resize']['test'] = ()=>{
-        //     // console.log('ok');
-        //   // };
-        //
-        //
-        //   // eventMgr.trigger('resize');
-        //   // eventMgr.removeListenerRelation(this.id, _.listener);
-        //   // instanceMgr.addInstance(this.id, this, eventMgr);
-        //
-        //   // ---------------------------------------------------------------------------
-        //   // set event relation.
-        //   __addEventListenerRelation.call(this);
-        //   __adjustStepNum.call(this);
-        //
-        //   // if first instance
-        //   if(__first){
-        //
-        //     if(conf.$window === null) conf.$window = $(window);
-        //     if(conf.$parent === null) conf.$parent = $('body');
-        //     if(conf.$scroll === null) conf.$scroll = $('body');
-        //
+          if (conf.mode === 'focus') domCtrl.addMode('focus', conf.focusBGColor, conf.resizeInterval);
+
+          // console.log(domCtrl.get$obj('bg'));
+
+          __first = false;
+        }
         //     let domCtrl = new DOMController({
         //       '$'         : $,
         //       '$window'   : conf.$window,
@@ -942,7 +878,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         //     //  if(__activeInstance) __activeInstance.end();
         //     //});
         //
-        if (__first) __first = false;
         __TutorialID++;
       }
 

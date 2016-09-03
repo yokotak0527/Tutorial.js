@@ -21,7 +21,7 @@ let concatJSList = [
   'assets/js/class.BGCanvas.js',
   'assets/js/class.CustomEvent.js',
   'assets/js/class.EventContainer.js',
-  'assets/js/class.DOMManager.js',
+  'assets/js/class.DOMController.js',
   'assets/js/class.InstanceMediator.js',
   'assets/js/static-private-properties.js',
   'assets/js/static-private-property.animation.js',
