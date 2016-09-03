@@ -233,26 +233,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       * @return      EventContainer
       */
       function EventContainer(name) {
-        var mediator = arguments.length <= 1 || arguments[1] === undefined ? new EventMediator() : arguments[1];
-        var list = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+        var list = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
         _classCallCheck(this, EventContainer);
 
         if (EventContainer.instance[name]) return EventContainer.getInstance(name);
         this.name = name;
-        this.mediator = mediator;
         this.list = Object.create(null);
 
         var _ = Object.create(null);
         _.relationList = Object.create(null);
         _.otherContainers = Object.create(null);
-        // _.otherContainers = Object.create(null);
         __privateMap.set(this, _);
-        // _.relationTargets = Object.create(null);
-        // this.relationList = Object.create(null);
-        // this.other = Object.create(null);
+
         if (list) this.addEvent(list);
-        this.mediator.addContainer(this.name, this);
         EventContainer.instance[name] = this;
       }
       /*
@@ -438,124 +432,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     EventContainer.getInstance = function (name) {
       if (EventContainer.instance[name]) return EventContainer.instance[name];
       return new EventContainer(name);
-    };
-
-    var EventMediator = function () {
-      /**
-      * @constructor EventMediator
-      */
-      function EventMediator() {
-        _classCallCheck(this, EventMediator);
-
-        if (EventMediator.instance) return EventMediator.instance;
-        this.containerList = Object.create(null);
-      }
-      /*
-      * @function addContainer
-      * @memberof EventMediator
-      * @param    {string}         name      -
-      * @param    {EventContainer} container -
-      * @return   EventMediator
-      */
-
-      /**
-      *
-      */
-
-
-      _createClass(EventMediator, [{
-        key: 'addContainer',
-        value: function addContainer(name, container) {
-          this.containerList[name] = container;
-          return this;
-        }
-        /*
-        * @function removeContainer
-        * @memberof EventMediator
-        * @return   EventMediator
-        */
-
-      }, {
-        key: 'removeContainer',
-        value: function removeContainer(name) {
-          if (this.containerList[name]) delete this.containerList[name];
-          return this;
-        }
-        /*
-        * @function addRelation
-        * @memberof EventMediator
-        * @return   EventMediator
-        */
-
-      }, {
-        key: 'addRelation',
-        value: function addRelation() {
-          return this;
-        }
-        /*
-        * @function removeRelation
-        * @memberof EventMediator
-        * @return   EventMediator
-        */
-
-      }, {
-        key: 'removeRelation',
-        value: function removeRelation() {
-          return this;
-        }
-
-        //getEventNames(){
-        //  return Object.keys(this.listener);
-        //}
-        ///**
-        //*
-        //*/
-        //trigger(name){
-        //  if(!this.listener[name]) return;
-        //  console.log(this.listener);
-        //  for(let key in this.listener[name]){
-        //    for(let func in this.listener[name][key]){
-        //      this.listener[name][key][func]();
-        //    }
-        //    // console.log(key);
-        //    // console.log(this.listener[name][key]);
-        //  }
-        //}
-        ///**
-        //*
-        //*/
-        //addListenerRelation(name, localListener){
-        //  let globalListener = this.listener;
-        //  for(let key in globalListener){
-        //    if(!localListener[key]) continue;
-        //    globalListener[key][name] = localListener[key];
-        //  }
-        //  // console.log(globalListener);
-        //  // for(let key in globalListener) globalListener[key][name] = localListener[key];
-        //}
-        ///**
-        //*
-        //*/
-        //removeListenerRelation(name, localListener){
-        //  let globalListener = this.listener;
-        //  for(let key in globalListener){
-        //    if(!localListener[key]) continue;
-        //    delete globalListener[key][name];
-        //  }
-        //  console.log(globalListener);
-        //    // let globalListener = this.listener;
-        //    // for(let key in globalListener) delete globalListener[key][id];
-        //}
-
-      }]);
-
-      return EventMediator;
-    }();
-
-    EventMediator.instance = undefined;
-
-    EventMediator.getInstance = function () {
-      return EventMediator.instance || new EventMediator();
     };
 
     var DOMManager = function () {
@@ -948,7 +824,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               var triggerHook = val[1];
               events.push(new CustomEvent(name, triggerHook));
             });
-            new EventContainer('global', new EventMediator(), events);
+            new EventContainer('global', events);
           })();
         }
         // ---------------------------------------------------------------------------
@@ -976,7 +852,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           var triggerHook = val[1];
           events.push(new CustomEvent(name, triggerHook));
         });
-        _.event = new EventContainer(this.id, new EventMediator(), events);
+        _.event = new EventContainer(this.id, events);
 
         _.event.addEventListener('resize', function (param) {
           console.log('ok');

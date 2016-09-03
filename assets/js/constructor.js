@@ -25,7 +25,7 @@ constructor(param = {}){
       let triggerHook = val[1];
       events.push(new CustomEvent(name, triggerHook));
     });
-    new EventContainer('global', new EventMediator(), events);
+    new EventContainer('global', events);
   }
   // ---------------------------------------------------------------------------
   // set instance member.
@@ -52,7 +52,7 @@ constructor(param = {}){
     let triggerHook = val[1];
     events.push(new CustomEvent(name, triggerHook));
   });
-  _.event = new EventContainer(this.id, new EventMediator(), events);
+  _.event = new EventContainer(this.id, events);
 
   _.event.addEventListener('resize', (param)=>{
     console.log('ok');

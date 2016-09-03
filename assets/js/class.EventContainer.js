@@ -13,22 +13,17 @@ class EventContainer{
     * @param       {CustomEvent | CustomEvent[]} [triggerHookParam = false] -
     * @return      EventContainer
     */
-    constructor(name, mediator = new EventMediator(), list = false){
+    constructor(name, list = false){
       if(EventContainer.instance[name]) return EventContainer.getInstance(name);
       this.name         = name;
-      this.mediator     = mediator;
       this.list         = Object.create(null);
 
       let _             = Object.create(null);
       _.relationList    = Object.create(null);
       _.otherContainers = Object.create(null);
-      // _.otherContainers = Object.create(null);
       __privateMap.set(this, _);
-      // _.relationTargets = Object.create(null);
-      // this.relationList = Object.create(null);
-      // this.other = Object.create(null);
+
       if(list) this.addEvent(list);
-      this.mediator.addContainer(this.name, this);
       EventContainer.instance[name] = this;
     }
     /*
