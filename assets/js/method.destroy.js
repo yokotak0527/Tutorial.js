@@ -5,5 +5,9 @@
 * @instance
 */
 destory(){
-  delete __instanceList['instance-'+this.id];
+  let _           = __privateMap.get(this);
+  let instanceMgr = new InstanceManager();
+  _.event.removeAllRlation();
+  instanceMgr.unregister(this);
+  // delete __instanceList['instance-'+this.id];
 }

@@ -15,7 +15,9 @@
 constructor(param = {}){
   let conf            = __conf;
   let $               = conf.$;
-  let instanceMed     = new InstanceMediator();
+  let instanceMgr     = new InstanceManager();
+  let animationKind   = ['fadeInOut', 'scroll'];
+
   // set default global events
   if(__first){
     let events = [];
@@ -32,6 +34,8 @@ constructor(param = {}){
   // set instance member.
   this.id = 'tutorial-'+__TutorialID;
 
+
+  instanceMgr.register(this);
   // ---------------------------------------------------------------------------
   // set private member.
   let _       = Object.create(null);
@@ -40,8 +44,13 @@ constructor(param = {}){
   _.fire      = false;
   _.num       = 0;
   _.pointer   = param.startStep ? param.startStep : 0;
-  _.animation = typeof param.animation === 'boolean' ? param.animation : true;
+  _.animation = param.animation || true;
   _.roop      = typeof param.roop === 'boolean' ? param.roop : false;
+  if(typeof _.animation === 'boolean'){
+    let bool    = _.animation;
+    _.animation = Object.create(null);
+    animationKind.forEach(key => _.animation[key] = bool );
+  }
   if(param.step){
     this.addStep(param.step);
     _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;

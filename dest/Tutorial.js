@@ -554,80 +554,95 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return DOMController.instance || false;
     };
 
-    var InstanceMediator = function () {
+    var InstanceManager = function () {
       /**
       *
+      * @return InstanceManager
       */
-      function InstanceMediator() {
-        _classCallCheck(this, InstanceMediator);
+      function InstanceManager() {
+        _classCallCheck(this, InstanceManager);
 
-        if (InstanceMediator.instance) return InstanceMediator.instance;
+        if (InstanceManager.instance) return InstanceManager.instance;
         this.active = undefined;
         this.list = Object.create(null);
       }
       /**
       *
+      * @param  {Tutorial} instance
+      * @return InstanceManager
       */
 
       /**
       *
+      * @return InstanceManager
       */
 
 
-      _createClass(InstanceMediator, [{
-        key: 'addInstance',
-        value: function addInstance(id, instance, eventManager) {
-          // eventManager.relation();
-          this.list['instance-' + id] = instance;
+      _createClass(InstanceManager, [{
+        key: 'register',
+        value: function register(instance) {
+          this.list[instance.id] = instance;
+          return this;
         }
         /**
         *
+        * @param  {String | Tutorial} id
+        * @return InstanceManager
+        */
+
+      }, {
+        key: 'unRegister',
+        value: function unRegister(id) {
+          if (this.active && this.active === this) this.active = undefined;
+          id = typeof id === 'string' ? id : id.id;
+          if (this.list[id]) delete this.list[id];
+          return this;
+        }
+        /**
+        *
+        * @param  {String} id
+        * @return InstanceManager
         */
 
       }, {
         key: 'getInstance',
         value: function getInstance(id) {
-          return this.list['instance-' + id];
+          return this.list[id] ? this.list[id] : false;
         }
-        /**
-        *
+        /*
+        * @param  {Tutorial} instance
+        * @return Boolean
         */
 
       }, {
-        key: 'deleteInstance',
-        value: function deleteInstance(id) {
-          var ins = this.list['instance-' + id];
-          if (!ins) return;
-          if (ins == this.active) this.active = undefined;
-          delete this.list['instance-' + id];
+        key: 'isActive',
+        value: function isActive(instance) {
+          return this.active === instance;
         }
-        /**
-        *
+        /*
+        * @param {Tutorial} newActive
+        * @return InstanceManager
         */
 
       }, {
-        key: 'getActiveInstance',
-        value: function getActiveInstance() {
-          return this.active;
-        }
-        /**
-        *
-        */
-
-      }, {
-        key: 'setActiveInstance',
-        value: function setActiveInstance(newActive) {
-          this.active = newActive;
+        key: 'changeActive',
+        value: function changeActive(newActive) {
+          if (!this.isActive(newActive)) {
+            if (this.active) this.active.hide();
+            this.active = this;
+          }
+          if (callback) callback();
+          return this;
         }
       }]);
 
-      return InstanceMediator;
+      return InstanceManager;
     }();
 
-    InstanceMediator.instance = undefined;
+    InstanceManager.instance = undefined;
 
-    InstanceMediator.getInstance = function () {
-      return InstanceMediator.instance || false;
+    InstanceManager.getInstance = function () {
+      return InstanceManager.instance || new InstanceManager();
     };
 
     var __first = true;
@@ -764,7 +779,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         var conf = __conf;
         var $ = conf.$;
-        var instanceMed = new InstanceMediator();
+        var instanceMgr = new InstanceManager();
+        var animationKind = ['fadeInOut', 'scroll'];
+
         // set default global events
         if (__first) {
           (function () {
@@ -783,6 +800,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // set instance member.
         this.id = 'tutorial-' + __TutorialID;
 
+        instanceMgr.register(this);
         // ---------------------------------------------------------------------------
         // set private member.
         var _ = Object.create(null);
@@ -791,8 +809,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         _.fire = false;
         _.num = 0;
         _.pointer = param.startStep ? param.startStep : 0;
-        _.animation = typeof param.animation === 'boolean' ? param.animation : true;
+        _.animation = param.animation || true;
         _.roop = typeof param.roop === 'boolean' ? param.roop : false;
+        if (typeof _.animation === 'boolean') {
+          (function () {
+            var bool = _.animation;
+            _.animation = Object.create(null);
+            animationKind.forEach(function (key) {
+              return _.animation[key] = bool;
+            });
+          })();
+        }
         if (param.step) {
           this.addStep(param.step);
           _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
@@ -1014,29 +1041,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function show(order) {
           var animationDisable = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-
           var _ = __privateMap.get(this);
           var $ = __conf.$;
           var d = new $.Deferred();
 
-          // if(this.isFire) this.stop();
+          var instanceMgr = InstanceManager.getInstance();
 
-          order = __changePointer.call(this, order);
-          var step = _.step[order];
+          instanceMgr.changeActive(this, changed);
 
-          if (__activeInstance && __activeInstance === this) __$content.empty();
-          if (__activeInstance && __activeInstance !== this) __activeInstance.destroy();
+          // // if(this.isFire) this.stop();
+          //
+          // order = __changePointer.call(this, order);
+          // let step = _.step[order];
+          //
+          // if(__activeInstance && __activeInstance === this) __$content.empty();
+          // if(__activeInstance && __activeInstance !== this) __activeInstance.destroy();
+          //
+          // _.fire   = true;
+          // _.active = true;
+          //
+          // d.done(()=>{
+          //   console.log("dds");
+          // });
+          //
+          // __activeInstance = this;
+          //
+          // if(animationDisable || !_.animation) __animate.show.call(this, step, d, 0);
+          // else __animate.show.call(this, step, d);
 
-          _.fire = true;
-          _.active = true;
-
-          d.done(function () {
-            console.log("dds");
-          });
-
-          __activeInstance = this;
-
-          if (animationDisable || !_.animation) __animate.show.call(this, step, d, 0);else __animate.show.call(this, step, d);
 
           // if((__activeInstance && __activeInstance === this)){
           // console.log("ok");

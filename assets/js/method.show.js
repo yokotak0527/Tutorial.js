@@ -6,30 +6,36 @@
 * @return {Number | String} [order]
 */
 show(order, animationDisable = false){
-
   let _ = __privateMap.get(this);
   let $ = __conf.$;
   let d = new $.Deferred();
 
-  // if(this.isFire) this.stop();
+  let instanceMgr = InstanceManager.getInstance();
 
-  order = __changePointer.call(this, order);
-  let step = _.step[order];
 
-  if(__activeInstance && __activeInstance === this) __$content.empty();
-  if(__activeInstance && __activeInstance !== this) __activeInstance.destroy();
+  instanceMgr.changeActive(this, changed);
 
-  _.fire   = true;
-  _.active = true;
 
-  d.done(()=>{
-    console.log("dds");
-  });
 
-  __activeInstance = this;
-
-  if(animationDisable || !_.animation) __animate.show.call(this, step, d, 0);
-  else __animate.show.call(this, step, d);
+  // // if(this.isFire) this.stop();
+  //
+  // order = __changePointer.call(this, order);
+  // let step = _.step[order];
+  //
+  // if(__activeInstance && __activeInstance === this) __$content.empty();
+  // if(__activeInstance && __activeInstance !== this) __activeInstance.destroy();
+  //
+  // _.fire   = true;
+  // _.active = true;
+  //
+  // d.done(()=>{
+  //   console.log("dds");
+  // });
+  //
+  // __activeInstance = this;
+  //
+  // if(animationDisable || !_.animation) __animate.show.call(this, step, d, 0);
+  // else __animate.show.call(this, step, d);
 
 
   // if((__activeInstance && __activeInstance === this)){
