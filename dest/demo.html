@@ -48,17 +48,28 @@
   </div>
   <script>
     Tutorial.changeConfig('skipLabel', 'スキップ');
-    var tutorial = new Tutorial({
+    var tutorial1 = new Tutorial({
       step : [
         {
-          name : 'step0'
+          name : 'step1-0'
         },
         {
-          name : 'step1'
+          name : 'step1-1'
         },
       ]
     });
-    tutorial.show();
+    var tutorial2 = new Tutorial({
+      step : [
+        {
+          name : 'step2-0'
+        },
+        {
+          name : 'step2-1'
+        },
+      ]
+    });
+    tutorial1.show();
+    tutorial2.show();
 
     // let a = tutorial.step.indexByName('step1');
     // console.log(a);

@@ -60,6 +60,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.fire = false;
         this.pointer = param.startStep ? param.startStep : 0;
         this.roop = typeof param.roop === 'boolean' ? param.roop : false;
+        this.Deferred = conf.Deferred;
 
         if (__first) __first = false;
       }
@@ -103,23 +104,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           var promise = this.mediator.appeal(this, 'prev');
         }
         /*
-        *
+        * @return {SimplePromise}
         */
 
       }, {
         key: 'show',
         value: function show() {
+          var _this = this;
+
           if (this.fire) return false;
           var promise = this.mediator.appeal(this, 'show');
+          var def = new this.Deferred();
+          promise.then(function () {
+            _this.fire = true;
+          });
+          return def.promise();
         }
         /*
-        *
+        * @return {SimplePromise}
         */
 
       }, {
         key: 'hide',
         value: function hide() {
-          var promise = this.mediator.appeal(this, 'show');
+          if (!this.fire) return false;
+          var promise = this.mediator.appeal(this, 'hide');
+          var def = new this.Deferred();
+          return def.promise();
         }
         /*
         *
@@ -128,7 +139,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'destroy',
         value: function destroy() {
-          var promise = this.mediator.appeal(this, 'show');
+          // let promise = this.mediator.appeal(this, 'show');
         }
       }]);
 
@@ -154,6 +165,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           self.$parent = conf.$parent || $('body');
           self.$scroll = conf.$scroll || $('body');
           self.Deferred = conf.Deferred;
+          self.active = false;
 
           // let events  = [];
 
@@ -197,19 +209,38 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'appeal',
         value: function appeal(tutorial, type) {
+          var _this2 = this;
+
           var Deferred = this.Deferred;
-          switch (type) {
-            case 'show':
-              var _def = new Deferred();
-              var _p = _def.promise();
-              _p.then(function () {
-                console.log('ok');
-              }, function () {
-                console.log(this);
-              });
-              _def.reject();
-              break;
-          }
+
+          var _ret2 = function () {
+            switch (type) {
+              // -----------------------------------------------------------------------
+              case 'show':
+                var def = new Deferred();
+                setTimeout(function () {
+                  if (!_this2.active) {
+                    _this2.active = tutorial;
+                    def.resolve();
+                  } else {
+                    var promise = _this2.active.hide();
+                    promise.then(function () {
+                      _this2.active = tutorial;
+                      def.resolve();
+                    });
+                  }
+                }, 10);
+                return {
+                  v: def.promise()
+                };
+                break;
+              // -----------------------------------------------------------------------
+              case 'hide':
+                break;
+            }
+          }();
+
+          if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
         }
       }]);
 
@@ -398,11 +429,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'add',
         value: function add(step) {
-          var _this = this;
+          var _this3 = this;
 
           var steps = Array.isArray(step) ? step : [step];
           steps.forEach(function (obj) {
-            return _this.list.push(obj);
+            return _this3.list.push(obj);
           });
           this.length = this.list.length;
           return this;
@@ -418,7 +449,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'delete',
         value: function _delete(order) {
-          var _this2 = this;
+          var _this4 = this;
 
           if (order === undefined) {
             this.list = [];
@@ -426,7 +457,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           } else {
             if (!Array.isArray(order)) order = [order];
             order = order.map(function (val) {
-              return typeof val === 'string' ? _this2.indexByName(val) : val;
+              return typeof val === 'string' ? _this4.indexByName(val) : val;
             });
             var newStep = this.list.filter(function (val, i) {
               var flg = true;
@@ -505,11 +536,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(EventContainer, [{
         key: 'addEvent',
         value: function addEvent(event) {
-          var _this3 = this;
+          var _this5 = this;
 
           if (!Array.isArray(event)) event = [event];
           event.forEach(function (val) {
-            return _this3.list[val.name] = val;
+            return _this5.list[val.name] = val;
           });
           return this;
         }
@@ -603,7 +634,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'addRelation',
         value: function addRelation(target, eventList) {
-          var _this4 = this;
+          var _this6 = this;
 
           var _target = __privateMap.get(target);
           var _ = __privateMap.get(this);
@@ -614,7 +645,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           eventList = typeof eventList === 'string' ? [eventList] : eventList;
           eventList.forEach(function (name) {
-            if (target.list[name]) relationList[name] = _this4.list[name];
+            if (target.list[name]) relationList[name] = _this6.list[name];
           });
           _.otherContainers[target.name] = target;
         }

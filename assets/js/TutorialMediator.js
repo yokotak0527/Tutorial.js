@@ -17,6 +17,7 @@ class TutorialMediator{
       self.$parent  = conf.$parent || $('body');
       self.$scroll  = conf.$scroll || $('body');
       self.Deferred = conf.Deferred;
+      self.active   = false;
 
       // let events  = [];
 
@@ -56,18 +57,25 @@ class TutorialMediator{
   appeal(tutorial, type){
     let Deferred = this.Deferred;
     switch(type){
+      // -----------------------------------------------------------------------
       case 'show' :
-        let _def = new Deferred();
-        let _p   = _def.promise();
-        _p.then(
-          ()=>{
-            console.log('ok');
-          },
-          function(){
-            console.log(this);
+        let def = new Deferred();
+        setTimeout(()=>{
+          if(!this.active){
+            this.active = tutorial;
+            def.resolve();
+          }else{
+            let promise = this.active.hide();
+            promise.then(()=>{
+              this.active = tutorial;
+              def.resolve();
+            });
           }
-        );
-        _def.reject();
+        }, 10);
+        return def.promise();
+        break;
+      // -----------------------------------------------------------------------
+      case 'hide' :
         break;
     }
   }

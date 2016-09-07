@@ -36,6 +36,7 @@ class Tutorial{
     this.fire     = false;
     this.pointer  = param.startStep ? param.startStep : 0;
     this.roop     = typeof param.roop === 'boolean' ? param.roop : false;
+    this.Deferred = conf.Deferred;
 
     if(__first) __first = false;
   }
@@ -66,22 +67,30 @@ class Tutorial{
     let promise = this.mediator.appeal(this, 'prev');
   }
   /*
-  *
+  * @return {SimplePromise}
   */
   show(){
     if(this.fire) return false;
     let promise = this.mediator.appeal(this, 'show');
+    let def     = new this.Deferred();
+    promise.then(()=>{
+      this.fire = true;
+    });
+    return def.promise();
   }
   /*
-  *
+  * @return {SimplePromise}
   */
   hide(){
-    let promise = this.mediator.appeal(this, 'show');
+    if(!this.fire) return false;
+    let promise = this.mediator.appeal(this, 'hide');
+    let def = new this.Deferred();
+    return def.promise();
   }
   /*
   *
   */
   destroy(){
-    let promise = this.mediator.appeal(this, 'show');
+    // let promise = this.mediator.appeal(this, 'show');
   }
 }
