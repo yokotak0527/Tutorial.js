@@ -8,85 +8,216 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 {
   (function () {
-    var __privateMap = new WeakMap();
+    var __private = new WeakMap();
 
-    var BGCanvas = function () {
-      /**
-      *
-      */
-      function BGCanvas($param) {
-        var _this = this;
+    var Tutorial = function () {
+      _createClass(Tutorial, null, [{
+        key: 'changeConfig',
 
-        _classCallCheck(this, BGCanvas);
-
-        if (BGCanvas.instance) return BGCanvas.instance;
-
-        var $ = $param.$;
-        var $window = $param.$window;
-        var $parent = $param.$parent;
-        var _$param$bgColor = $param.bgColor;
-        var bgColor = _$param$bgColor === undefined ? '0x000000' : _$param$bgColor;
-        var _$param$resizeInterva = $param.resizeInterval;
-        var resizeInterval = _$param$resizeInterva === undefined ? 250 : _$param$resizeInterva;
-
-        $window = $window ? $(window) : $window;
-
-        this.$ = $;
-        this.$window = $window;
-        this.$parent = $parent;
-        this.bgColor = bgColor;
-        this.$cvs = $('<canvas>');
-        this.cvs = this.$cvs[0];
-        this.ctx = this.cvs.getContext('2d');
-        this.resizeInterval = resizeInterval;
-        this.timer = null;
-
-        this.cvs.width = $window.innerWidth();
-        this.cvs.height = $window.innerHeight();
-
-        $window.on('resize', function () {
-          if (_this.timer) clearTimeout(_this.timer);
-          _this.timer = setTimeout(function () {
-            _this.cvs.width = _this.$window.innerWidth();
-            _this.cvs.height = _this.$window.innerHeight();
-            _this.draw();
-          }, _this.resizeInterval);
-        });
-        this.$parent.append(this.$cvs);
-        BGCanvas.instance = this;
-        return this;
-      }
-      /**
-      *
-      */
-
-      /**
-      *
-      */
-
-
-      _createClass(BGCanvas, [{
-        key: 'draw',
-        value: function draw() {
-          var rect = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-
-          this.ctx.fillStyle = this.bgColor;
-          this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
-          this.ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
-          if (rect) rect.forEach(function (val) {
-            return ctx.clearRect(val[0], val[1], val[2], val[3]);
+        /**
+        * Tutorial全体の動作を変更する。Tutorialのインスタンスを作成する前のみ可能
+        *
+        * @param {(String|Object[])} name
+        * @param {String}            name.name
+        * @param {*}                 name.val
+        * @param {*}                 [val]
+        */
+        value: function changeConfig(key, val) {
+          if (!__first) return false;
+          var confArr = Array.isArray(key) ? key : [{ 'key': key, 'val': val }];
+          confArr.forEach(function (obj) {
+            return __conf[obj.key] = obj.val;
           });
+        }
+        /*
+        * @constructor Tutorial
+        *
+        * @param {Object}          [param]                   - Tutorial instance setting parameter
+        * @param {Boolean}         [param.auto = false]      - auto start.
+        * @param {Boolean}         [param.skip = true]       - use skip button.
+        * @param {String | Number} [param.startStep = true]
+        * @param {Boolean}         [roop = false]
+        * @param {Boolean}         [param.pager = true]      - use pager.
+        * @param {Boolean}         [param.controller = true] - use controller.
+        * @param {Object[]}        [param.step]
+        * @return Tutorial
+        */
+
+      }]);
+
+      function Tutorial() {
+        var param = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+        _classCallCheck(this, Tutorial);
+
+        var conf = __conf;
+        var $ = conf.$;
+        var _ = Object.create(null);
+        __private.set(this, _);
+        // let animationKind = ['fadeInOut', 'scroll'];
+        this.mediator = new TutorialMediator(this, conf);
+        this.step = new Step(param.step || false);
+        this.fire = false;
+        this.pointer = param.startStep ? param.startStep : 0;
+        this.roop = typeof param.roop === 'boolean' ? param.roop : false;
+
+        if (__first) __first = false;
+      }
+      /*
+      *
+      */
+
+
+      _createClass(Tutorial, [{
+        key: 'next',
+        value: function next() {
+          if (this.fire) return false;
+          var promise = this.mediator.appeal(this, 'next');
+        }
+        /*
+        *
+        */
+
+      }, {
+        key: 'prev',
+        value: function prev() {
+          if (this.fire) return false;
+          var promise = this.mediator.appeal(this, 'prev');
+        }
+        /*
+        *
+        */
+
+      }, {
+        key: 'skip',
+        value: function skip() {
+          var promise = this.mediator.appeal(this, 'prev');
+        }
+        /*
+        *
+        */
+
+      }, {
+        key: 'end',
+        value: function end() {
+          var promise = this.mediator.appeal(this, 'prev');
+        }
+        /*
+        *
+        */
+
+      }, {
+        key: 'show',
+        value: function show() {
+          if (this.fire) return false;
+          var promise = this.mediator.appeal(this, 'show');
+        }
+        /*
+        *
+        */
+
+      }, {
+        key: 'hide',
+        value: function hide() {
+          var promise = this.mediator.appeal(this, 'show');
+        }
+        /*
+        *
+        */
+
+      }, {
+        key: 'destroy',
+        value: function destroy() {
+          var promise = this.mediator.appeal(this, 'show');
         }
       }]);
 
-      return BGCanvas;
+      return Tutorial;
     }();
 
-    BGCanvas.instance = undefined;
+    var TutorialMediator = function () {
+      /*
+      * @constructor
+      * @param      {Tutorial} tutorial
+      * @return     TutorialMediator
+      */
+      function TutorialMediator(tutorial, conf) {
+        _classCallCheck(this, TutorialMediator);
 
-    BGCanvas.getInstance = function () {
-      return BGCanvas.instance || false;
-    };
+        var TM = TutorialMediator;
+        var self = TM.instance ? TM.instance : this;
+        tutorial.id = self.issuanceNewID();
+
+        if (!TM.instance) {
+          self.$ = conf.$;
+          self.$window = conf.$window || $(window);
+          self.$parent = conf.$parent || $('body');
+          self.$scroll = conf.$scroll || $('body');
+          self.Deferred = conf.Deferred;
+
+          // let events  = [];
+
+          // globalEvent = new EventContainer('global');
+          //   conf.defaultEventConf.forEach((val)=>{
+          //     let name        = val[0];
+          //     let triggerHook = val[1];
+          //     events.push(new CustomEvent(name, triggerHook));
+          //   });
+          //   new EventContainer('global', events);
+          // }
+          // let globalEvent = EventContainer.getInstance('global');
+
+
+          self.list = Object.create(null);
+          TM.instance = self;
+        }
+
+        self.list[tutorial.id] = tutorial;
+        return self;
+      }
+      /*
+      * 新しいIDを発行する
+      * @return String
+      */
+
+
+      _createClass(TutorialMediator, [{
+        key: 'issuanceNewID',
+        value: function issuanceNewID() {
+          var TM = TutorialMediator;
+          var rtn = 'tutorial-' + TM.idNum;
+          TM.idNum++;
+          return rtn;
+        }
+        /*
+        * @param {Tutorial} tutorial
+        * @param {String}   type
+        */
+
+      }, {
+        key: 'appeal',
+        value: function appeal(tutorial, type) {
+          var Deferred = this.Deferred;
+          switch (type) {
+            case 'show':
+              var _def = new Deferred();
+              var _p = _def.promise();
+              _p.then(function () {
+                console.log('ok');
+              }, function () {
+                console.log(this);
+              });
+              _def.reject();
+              break;
+          }
+        }
+      }]);
+
+      return TutorialMediator;
+    }();
+
+    TutorialMediator.instance = undefined;
+    TutorialMediator.idNum = 0;
 
     var CustomEvent = function () {
       /*
@@ -225,6 +356,116 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return CustomEvent;
     }();
 
+    var Step = function () {
+      /*
+      * @param    {Object[]} step
+      * @return   Step
+      */
+      function Step(step) {
+        _classCallCheck(this, Step);
+
+        this.list = [];
+        this.length = 0;
+        if (step) this.add(step);
+      }
+      /*
+      * ステップの内容を変更する
+      * @function changeeStep
+      * @memberof Step
+      * @instance
+      * @param    {String | Number} order
+      * @param    {Object}          step
+      * @return   Step
+      */
+
+
+      _createClass(Step, [{
+        key: 'change',
+        value: function change(order, step) {
+          order = typeof order === 'string' ? this.indexByName(order) : order;
+          if (order < 0) return;
+          this.list[order] = step;
+          return this;
+        }
+        /*
+        * @function addStep
+        * @memberof Step
+        * @instance
+        * @param    {Object | Object[]} step
+        * @return   Step
+        */
+
+      }, {
+        key: 'add',
+        value: function add(step) {
+          var _this = this;
+
+          var steps = Array.isArray(step) ? step : [step];
+          steps.forEach(function (obj) {
+            return _this.list.push(obj);
+          });
+          this.length = this.list.length;
+          return this;
+        }
+        /*
+        * @function deleteStep
+        * @memberof Step
+        * @instance
+        * @param    {String | Number | Array.<String|Number>} order
+        * @return   Step
+        */
+
+      }, {
+        key: 'delete',
+        value: function _delete(order) {
+          var _this2 = this;
+
+          if (order === undefined) {
+            this.list = [];
+            this.length = this.list.length;
+          } else {
+            if (!Array.isArray(order)) order = [order];
+            order = order.map(function (val) {
+              return typeof val === 'string' ? _this2.indexByName(val) : val;
+            });
+            var newStep = this.list.filter(function (val, i) {
+              var flg = true;
+              for (var _i = 0, _l = order.length; _i < _l; _i++) {
+                if (order[_i] === i) {
+                  flg = false;
+                  break;
+                }
+              }
+              if (flg) return val;
+            });
+            this.list = newStep;
+            this.length = this.list.length;
+          }
+          return this;
+        }
+        /*
+        * @function deleteStep
+        * @memberof Step
+        * @instance
+        * @param    {String}          name
+        * @return   Number | Number[]
+        */
+
+      }, {
+        key: 'indexByName',
+        value: function indexByName(name) {
+          if (typeof name !== 'string') return -1;
+          var arr = [];
+          this.list.forEach(function (el, i) {
+            if ((typeof el === 'undefined' ? 'undefined' : _typeof(el)) === 'object' && el.name === name) arr.push(i);
+          });
+          return arr.length > 1 ? arr : arr.length === 1 ? arr[0] : -1;
+        }
+      }]);
+
+      return Step;
+    }();
+
     var EventContainer = function () {
       /*
       * @constructor EventContainer
@@ -264,11 +505,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(EventContainer, [{
         key: 'addEvent',
         value: function addEvent(event) {
-          var _this2 = this;
+          var _this3 = this;
 
           if (!Array.isArray(event)) event = [event];
           event.forEach(function (val) {
-            return _this2.list[val.name] = val;
+            return _this3.list[val.name] = val;
           });
           return this;
         }
@@ -362,7 +603,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'addRelation',
         value: function addRelation(target, eventList) {
-          var _this3 = this;
+          var _this4 = this;
 
           var _target = __privateMap.get(target);
           var _ = __privateMap.get(this);
@@ -373,7 +614,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           eventList = typeof eventList === 'string' ? [eventList] : eventList;
           eventList.forEach(function (name) {
-            if (target.list[name]) relationList[name] = _this3.list[name];
+            if (target.list[name]) relationList[name] = _this4.list[name];
           });
           _.otherContainers[target.name] = target;
         }
@@ -434,222 +675,121 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return new EventContainer(name);
     };
 
-    var DOMController = function () {
-      /**
-      *
+    var SimplePromise = function () {
+      /*
+      * @param {SimpleDeferred} deferred
       */
-      function DOMController(param) {
-        _classCallCheck(this, DOMController);
+      function SimplePromise(deferred) {
+        _classCallCheck(this, SimplePromise);
 
-        if (DOMController.instance) return DOMController.instance;
-
-        var $ = param.$;
-        var $window = param.$window;
-        var $template = param.$template;
-        var zIndex = param.zIndex;
-        var $parent = param.$parent;
-        var mode = param.mode;
-
-
-        this.$ = $;
-        this.$window = $window;
-        this.$template = $template;
-        this.$contentWrap = $('.content-wrap', this.$template);
-        this.$content = $('.content', this.$template);
-        this.$bg = $('.bg', this.$template);
-        this.$pager = $('.pager', this.$template);
-        this.$controller = $('.pager', this.$template);
-        this.$parent = $parent;
-        $template.css({
-          'z-index': zIndex,
-          'display': 'none',
-          'opacity': 0
-        });
-        this.$contentWrap.css('z-index', zIndex + 2);
-        this.$bg.css('z-index', zIndex + 1);
-
-        // add click skip btn event.
-        // $('.controller .skip span', $cnt).on('click', (e)=>{
-        // if(__activeInstance) __activeInstance.skip();
-        // });
-
-        //// add click prev btn event.
-        //$('.controller .prev span', $cnt).on('click', (e)=>{
-        //  if(__activeInstance) __activeInstance.prev();
-        //});
-        //
-        //// add click next btn event.
-        //$('.controller .next span', $cnt).on('click', (e)=>{
-        //    if(__activeInstance) __activeInstance.next();
-        //});
-        //
-        //// add click end btn event.
-        //$('.controller .end span', $cnt).on('click', (e)=>{
-        //  if(__activeInstance) __activeInstance.end();
-        //});
-
-        this.$parent.append(this.$template);
+        this.def = deferred;
       }
-      /**
-      *
-      * @param  {String} name -
-      * @return jQuery Object
-      */
-
-      /**
-      *
+      /*
+      * @param {Function} onFulfilled
+      * @param {Function} [onRejected = false]
       */
 
 
-      _createClass(DOMController, [{
-        key: 'get$obj',
-        value: function get$obj(name) {
-          switch (name) {
-            case 'all':
-              return this.$template;
-              break;
-            case 'content-wrap':
-              return this.$contentWrap;
-            case 'content-set':
-              return this.$contentWrap;
-              break;
-            case 'controller':
-              return this.$controller;
-              break;
-            case 'pager':
-              return this.$pager;
-              break;
-            case 'bg':
-              return this.$bg;
-              break;
-          }
-        }
-        /**
-        *
-        */
-
-      }, {
-        key: 'addMode',
-        value: function addMode(mode, color, interval) {
-          if (mode === 'focus') {
-            this.$template.addClass('focus');
-            var bgCvs = new BGCanvas({
-              '$': this.$,
-              '$window': this.$window,
-              '$parent': this.$bg,
-              'bgColor': color,
-              'resizeInterval': interval
-            });
-            bgCvs.draw();
-          }
+      _createClass(SimplePromise, [{
+        key: 'then',
+        value: function then(onFulfilled, onRejected) {
+          this.def.addListener(onFulfilled, onRejected);
         }
       }]);
 
-      return DOMController;
+      return SimplePromise;
     }();
 
-    DOMController.instance = undefined;
-
-    DOMController.getInstance = function () {
-      return DOMController.instance || false;
-    };
-
-    var InstanceManager = function () {
-      /**
+    var SimpleDeferred = function () {
+      /*
       *
-      * @return InstanceManager
       */
-      function InstanceManager() {
-        _classCallCheck(this, InstanceManager);
+      function SimpleDeferred() {
+        _classCallCheck(this, SimpleDeferred);
 
-        if (InstanceManager.instance) return InstanceManager.instance;
-        this.active = undefined;
-        this.list = Object.create(null);
+        var _ = Object.create(null);
+        _.list = [];
+        _.status = null;
+        __private.set(this, _);
       }
-      /**
+      /*
       *
-      * @param  {Tutorial} instance
-      * @return InstanceManager
-      */
-
-      /**
-      *
-      * @return InstanceManager
       */
 
 
-      _createClass(InstanceManager, [{
-        key: 'register',
-        value: function register(instance) {
-          this.list[instance.id] = instance;
-          return this;
-        }
-        /**
-        *
-        * @param  {String | Tutorial} id
-        * @return InstanceManager
-        */
-
-      }, {
-        key: 'unRegister',
-        value: function unRegister(id) {
-          if (this.active && this.active === this) this.active = undefined;
-          id = typeof id === 'string' ? id : id.id;
-          if (this.list[id]) delete this.list[id];
-          return this;
-        }
-        /**
-        *
-        * @param  {String} id
-        * @return InstanceManager
-        */
-
-      }, {
-        key: 'getInstance',
-        value: function getInstance(id) {
-          return this.list[id] ? this.list[id] : false;
+      _createClass(SimpleDeferred, [{
+        key: 'promise',
+        value: function promise() {
+          var _ = __private.get(this);
+          if (_.status !== null) return this;
+          _.promise = new SimplePromise(this);
+          return _.promise;
         }
         /*
-        * @param  {Tutorial} instance
-        * @return Boolean
+        *
         */
 
       }, {
-        key: 'isActive',
-        value: function isActive(instance) {
-          return this.active === instance;
+        key: 'getStatus',
+        value: function getStatus() {
+          var _ = __private.get(this);
+          return _.status;
         }
         /*
-        * @param {Tutorial} newActive
-        * @return InstanceManager
+        *
         */
 
       }, {
-        key: 'changeActive',
-        value: function changeActive(newActive) {
-          if (!this.isActive(newActive)) {
-            if (this.active) this.active.hide();
-            this.active = this;
-          }
-          if (callback) callback();
+        key: 'reject',
+        value: function reject() {
+          var _ = __private.get(this);
+          if (_.status !== null) return this;
+          _.status = false;
+          _.list.forEach(function (listener) {
+            if (listener[1]) listener[1].call(_.promise);
+          });
+          return this;
+        }
+        /*
+        * @return SimpleDeferred
+        */
+
+      }, {
+        key: 'resolve',
+        value: function resolve() {
+          var _ = __private.get(this);
+          if (_.status !== null) return this;
+          _.list.forEach(function (listener) {
+            return listener[0].call(_.promise);
+          });
+          _.status = true;
+          return this;
+        }
+        /*
+        * @param  {Function}         onFulfilled
+        * @param  {Function | false} [onRejected]
+        * @return SimpleDeferred
+        */
+
+      }, {
+        key: 'addListener',
+        value: function addListener(onFulfilled, onRejected) {
+          var _ = __private.get(this);
+          if (_.status !== null) return this;
+          _.list.push([onFulfilled, onRejected]);
           return this;
         }
       }]);
 
-      return InstanceManager;
+      return SimpleDeferred;
     }();
 
-    InstanceManager.instance = undefined;
+    SimpleDeferred.num = 0;
 
-    InstanceManager.getInstance = function () {
-      return InstanceManager.instance || new InstanceManager();
-    };
+    SimpleDeferred.complete = function () {};
 
     var __first = true;
-    var __TutorialID = 0;
-    /** ============================================================================
-    *
-    */
+
     var __conf = Object.create(null);
     __conf.mode = 'focus'; // focus | arrow
     __conf.resizeInterval = 250;
@@ -671,523 +811,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return '\n<div class="tutorial">\n<div class="content-wrap center-middle">\n <ol class="pager">\n  <li><span class="active">1</span></li>\n  <li><span>2</span></li>\n  <li><span>3</span></li>\n  <li><span>4</span></li>\n  <li><span>5</span></li>\n </ol>\n <div class="content"></div>\n <div class="controller">\n   <ul class="left">\n     <li class="skip"><span>' + __conf.skipLabel + '</span></li>\n   </ul>\n   <ul class="right">\n     <li class="prev"><span>' + __conf.prevLabel + '</span></li>\n     <li class="next"><span>' + __conf.nextLabel + '</span></li>\n     <li class="end"><span>' + __conf.endLabel + '</span></li>\n   </ul>\n </div>\n</div>\n<div class="bg"></div>\n</div>\n';
     };
     __conf.defaultEventConf = [['resize', false], ['scroll', false], ['beforeAddStep', false], ['afterAddStep', false], ['beforeRemoveStep', false], ['afterRemoveStep', false], ['beforeChangeStep', false], ['afterChangeStep', false], ['beforeShow', false], ['afterShow', false], ['beforeNext', false], ['afterNext', false], ['beforePrev', false], ['afterPrev', false], ['beforeHide', false], ['afterHide', false], ['beforeDestory', false], ['afterDestory', false], ['beforeSkip', false], ['afterSkip', false]];
+    __conf.Deferred = SimpleDeferred;
     Object.seal(__conf);
-
-    var __animate = Object.create(null);
-
-    __animate.show = function (step, deferred) {
-      var time = arguments.length <= 2 || arguments[2] === undefined ? -1 : arguments[2];
-
-      var _ = __privateMap.get(undefined);
-      var conf = __conf;
-      var $ = conf.$;
-      var $window = conf.$window;
-      time = time < 0 ? __conf.fadeinSpeed : time;
-
-      __$tutorial.css('display', '');
-      __$tutorial.animate({
-        'opacity': 1
-      }, time, function () {
-        return deferred.resolve();
-      });
-
-      // 250mm
-
-      //let $cnt = __$content;
-      deferred.resolve();
-    };
-
-    __animate.hide = function () {};
-    __animate.move = function () {};
-
-    var __adjustStepNum = function __adjustStepNum() {
-      var _ = __privateMap.get(this);
-      _.num = _.step.length;
-    };
-
-    var __addEventListenerRelation = function __addEventListenerRelation() {
-      var _ = __privateMap.get(this);
-      var id = 'instance-' + this.id;
-      var globalListener = __listener;
-      var localListener = _.listener;
-      for (var key in globalListener) {
-        globalListener[key][id] = localListener[key];
-      }
-    };
-    var __removeEventListenerRelation = function __removeEventListenerRelation() {
-      var _ = __privateMap.get(this);
-      var id = 'instance-' + this.id;
-      var globalListener = __listener;
-      var localListener = _.listener;
-      for (var key in globalListener) {
-        delete globalListener[key][id];
-      }
-    };
-
-    var __changePointer = function __changePointer(order) {
-      var _ = __privateMap.get(this);
-      if (this.isFire) return order;
-      order = typeof order === 'string' ? this.name2index(order) : typeof order === 'number' ? order : _.pointer;
-      order = this.getPointer() < order ? this.getPointer() - 1 : order;
-      order = order < 0 ? 0 : order;
-      _.pointer = order;
-      return _.pointer;
-    };
-
-    var Tutorial = function () {
-      _createClass(Tutorial, null, [{
-        key: 'changeConfig',
-
-
-        /**
-        * @function Tutorial.changeConfig
-        *
-        * @desc  change Tutorial.js configuration.
-        * @param {(String|Object[])} name
-        * @param {String}            name.name
-        * @param {*}                 name.val
-        * @param {*}                 [val]
-        */
-        value: function changeConfig(key, val) {
-          var confArr = Array.isArray(key) ? key : [{ 'key': key, 'val': val }];
-          confArr.forEach(function (obj) {
-            return __conf[obj.key] = obj.val;
-          });
-        }
-
-        /**
-        * @constructor Tutorial
-        *
-        * @param {Object}          [param]                   - Tutorial instance setting parameter
-        * @param {Boolean}         [param.auto = false]      - auto start.
-        * @param {Boolean}         [param.skip = true]       - use skip button.
-        * @param {String | Number} [param.startStep = true]
-        * @param {Boolean}         [roop = false]
-        * @param {Boolean}         [param.pager = true]      - use pager.
-        * @param {Boolean}         [param.controller = true] - use controller.
-        * @param {Object[]}        [param.step]
-        *
-        * @return Tutorial
-        */
-
-      }]);
-
-      function Tutorial() {
-        var param = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-        _classCallCheck(this, Tutorial);
-
-        var conf = __conf;
-        var $ = conf.$;
-        var instanceMgr = new InstanceManager();
-        var animationKind = ['fadeInOut', 'scroll'];
-
-        // set default global events
-        if (__first) {
-          (function () {
-            var events = [];
-            conf.defaultEventConf.forEach(function (val) {
-              var name = val[0];
-              var triggerHook = val[1];
-              events.push(new CustomEvent(name, triggerHook));
-            });
-            new EventContainer('global', events);
-          })();
-        }
-        var globalEvent = EventContainer.getInstance('global');
-
-        // ---------------------------------------------------------------------------
-        // set instance member.
-        this.id = 'tutorial-' + __TutorialID;
-
-        instanceMgr.register(this);
-        // ---------------------------------------------------------------------------
-        // set private member.
-        var _ = Object.create(null);
-        _.step = [];
-        _.active = false;
-        _.fire = false;
-        _.num = 0;
-        _.pointer = param.startStep ? param.startStep : 0;
-        _.animation = param.animation || true;
-        _.roop = typeof param.roop === 'boolean' ? param.roop : false;
-        if (typeof _.animation === 'boolean') {
-          (function () {
-            var bool = _.animation;
-            _.animation = Object.create(null);
-            animationKind.forEach(function (key) {
-              return _.animation[key] = bool;
-            });
-          })();
-        }
-        if (param.step) {
-          this.addStep(param.step);
-          _.pointer = param.startStep ? typeof param.startStep === 'string' ? this.name2index(param.startStep) : param.startStep : 0;
-        }
-
-        var events = [];
-        conf.defaultEventConf.forEach(function (val) {
-          var name = val[0];
-          var triggerHook = val[1];
-          events.push(new CustomEvent(name, triggerHook));
-        });
-        _.event = new EventContainer(this.id, events);
-        _.event.addRelation(globalEvent, ['resize', 'scroll']);
-
-        __privateMap.set(this, _);
-
-        // ---------------------------------------------------------------------------
-        // make DOM
-        if (__first) {
-          if (conf.$window === null) conf.$window = $(window);
-          if (conf.$parent === null) conf.$parent = $('body');
-          if (conf.$scroll === null) conf.$scroll = $('body');
-
-          var domCtrl = new DOMController({
-            '$': $,
-            '$window': conf.$window,
-            '$template': $(conf.template()),
-            'zIndex': conf.zIndex,
-            '$parent': conf.$parent
-          });
-
-          if (conf.mode === 'focus') domCtrl.addMode('focus', conf.focusBGColor, conf.resizeInterval);
-
-          // console.log(domCtrl.get$obj('bg'));
-
-          __first = false;
-        }
-        //     let domCtrl = new DOMController({
-        //       '$'         : $,
-        //       '$window'   : conf.$window,
-        //       '$template' : $(conf.template()),
-        //       'zIndex'    : conf.zIndex,
-        //       '$parent'   : conf.$parent
-        //     });
-        //
-        //     if(conf.mode === 'focus') domCtrl.addMode('focus', conf.focusBGColor, conf.resizeInterval);
-        //
-        //
-        //     // add resize event.
-        //     let resizeTimer = null;
-        //     conf.$window.on('resize', (e)=>{
-        //       if(resizeTimer) clearTimeout(resizeTimer);
-        //       resizeTimer = setTimeout(()=>{
-        //         let w        = conf.$window.innerWidth();
-        //         let h        = conf.$window.innerHeight();
-        //         let listener = __listener['resize'];
-        //         for(let instance in listener){
-        //           let self = __instanceList[instance];
-        //           for(let key in listener[instance]){
-        //             listener[instance][key].call(self, e, {w:w, h:h});
-        //           }
-        //         }
-        //       }, conf.resizeInterval);
-        //     });
-        //
-        //     //// add click skip btn event.
-        //     //$('.controller .skip span', $cnt).on('click', (e)=>{
-        //     //  if(__activeInstance) __activeInstance.skip();
-        //     //});
-        // //
-        //     //// add click prev btn event.
-        //     //$('.controller .prev span', $cnt).on('click', (e)=>{
-        //     //  if(__activeInstance) __activeInstance.prev();
-        //     //});
-        // //
-        //     //// add click next btn event.
-        //     //$('.controller .next span', $cnt).on('click', (e)=>{
-        //     //    if(__activeInstance) __activeInstance.next();
-        //     //});
-        // //
-        //     //// add click end btn event.
-        //     //$('.controller .end span', $cnt).on('click', (e)=>{
-        //     //  if(__activeInstance) __activeInstance.end();
-        //     //});
-        //
-        __TutorialID++;
-      }
-
-      /**
-      * @function addStep
-      *
-      * @memberof Tutorial
-      * @instance
-      * @param    {Object | Object[]} step
-      */
-
-
-      _createClass(Tutorial, [{
-        key: 'addStep',
-        value: function addStep(step) {
-          var steps = Array.isArray(step) ? step : [step];
-          var _ = __privateMap.get(this);
-          steps.forEach(function (obj) {
-            return _.step.push(obj);
-          });
-          __adjustStepNum.call(this);
-          return this;
-        }
-
-        /**
-        * @function removeStep
-        *
-        * @memberof Tutorial
-        * @instance
-        * @param    {String | Number | Array.<String|Number>} order
-        */
-
-      }, {
-        key: 'removeStep',
-        value: function removeStep(order) {
-          var _this4 = this;
-
-          var _ = __privateMap.get(this);
-          if (order === undefined) {
-            _.step = [];
-          } else {
-            if (!Array.isArray(order)) order = [order];
-            order = order.map(function (val) {
-              return typeof val === 'string' ? _this4.indexByName(val) : val;
-            });
-            var newStep = _.step.filter(function (val, i) {
-              var flg = true;
-              for (var _i = 0, _l = order.length; _i < _l; _i++) {
-                if (order[_i] === i) {
-                  flg = false;
-                  break;
-                }
-              }
-              if (flg) return val;
-            });
-            _.step = newStep;
-          }
-          __adjustStepNum.call(this);
-          return this;
-        }
-
-        /**
-        * @function changeeStep
-        *
-        * @memberof Tutorial
-        * @instance
-        * @param {String | Number} order
-        * @param {Object}          step
-        */
-
-      }, {
-        key: 'changeStep',
-        value: function changeStep(order, step) {
-          var _ = __privateMap.get(this);
-          order = typeof order === 'string' ? this.indexByName(order) : order;
-          if (order < 0) return;
-          _.step[order] = step;
-        }
-
-        /**
-        *
-        */
-
-      }, {
-        key: 'prev',
-        value: function prev(step) {
-          var _ = __privateMap.get(this);
-
-          this.show(_.pointer);
-          return this;
-        }
-
-        /**
-        *
-        */
-
-      }, {
-        key: 'next',
-        value: function next(step) {
-          var _ = __privateMap.get(this);
-          // _.active = true;
-          this.show(_.pointer);
-          return this;
-        }
-
-        /**
-        * @function hide
-        *
-        * @memberof Tutorial
-        * @instance
-        */
-
-      }, {
-        key: 'hide',
-        value: function hide(step) {
-          if (!__activeInstance) return this;
-          var _ = __privateMap.get(this);
-          __$content.empty();
-          __activeInstance = undefined;
-          _.active = false;
-          return this;
-        }
-
-        /**
-        * @function show
-        *
-        * @memberof Tutorial
-        * @instance
-        * @return {Number | String} [order]
-        */
-
-      }, {
-        key: 'show',
-        value: function show(order) {
-          var animationDisable = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-          var _ = __privateMap.get(this);
-          var $ = __conf.$;
-          var d = new $.Deferred();
-
-          var instanceMgr = InstanceManager.getInstance();
-
-          instanceMgr.changeActive(this, changed);
-
-          // // if(this.isFire) this.stop();
-          //
-          // order = __changePointer.call(this, order);
-          // let step = _.step[order];
-          //
-          // if(__activeInstance && __activeInstance === this) __$content.empty();
-          // if(__activeInstance && __activeInstance !== this) __activeInstance.destroy();
-          //
-          // _.fire   = true;
-          // _.active = true;
-          //
-          // d.done(()=>{
-          //   console.log("dds");
-          // });
-          //
-          // __activeInstance = this;
-          //
-          // if(animationDisable || !_.animation) __animate.show.call(this, step, d, 0);
-          // else __animate.show.call(this, step, d);
-
-
-          // if((__activeInstance && __activeInstance === this)){
-          // console.log("ok");
-          // }
-
-
-          // this.id
-          // let _ = privateMap.get(this);
-          // order = order || _.pointer;
-
-
-          // _.animation
-        }
-
-        /**
-        *
-        */
-
-      }, {
-        key: 'getPointer',
-        value: function getPointer() {
-          var _ = __privateMap.get(this);
-          return _.step.length;
-        }
-
-        /**
-        * @function addEventListener
-        *
-        * @memberof Tutorial
-        * @instance
-        * @param    {String}   eventName
-        * @param    {String}   [name]
-        * @param    {Function} callback
-        
-        * @return {String} - event listener name.
-        */
-
-      }, {
-        key: 'addEventListener',
-        value: function addEventListener(eventName, name, callback) {
-          var _ = __privateMap.get(this);
-          var conf = __conf;
-          var listener = _.listener;
-          if (typeof name === 'function') {
-            callback = name;
-            name = 'el-' + this.id + '-' + Math.random().toString(36).slice(-10);
-          }
-          if (!listener[eventName]) return '';
-          listener[eventName][name] = callback;
-          return name;
-        }
-
-        /**
-        * @function removeEventListener
-        *
-        * @memberof Tutorial
-        * @instance
-        * @param    {String}   eventName
-        * @param    {String}   [name]
-        */
-
-      }, {
-        key: 'removeEventListener',
-        value: function removeEventListener(eventName, name) {}
-
-        /**
-        * @function isActive
-        *
-        * @memberof Tutorial
-        * @instance
-        * @return {Boolean}
-        */
-
-      }, {
-        key: 'isActive',
-        value: function isActive() {
-          var _ = __privateMap.get(this);
-          return _.active;
-        }
-
-        /**
-        * @function isFire
-        *
-        * @memberof Tutorial
-        * @instance
-        * @return {Boolean}
-        */
-
-      }, {
-        key: 'isFire',
-        value: function isFire() {
-          var _ = __privateMap.get(this);
-          return _.fire;
-        }
-
-        /**
-        * @function indexByName
-        *
-        * @memberof Tutorial
-        * @instance
-        * @param    {String} name - step name.
-        * @return   {Number|Number[]}
-        */
-
-      }, {
-        key: 'indexByName',
-        value: function indexByName(name) {
-          if (typeof name !== 'string') return -1;
-          var _ = __privateMap.get(this);
-          var arr = [];
-          _.step.forEach(function (el, i) {
-            if ((typeof el === 'undefined' ? 'undefined' : _typeof(el)) === 'object' && el.name === name) arr.push(i);
-          });
-          return arr.length > 1 ? arr : arr.length === 1 ? arr[0] : -1;
-        }
-      }]);
-
-      return Tutorial;
-    }();
 
     window.Tutorial = Tutorial;
   })();

@@ -1,2 +1,2 @@
-  window.Tutorial = Tutorial;
+window.Tutorial = Tutorial;
 }

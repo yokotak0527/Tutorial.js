@@ -1,3 +1,3 @@
 "use strict";
 {
-  let __privateMap = new WeakMap();
+  let __private = new WeakMap();

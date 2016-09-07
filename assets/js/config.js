@@ -1,8 +1,5 @@
 let __first           = true;
-let __TutorialID      = 0;
-/** ============================================================================
-*
-*/
+
 let __conf            = Object.create(null);
 __conf.mode           = 'focus'; // focus | arrow
 __conf.resizeInterval = 250;
@@ -67,4 +64,5 @@ __conf.defaultEventConf = [
   ['beforeSkip',       false],
   ['afterSkip',        false]
 ];
+__conf.Deferred = SimpleDeferred;
 Object.seal(__conf);
