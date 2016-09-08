@@ -3,6 +3,7 @@ let __first           = true;
 let __conf            = Object.create(null);
 __conf.mode           = 'focus'; // focus | arrow
 __conf.resizeInterval = 250;
+__conf.scrollInterval = 100;
 __conf.scrollSpeed    = 500;
 __conf.fadeinSpeed    = 500;
 __conf.fadeoutSpeed   = 500;
@@ -64,5 +65,8 @@ __conf.defaultEventConf = [
   ['beforeSkip',       false],
   ['afterSkip',        false]
 ];
-__conf.Deferred = SimpleDeferred;
+__conf.Deferred             = SimpleDeferred;
+__conf.DOMController        = DOMController;
+__conf.CustomEvent          = CustomEvent;
+__conf.CustomEventContainer = CustomEventContainer;
 Object.seal(__conf);

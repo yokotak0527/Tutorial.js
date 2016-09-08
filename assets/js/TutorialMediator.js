@@ -12,12 +12,49 @@ class TutorialMediator{
     tutorial.id = self.issuanceNewID();
 
     if(!TM.instance){
+      let events = [];
+      conf.defaultEventConf.forEach((val)=>{
+        let name        = val[0];
+        let triggerHook = val[1];
+        events.push(new conf.CustomEvent(name, triggerHook));
+      });
+      self.eventCtnr = new CustomEventContainer('global', events);
+
       self.$        = conf.$;
       self.$window  = conf.$window || $(window);
       self.$parent  = conf.$parent || $('body');
       self.$scroll  = conf.$scroll || $('body');
       self.Deferred = conf.Deferred;
-      self.active   = false;
+      self.domCtlr  = new conf.DOMController({
+        '$'         : self.$,
+        '$window'   : self.$window,
+        '$template' : self.$(conf.template()),
+        'zIndex'    : conf.zIndex,
+        '$parent'   : self.$parent,
+        'mode'      : conf.mode
+      });
+
+      // add event listener
+      {
+        let resizeInterval = conf.resizeInterval || 250;
+        let resizeTimer    = null;
+        self.$window.on('resize', (e)=>{
+          if(resizeTimer) clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(()=>{
+            self.eventCtnr.trigger('resize');
+          }, resizeInterval);
+        });
+        // ???
+        self.$scroll.on('scroll', (e)=>{
+          console.log(e);
+        });
+      }
+      // self.eventCtnr
+
+      // self.DOMController = conf.DOMController;
+
+      // active tutorial
+      self.active = false;
 
       // let events  = [];
 

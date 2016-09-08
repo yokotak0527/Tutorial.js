@@ -67,14 +67,15 @@ class Tutorial{
     let promise = this.mediator.appeal(this, 'prev');
   }
   /*
+  * @param  {String} order
   * @return {SimplePromise}
   */
-  show(){
+  show(order){
     if(this.fire) return false;
+    this.fire   = true;
     let promise = this.mediator.appeal(this, 'show');
     let def     = new this.Deferred();
     promise.then(()=>{
-      this.fire = true;
     });
     return def.promise();
   }

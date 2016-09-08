@@ -21,8 +21,9 @@ let concatJSList = [
   'assets/js/Tutorial.js',
   'assets/js/TutorialMediator.js',
   'assets/js/CustomEvent.js',
+  'assets/js/CustomEventContainer.js',
   'assets/js/Step.js',
-  'assets/js/EventContainer.js',
+  'assets/js/DOMController.js',
   'assets/js/SimpleDeferred.js',
   'assets/js/config.js',
   'assets/js/footer.js'

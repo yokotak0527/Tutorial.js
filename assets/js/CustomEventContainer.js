@@ -1,36 +1,36 @@
-class EventContainer{
+class CustomEventContainer{
     static instance = Object.create(null);
     /*
     *
     */
     static getInstance = (name)=>{
-      if(EventContainer.instance[name]) return EventContainer.instance[name];
-      return new EventContainer(name);
+      if(CustomEventContainer.instance[name]) return CustomEventContainer.instance[name];
+      return new CustomEventContainer(name);
     }
     /*
-    * @constructor EventContainer
+    * @constructor CustomEventContainer
     * @param       {String}                      name                       - event container name
     * @param       {CustomEvent | CustomEvent[]} [triggerHookParam = false] -
-    * @return      EventContainer
+    * @return      CustomEventContainer
     */
     constructor(name, list = false){
-      if(EventContainer.instance[name]) return EventContainer.getInstance(name);
+      if(CustomEventContainer.instance[name]) return CustomEventContainer.getInstance(name);
       this.name         = name;
       this.list         = Object.create(null);
 
       let _             = Object.create(null);
       _.relationList    = Object.create(null);
       _.otherContainers = Object.create(null);
-      __privateMap.set(this, _);
+      __private.set(this, _);
 
       if(list) this.addEvent(list);
-      EventContainer.instance[name] = this;
+      CustomEventContainer.instance[name] = this;
     }
     /*
     * @function addEvent
-    * @memberof EventContainer
+    * @memberof CustomEventContainer
     * @param    {CustomEvent | CustomEvent[]} event -
-    * @return   EventContainer
+    * @return   CustomEventContainer
     */
     addEvent(event){
       if(!Array.isArray(event)) event = [event];
@@ -39,9 +39,9 @@ class EventContainer{
     }
     /*
     * @function removeEvent
-    * @memberof EventContainer
+    * @memberof CustomEventContainer
     * @param    {String}       [name] -
-    * @return   EventContainer
+    * @return   CustomEventContainer
     */
     removeEvent(name){
       if(!name){
@@ -53,7 +53,7 @@ class EventContainer{
     }
     /*
     * @function addEventListener
-    * @memberof EventContainer
+    * @memberof CustomEventContainer
     * @param    {String}            eventName    -
     * @param    {String | Function} listenerName -
     * @param    {Function}          [callback]   -
@@ -71,10 +71,10 @@ class EventContainer{
     }
     /*
     * @function removeEventListener
-    * @memberof EventContainer
+    * @memberof CustomEventContainer
     * @param    {String}            eventName      -
     * @param    {String}            [listenerName] -
-    * @return   EventContainer
+    * @return   CustomEventContainer
     */
     removeEventListener(eventName, listenerName){
       if(!this.list[eventName]) return this;
@@ -87,14 +87,13 @@ class EventContainer{
     }
     /*
     * @function trigger
-    * @memberof EventContainer
+    * @memberof CustomEventContainer
     * @param    {String}       eventName
-    * @return   EventContainer
+    * @return   CustomEventContainer
     */
     trigger(eventName){
-      let _            = __privateMap.get(this);
+      let _            = __private.get(this);
       let relationList = _.relationList;
-      // console.log(relationList);
       if(this.list[eventName]) this.list[eventName].trigger();
       for(let containerName in relationList){
         if(relationList[containerName][eventName]) relationList[containerName][eventName].trigger();
@@ -104,16 +103,16 @@ class EventContainer{
     }
     /*
     * @function addRelation
-    * @memberof EventContainer
+    * @memberof CustomEventContainer
     * イベントコンテナと他のイベントコンテナを親-子の関係で紐付ける。
     * 第1引数に親となるイベントコンテナ、第2引数に親が持っている紐付けるイベント名
-    * @param    {EventContainer}    target    - parent EventContainer
-    * @param    {String | String[]} eventList - event name of parent EventContainer to relate container.
-    * @return   EventContainer
+    * @param    {CustomEventContainer}    target    - parent CustomEventContainer
+    * @param    {String | String[]} eventList - event name of parent CustomEventContainer to relate container.
+    * @return   CustomEventContainer
     */
     addRelation(target, eventList){
-      let _target      = __privateMap.get(target);
-      let _            = __privateMap.get(this);
+      let _target      = __private.get(target);
+      let _            = __private.get(this);
       let relationList = _target.relationList;
 
       if(!relationList[this.name]) relationList[this.name] = Object.create(null);
@@ -127,13 +126,13 @@ class EventContainer{
     }
     /*
     * @function removeRelation
-    * @memberof EventContainer
-    * @param    {EventContainer} target -
-    * @return   EventContainer
+    * @memberof CustomEventContainer
+    * @param    {CustomEventContainer} target -
+    * @return   CustomEventContainer
     */
     removeRelation(target, eventList){
-      let _target      = __privateMap.get(target);
-      let _            = __privateMap.get(this);
+      let _target      = __private.get(target);
+      let _            = __private.get(this);
       let relationList = _target.relationList;
 
       if(eventList === undefined) eventList = Object.keys(this.list);
@@ -150,11 +149,11 @@ class EventContainer{
     }
     /*
     * @function removeAllRelation
-    * @memberof EventContainer
-    * @return   EventContainer
+    * @memberof CustomEventContainer
+    * @return   CustomEventContainer
     */
     removeAllRelation(target){
-      let _ = __privateMap.get(this);
+      let _ = __private.get(this);
       if(target){
         this.removeRelation(target);
       }else{

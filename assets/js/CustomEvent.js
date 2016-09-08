@@ -14,7 +14,7 @@ class CustomEvent{
     this.name = name;
     this.list = Object.create(null);
 
-    __privateMap.set(this, _);
+    __private.set(this, _);
 
     this.removeTriggerHook();
     if(triggerHookParam) this.addTriggerHook(triggerHookParam);
@@ -57,7 +57,7 @@ class CustomEvent{
   * @return   CustomEvent
   */
   addTriggerHook(param = {}){
-    let _ = __privateMap.get(this);
+    let _ = __private.get(this);
     this.removeTriggerHook();
     _.triggerHook.func = param.func;
     _.triggerHook.ags  = param.ags  || _.triggerHook.ags;
@@ -70,7 +70,7 @@ class CustomEvent{
   * @return   CustomEvent
   */
   removeTriggerHook(){
-    let _ = __privateMap.get(this);
+    let _ = __private.get(this);
     _.triggerHook = Object.create(null);
     _.triggerHook.func = (ags)=>{};
     _.triggerHook.ags  = undefined;
@@ -96,7 +96,7 @@ class CustomEvent{
   * @return   CustomEvent
   */
   trigger(){
-    let _     = __privateMap.get(this);
+    let _     = __private.get(this);
     let param = _.triggerHook.func.call(_.triggerHook.this, _.triggerHook.ags);
 
     for(let name in this.list) this.list[name].call(this, param);
