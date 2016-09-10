@@ -56,11 +56,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         __private.set(this, _);
         // let animationKind = ['fadeInOut', 'scroll'];
         this.mediator = new TutorialMediator(this, conf);
-        this.step = new Step(param.step || false);
+        this.domCtrl = this.mediator.domCtrl;
         this.fire = false;
         this.pointer = param.startStep ? param.startStep : 0;
         this.roop = typeof param.roop === 'boolean' ? param.roop : false;
         this.Deferred = conf.Deferred;
+        this.pager = typeof param.pager === 'boolean' ? param.pager : true;
+        this.controller = typeof param.controller === 'boolean' ? param.controller : true;
+        this.step = new Step(param.step || false);
 
         if (__first) __first = false;
       }
@@ -74,6 +77,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function next() {
           if (this.fire) return false;
           var promise = this.mediator.appeal(this, 'next');
+          // this.pointer
         }
         /*
         *
@@ -84,6 +88,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function prev() {
           if (this.fire) return false;
           var promise = this.mediator.appeal(this, 'prev');
+          // this.pointer
         }
         /*
         *
@@ -110,12 +115,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'show',
-        value: function show(order) {
-          if (this.fire) return false;
+        value: function show() {
+          var _this = this;
+
+          var order = arguments.length <= 0 || arguments[0] === undefined ? -1 : arguments[0];
+
+          order = typeof order === 'string' ? this.step.indexByName(order) : order;
+          order = !this.step.list[order] ? this.pointer : order;
+          var step = this.step.list[order];
           this.fire = true;
-          var promise = this.mediator.appeal(this, 'show');
+
+          // 内容の切り替えはメディエータに任せる。
+          var promise = this.mediator.appeal(this, 'show', step);
           var def = new this.Deferred();
-          promise.then(function () {});
+          promise.then(function () {
+            _this.fire = false;
+            def.resolve();
+          });
           return def.promise();
         }
         /*
@@ -125,7 +141,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'hide',
         value: function hide() {
-          if (!this.fire) return false;
+          // if(!this.fire) return false;
           var promise = this.mediator.appeal(this, 'hide');
           var def = new this.Deferred();
           return def.promise();
@@ -167,43 +183,65 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             });
             self.eventCtnr = new CustomEventContainer('global', events);
 
+            self.conf = conf;
             self.$ = conf.$;
-            self.$window = conf.$window || $(window);
-            self.$parent = conf.$parent || $('body');
-            self.$scroll = conf.$scroll || $('body');
+            conf.$window = conf.$window || $(window);
+            conf.$parent = conf.$parent || $('body');
+            conf.$scroll = conf.$scroll || $('body');
+            self.$window = conf.$window;
+            self.$parent = conf.$parent;
+            self.$scroll = conf.$scroll;
             self.Deferred = conf.Deferred;
+            self.animation = new conf.Animation(self.$, self.Deferred);
             self.domCtlr = new conf.DOMController({
               '$': self.$,
               '$window': self.$window,
               '$template': self.$(conf.template()),
               'zIndex': conf.zIndex,
               '$parent': self.$parent,
-              'mode': conf.mode
+              'mode': conf.mode,
+              'BGCanvas': conf.BGCanvas,
+              'bgColor': conf.bgColor
+            });
+            if (self.domCtlr.bgCanvas) {
+              self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
+              self.domCtlr.bgCanvas.draw();
+            }
+            /* $ resize event listener */
+            var resizeInterval = conf.resizeInterval || 250;
+            var resizeTimer = null;
+            self.$window.on('resize', function (e) {
+              if (resizeTimer) clearTimeout(resizeTimer);
+              resizeTimer = setTimeout(function () {
+                self.eventCtnr.trigger('resize');
+              }, resizeInterval);
+            });
+            /* custom resize event listener */
+            self.eventCtnr.addEventListener('resize', function (size) {
+              if (self.domCtlr.bgCanvas) {
+                self.domCtlr.bgCanvas.setSize(size.width, size.height);
+                self.domCtlr.bgCanvas.draw();
+              }
+            });
+            /* $ pager event listener */
+            var $pager = self.domCtlr.get$obj('pager');
+            $pager.on('click', 'li span', function () {
+              // self.eventCtnr.trigger('pager');
             });
 
-            // add event listener
-            {
-              (function () {
-                var resizeInterval = conf.resizeInterval || 250;
-                var resizeTimer = null;
-                self.$window.on('resize', function (e) {
-                  if (resizeTimer) clearTimeout(resizeTimer);
-                  resizeTimer = setTimeout(function () {
-                    self.eventCtnr.trigger('resize');
-                  }, resizeInterval);
-                });
-                // ???
-                self.$scroll.on('scroll', function (e) {
-                  console.log(e);
-                });
-              })();
-            }
-            // self.eventCtnr
+            /* $ */
+
+            // eventContainer.trigger('resize');
+            //
+            //       // pager event
+            //       this.$pager.on('click', 'li span', ()=>{
+            //         console.log("ddd");
+            //       });
+            // self.domCtlr
 
             // self.DOMController = conf.DOMController;
 
-            // active tutorial
-            self.active = false;
+            self.active = false; /* active tutorial */
 
             // let events  = [];
 
@@ -243,43 +281,73 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         /*
         * @param {Tutorial} tutorial
         * @param {String}   type
+        * @param {Step}     ops
         */
 
       }, {
         key: 'appeal',
-        value: function appeal(tutorial, type) {
-          var _this = this;
+        value: function appeal(tutorial, type, ops) {
+          var _this2 = this;
 
-          var Deferred = this.Deferred;
+          var def = new this.Deferred();
 
-          var _ret4 = function () {
-            switch (type) {
-              // -----------------------------------------------------------------------
-              case 'show':
-                var def = new Deferred();
-                setTimeout(function () {
-                  if (!_this.active) {
-                    _this.active = tutorial;
-                    def.resolve();
-                  } else {
-                    var promise = _this.active.hide();
-                    promise.then(function () {
-                      _this.active = tutorial;
-                      def.resolve();
-                    });
-                  }
-                }, 10);
-                return {
-                  v: def.promise()
-                };
-                break;
-              // -----------------------------------------------------------------------
-              case 'hide':
-                break;
+          // 表示するための処理
+          var showFunc = function showFunc(step) {
+            var conf = _this2.conf;
+            var speed = conf.animation === true || conf.animation.show ? conf.showSpeed : 0;
+            var $parent = _this2.domCtlr.get$obj('content');
+            var $pager = _this2.domCtlr.get$obj('pager');
+            var $skipBtn = _this2.domCtlr.get$obj('skipBtn');
+            var $prevBtn = _this2.domCtlr.get$obj('prevBtn');
+            var $nextBtn = _this2.domCtlr.get$obj('nextBtn');
+            var $endBtn = _this2.domCtlr.get$obj('endBtn');
+            if (!_this2.active) {
+              _this2.active = tutorial;
+              $parent.empty().append(step.$cnt || '');
+              // ここから
+              var promise = _this2.animation.show(_this2.domCtlr.get$obj('all'), speed);
+              promise.then(function () {
+                return def.resolve();
+              });
+            } else {
+
+              // let promise = this.active.hide();
+
+              //  promise.then(()=>{
+              //    this.active = tutorial;
+              //    def.resolve();
+              //  });
             }
-          }();
+          };
 
-          if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
+          // 非表示するための処理
+          var hideFunc = function hideFunc(tutorial) {
+            if (_this2.active !== tutorial) {
+              def.reject();
+              return false;
+            }
+            // 処理
+          };
+
+          switch (type) {
+            // -----------------------------------------------------------------------
+            case 'show':
+              setTimeout(showFunc.bind(this, ops), 10);
+              return def.promise();
+            // -----------------------------------------------------------------------
+            case 'hide':
+              setTimeout(hideFunc.bind(this, tutorial), 10);
+              return def.promise();
+          }
+        }
+        /*
+        * @return Boolean
+        */
+
+      }, {
+        key: 'hasActive',
+        value: function hasActive() {
+          return this.active ? true : false;
         }
       }]);
 
@@ -465,11 +533,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(CustomEventContainer, [{
         key: 'addEvent',
         value: function addEvent(event) {
-          var _this2 = this;
+          var _this3 = this;
 
           if (!Array.isArray(event)) event = [event];
           event.forEach(function (val) {
-            return _this2.list[val.name] = val;
+            return _this3.list[val.name] = val;
           });
           return this;
         }
@@ -562,7 +630,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'addRelation',
         value: function addRelation(target, eventList) {
-          var _this3 = this;
+          var _this4 = this;
 
           var _target = __private.get(target);
           var _ = __private.get(this);
@@ -573,7 +641,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           eventList = typeof eventList === 'string' ? [eventList] : eventList;
           eventList.forEach(function (name) {
-            if (target.list[name]) relationList[name] = _this3.list[name];
+            if (target.list[name]) relationList[name] = _this4.list[name];
           });
           _.otherContainers[target.name] = target;
         }
@@ -636,6 +704,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     var Step = function () {
       /*
+      * @constructor
       * @param    {Object[]} step
       * @return   Step
       */
@@ -646,23 +715,37 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.length = 0;
         if (step) this.add(step);
       }
-      /*
-      * ステップの内容を変更する
-      * @function changeeStep
-      * @memberof Step
-      * @instance
-      * @param    {String | Number} order
-      * @param    {Object}          step
-      * @return   Step
-      */
+      /* */
 
 
       _createClass(Step, [{
         key: 'change',
+
+        /*
+        * ステップの内容を変更する
+        * @function changeeStep
+        * @memberof Step
+        * @instance
+        * @param    {String | Number} order
+        * @param    {Object}          step
+        * @param    {Boolean}         [partial = true]
+        * @return   Step
+        */
         value: function change(order, step) {
+          var partial = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
+
           order = typeof order === 'string' ? this.indexByName(order) : order;
-          if (order < 0) return;
-          this.list[order] = step;
+          if (!this.list[order]) return this;
+          var name = this.list[order].name;
+          // console.log(name);
+          if (partial) {
+            for (var key in step) {
+              this.list[order][key] = step[key];
+            }
+          } else {
+            if (!step.name) step.name = name;
+            this.list[order] = Step.setDefaultProperties(step);
+          }
           return this;
         }
         /*
@@ -676,11 +759,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'add',
         value: function add(step) {
-          var _this4 = this;
+          var _this5 = this;
 
           var steps = Array.isArray(step) ? step : [step];
-          steps.forEach(function (obj) {
-            return _this4.list.push(obj);
+          steps.forEach(function (step) {
+            return _this5.list.push(Step.setDefaultProperties(step));
           });
           this.length = this.list.length;
           return this;
@@ -696,7 +779,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'delete',
         value: function _delete(order) {
-          var _this5 = this;
+          var _this6 = this;
 
           if (order === undefined) {
             this.list = [];
@@ -704,7 +787,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           } else {
             if (!Array.isArray(order)) order = [order];
             order = order.map(function (val) {
-              return typeof val === 'string' ? _this5.indexByName(val) : val;
+              return typeof val === 'string' ? _this6.indexByName(val) : val;
             });
             var newStep = this.list.filter(function (val, i) {
               var flg = true;
@@ -739,10 +822,46 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           });
           return arr.length > 1 ? arr : arr.length === 1 ? arr[0] : -1;
         }
+        /*
+        * @function deleteStep
+        * @memberof Step
+        * @instance
+        * @param    {Number}
+        * @return   String
+        */
+
+      }, {
+        key: 'nameByIndex',
+        value: function nameByIndex(index) {
+          if (!this.list[index]) return '';
+          if (this.list[index]) return this.list[index].name;
+        }
+      }], [{
+        key: 'setDefaultProperties',
+
+        /*
+        * @param  {Object} step
+        * @return Object
+        */
+        value: function setDefaultProperties(step) {
+          var name = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+
+          step.pager = typeof step.pager === 'boolean' ? step.pager : true;
+          step.controller = typeof step.controller === 'boolean' ? step.controller : true;
+          step.skipBtn = typeof step.skipBtn === 'boolean' ? step.skipBtn : true;
+          step.pos = Array.isArray(step.pos) ? step.pos : ['center', 'center'];
+          if (!step.name) {
+            step.name = 'step-#{Step.id}';
+            Step.id++;
+          }
+          return step;
+        }
       }]);
 
       return Step;
     }();
+
+    Step.id = 0;
 
     var DOMController = function () {
       /**
@@ -759,6 +878,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var zIndex = param.zIndex;
         var $parent = param.$parent;
         var mode = param.mode;
+        var BGCanvas = param.BGCanvas;
+        var bgColor = param.bgColor;
 
 
         this.$ = $;
@@ -768,15 +889,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$content = $('.content', this.$template);
         this.$bg = $('.bg', this.$template);
         this.$pager = $('.pager', this.$template);
-        this.$controller = $('.pager', this.$template);
+        this.$controller = $('.controller', this.$template);
+        this.$skipBtn = $('.skip', this.$controller);
+        this.$prevBtn = $('.prev', this.$controller);
+        this.$nextBtn = $('.next', this.$controller);
+        this.$endBtn = $('.end', this.$controller);
         this.$parent = $parent;
         $template.css({
           'z-index': zIndex,
           'display': 'none',
           'opacity': 0
         });
+        if (mode === 'focus') {
+          this.bgCanvas = new BGCanvas({
+            '$': this.$,
+            '$parent': this.$bg,
+            'bgColor': bgColor
+          });
+        }
         this.$contentWrap.css('z-index', zIndex + 2);
         this.$bg.css('z-index', zIndex + 1);
+
+        // this.$pager
+        // eventContainer
+
 
         // add click skip btn event.
         // $('.controller .skip span', $cnt).on('click', (e)=>{
@@ -820,11 +956,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               break;
             case 'content-wrap':
               return this.$contentWrap;
-            case 'content-set':
-              return this.$contentWrap;
+              break;
+            case 'content':
+              return this.$content;
               break;
             case 'controller':
               return this.$controller;
+              break;
+            case 'skipBtn':
+              return this.$skipBtn;
+              break;
+            case 'prevBtn':
+              return this.$prevBtn;
+              break;
+            case 'nextBtn':
+              return this.$nextBtn;
+              break;
+            case 'endBtn':
+              return this.$nextBtn;
               break;
             case 'pager':
               return this.$pager;
@@ -977,6 +1126,124 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     SimpleDeferred.complete = function () {};
 
+    var Animation = function () {
+      _createClass(Animation, null, [{
+        key: 'getInstance',
+
+        /*
+        *
+        */
+        value: function getInstance() {
+          return Animation.instance ? Animation.instance : false;
+        }
+        /*
+        *
+        */
+
+      }]);
+
+      function Animation($, Deferred) {
+        _classCallCheck(this, Animation);
+
+        if (Animation.instance) return Animation.instance;
+        this.$ = $;
+        this.Deferred = Deferred;
+      }
+      /*
+      *
+      */
+
+
+      _createClass(Animation, [{
+        key: 'show',
+        value: function show($target, speed) {
+          var def = new this.Deferred();
+          $target.stop().css('display', 'block').animate({
+            'opacity': 1
+          }, speed, function () {
+            return def.resolve();
+          });
+          return def.promise();
+        }
+        /*
+        *
+        */
+
+      }, {
+        key: 'hide',
+        value: function hide() {
+          var def = new this.Deferred();
+          return def.promise();
+        }
+      }]);
+
+      return Animation;
+    }();
+
+    var BGCanvas = function () {
+      /**
+      *
+      */
+      function BGCanvas(param) {
+        _classCallCheck(this, BGCanvas);
+
+        if (BGCanvas.instance) return BGCanvas.instance;
+        var $ = param.$;
+        var $parent = param.$parent;
+        var bgColor = param.bgColor;
+
+
+        this.bgColor = bgColor;
+        this.$cvs = $('<canvas>');
+        this.cvs = this.$cvs[0];
+        this.ctx = this.cvs.getContext('2d');
+        $parent.append(this.$cvs);
+        if (!BGCanvas.instance) BGCanvas.instance = this;
+      }
+      /*
+      * @param {Number} w
+      * @param {Number} h
+      */
+
+      /**
+      *
+      */
+
+
+      _createClass(BGCanvas, [{
+        key: 'setSize',
+        value: function setSize(w, h) {
+          this.cvs.width = w;
+          this.cvs.height = h;
+          return this;
+        }
+        /**
+        *
+        */
+
+      }, {
+        key: 'draw',
+        value: function draw() {
+          var rect = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+
+          this.ctx.fillStyle = this.bgColor;
+          this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
+          this.ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
+          if (rect) rect.forEach(function (val) {
+            return ctx.clearRect(val[0], val[1], val[2], val[3]);
+          });
+        }
+      }]);
+
+      return BGCanvas;
+    }();
+
+    BGCanvas.instance = undefined;
+
+    BGCanvas.getInstance = function () {
+      return BGCanvas.instance || false;
+    };
+
     var __first = true;
 
     var __conf = Object.create(null);
@@ -984,8 +1251,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.resizeInterval = 250;
     __conf.scrollInterval = 100;
     __conf.scrollSpeed = 500;
-    __conf.fadeinSpeed = 500;
-    __conf.fadeoutSpeed = 500;
+    __conf.showSpeed = 1000;
+    __conf.hideSpeed = 500;
+    __conf.animation = Object.create(null);
+    __conf.animation.show = true;
+    __conf.animation.hide = true;
+    __conf.animation.scroll = true;
     __conf.animationFPS = 60;
     __conf.skipLabel = 'Skip';
     __conf.prevLabel = 'Prev';
@@ -996,15 +1267,45 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.$parent = null;
     __conf.$scroll = null;
     __conf.zIndex = 9000;
-    __conf.focusBGColor = 'rgba(0, 0, 0, 0.5)';
+    __conf.bgColor = 'rgba(0, 0, 0, 0.5)';
     __conf.template = function () {
       return '\n<div class="tutorial">\n<div class="content-wrap center-middle">\n <ol class="pager">\n  <li><span class="active">1</span></li>\n  <li><span>2</span></li>\n  <li><span>3</span></li>\n  <li><span>4</span></li>\n  <li><span>5</span></li>\n </ol>\n <div class="content"></div>\n <div class="controller">\n   <ul class="left">\n     <li class="skip"><span>' + __conf.skipLabel + '</span></li>\n   </ul>\n   <ul class="right">\n     <li class="prev"><span>' + __conf.prevLabel + '</span></li>\n     <li class="next"><span>' + __conf.nextLabel + '</span></li>\n     <li class="end"><span>' + __conf.endLabel + '</span></li>\n   </ul>\n </div>\n</div>\n<div class="bg"></div>\n</div>\n';
     };
-    __conf.defaultEventConf = [['resize', false], ['scroll', false], ['beforeAddStep', false], ['afterAddStep', false], ['beforeRemoveStep', false], ['afterRemoveStep', false], ['beforeChangeStep', false], ['afterChangeStep', false], ['beforeShow', false], ['afterShow', false], ['beforeNext', false], ['afterNext', false], ['beforePrev', false], ['afterPrev', false], ['beforeHide', false], ['afterHide', false], ['beforeDestory', false], ['afterDestory', false], ['beforeSkip', false], ['afterSkip', false]];
+    __conf.defaultEventConf = [];
+    __conf.defaultEventConf.push(['resize', {
+      'func': function func(conf) {
+        return {
+          'width': conf.$window.innerWidth(),
+          'height': conf.$window.innerHeight()
+        };
+      },
+      'ags': __conf
+    }]);
+    __conf.defaultEventConf.push(['scroll', false]);
+    __conf.defaultEventConf.push(['beforeAddStep', false]);
+    __conf.defaultEventConf.push(['afterAddStep', false]);
+    __conf.defaultEventConf.push(['beforeRemoveStep', false]);
+    __conf.defaultEventConf.push(['afterRemoveStep', false]);
+    __conf.defaultEventConf.push(['beforeChangeStep', false]);
+    __conf.defaultEventConf.push(['afterChangeStep', false]);
+    __conf.defaultEventConf.push(['beforeShow', false]);
+    __conf.defaultEventConf.push(['afterShow', false]);
+    __conf.defaultEventConf.push(['beforeNext', false]);
+    __conf.defaultEventConf.push(['afterNext', false]);
+    __conf.defaultEventConf.push(['beforePrev', false]);
+    __conf.defaultEventConf.push(['afterPrev', false]);
+    __conf.defaultEventConf.push(['beforeHide', false]);
+    __conf.defaultEventConf.push(['afterHide', false]);
+    __conf.defaultEventConf.push(['beforeDestory', false]);
+    __conf.defaultEventConf.push(['afterDestory', false]);
+    __conf.defaultEventConf.push(['beforeSkip', false]);
+    __conf.defaultEventConf.push(['afterSkip', false]);
     __conf.Deferred = SimpleDeferred;
     __conf.DOMController = DOMController;
     __conf.CustomEvent = CustomEvent;
     __conf.CustomEventContainer = CustomEventContainer;
+    __conf.Animation = Animation;
+    __conf.BGCanvas = BGCanvas;
     Object.seal(__conf);
 
     window.Tutorial = Tutorial;

@@ -51,10 +51,12 @@
     var tutorial1 = new Tutorial({
       step : [
         {
-          name : 'step1-0'
+          name : 'step1-0',
+          $cnt : $('<span>hoge</span>')
         },
         {
-          name : 'step1-1'
+          name : 'step1-1',
+          $cnt : $('<span>fuga</span>')
         },
       ]
     });
@@ -68,8 +70,16 @@
         },
       ]
     });
+    tutorial1.step.change('step1-0', {
+      'hoge' : 'fuga'
+    });
     tutorial1.show();
-    tutorial2.show();
+
+    //setTimeout(function(){
+    //  tutorial1.hide();
+    //}, 2000);
+
+    // tutorial2.show();
 
     // let a = tutorial.step.indexByName('step1');
     // console.log(a);

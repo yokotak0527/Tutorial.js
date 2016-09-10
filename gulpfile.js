@@ -25,6 +25,8 @@ let concatJSList = [
   'assets/js/Step.js',
   'assets/js/DOMController.js',
   'assets/js/SimpleDeferred.js',
+  'assets/js/Animation.js',
+  'assets/js/BGCanvas.js',
   'assets/js/config.js',
   'assets/js/footer.js'
   //'assets/js/header.js',

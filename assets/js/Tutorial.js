@@ -31,12 +31,15 @@ class Tutorial{
     let _         = Object.create(null);
     __private.set(this, _);
     // let animationKind = ['fadeInOut', 'scroll'];
-    this.mediator = new TutorialMediator(this, conf);
-    this.step     = new Step(param.step || false);
-    this.fire     = false;
-    this.pointer  = param.startStep ? param.startStep : 0;
-    this.roop     = typeof param.roop === 'boolean' ? param.roop : false;
-    this.Deferred = conf.Deferred;
+    this.mediator   = new TutorialMediator(this, conf);
+    this.domCtrl    = this.mediator.domCtrl;
+    this.fire       = false;
+    this.pointer    = param.startStep ? param.startStep : 0;
+    this.roop       = typeof param.roop === 'boolean' ? param.roop : false;
+    this.Deferred   = conf.Deferred;
+    this.pager      = typeof param.pager === 'boolean' ? param.pager : true;
+    this.controller = typeof param.controller === 'boolean' ? param.controller : true;
+    this.step       = new Step(param.step || false);
 
     if(__first) __first = false;
   }
@@ -46,6 +49,7 @@ class Tutorial{
   next(){
     if(this.fire) return false;
     let promise = this.mediator.appeal(this, 'next');
+    // this.pointer
   }
   /*
   *
@@ -53,6 +57,7 @@ class Tutorial{
   prev(){
     if(this.fire) return false;
     let promise = this.mediator.appeal(this, 'prev');
+    // this.pointer
   }
   /*
   *
@@ -70,12 +75,18 @@ class Tutorial{
   * @param  {String} order
   * @return {SimplePromise}
   */
-  show(order){
-    if(this.fire) return false;
-    this.fire   = true;
-    let promise = this.mediator.appeal(this, 'show');
+  show(order = -1){
+    order     = typeof order === 'string' ? this.step.indexByName(order) : order;
+    order     = !this.step.list[order] ? this.pointer : order;
+    let step  = this.step.list[order];
+    this.fire = true;
+
+    // 内容の切り替えはメディエータに任せる。
+    let promise = this.mediator.appeal(this, 'show', step);
     let def     = new this.Deferred();
     promise.then(()=>{
+      this.fire = false;
+      def.resolve();
     });
     return def.promise();
   }
@@ -83,7 +94,7 @@ class Tutorial{
   * @return {SimplePromise}
   */
   hide(){
-    if(!this.fire) return false;
+    // if(!this.fire) return false;
     let promise = this.mediator.appeal(this, 'hide');
     let def = new this.Deferred();
     return def.promise();

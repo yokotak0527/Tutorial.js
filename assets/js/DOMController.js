@@ -18,7 +18,9 @@ class DOMController{
         $template,
         zIndex,
         $parent,
-        mode
+        mode,
+        BGCanvas,
+        bgColor
       } = param;
 
       this.$            = $;
@@ -28,15 +30,30 @@ class DOMController{
       this.$content     = $('.content',      this.$template);
       this.$bg          = $('.bg',           this.$template);
       this.$pager       = $('.pager',        this.$template);
-      this.$controller  = $('.pager',        this.$template);
+      this.$controller  = $('.controller',   this.$template);
+      this.$skipBtn     = $('.skip',         this.$controller);
+      this.$prevBtn     = $('.prev',         this.$controller);
+      this.$nextBtn     = $('.next',         this.$controller);
+      this.$endBtn      = $('.end',          this.$controller);
       this.$parent      = $parent;
       $template.css({
         'z-index' : zIndex,
         'display' : 'none',
         'opacity' : 0
       });
+      if(mode === 'focus'){
+        this.bgCanvas = new BGCanvas({
+          '$'       : this.$,
+          '$parent' : this.$bg,
+          'bgColor' : bgColor
+        });
+      }
       this.$contentWrap.css('z-index', zIndex+2);
       this.$bg.css('z-index', zIndex+1);
+
+
+      // this.$pager
+      // eventContainer
 
 
       // add click skip btn event.
@@ -71,21 +88,34 @@ class DOMController{
       switch(name){
         case 'all' :
           return this.$template;
-        break;
+          break;
         case 'content-wrap' :
           return this.$contentWrap;
-        case 'content-set' :
-          return this.$contentWrap;
-        break;
+          break;
+        case 'content' :
+          return this.$content;
+          break;
         case 'controller' :
           return this.$controller;
-        break;
+          break;
+        case 'skipBtn' :
+          return this.$skipBtn;
+          break;
+        case 'prevBtn' :
+          return this.$prevBtn;
+          break;
+        case 'nextBtn' :
+          return this.$nextBtn;
+          break;
+        case 'endBtn' :
+          return this.$nextBtn;
+          break;
         case 'pager' :
           return this.$pager;
-        break;
+          break;
         case 'bg' :
           return this.$bg;
-        break;
+          break;
       }
     }
     /**
