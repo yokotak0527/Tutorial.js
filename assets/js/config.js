@@ -24,27 +24,21 @@ __conf.zIndex           = 9000;
 __conf.bgColor          = 'rgba(0, 0, 0, 0.5)';
 __conf.template         = ()=> `
 <div class="tutorial">
-<div class="content-wrap center-middle">
- <ol class="pager">
-  <li><span class="active">1</span></li>
-  <li><span>2</span></li>
-  <li><span>3</span></li>
-  <li><span>4</span></li>
-  <li><span>5</span></li>
- </ol>
- <div class="content"></div>
- <div class="controller">
-   <ul class="left">
-     <li class="skip"><span>${__conf.skipLabel}</span></li>
-   </ul>
-   <ul class="right">
-     <li class="prev"><span>${__conf.prevLabel}</span></li>
-     <li class="next"><span>${__conf.nextLabel}</span></li>
-     <li class="end"><span>${__conf.endLabel}</span></li>
-   </ul>
- </div>
-</div>
-<div class="bg"></div>
+  <div class="content-wrap center-middle">
+    <ol class="pager"></ol>
+    <div class="content"></div>
+    <div class="controller">
+      <ul class="left">
+        <li class="skip"><span>${__conf.skipLabel}</span></li>
+      </ul>
+      <ul class="right">
+        <li class="prev"><span>${__conf.prevLabel}</span></li>
+        <li class="next"><span>${__conf.nextLabel}</span></li>
+        <li class="end"><span>${__conf.endLabel}</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="bg"></div>
 </div>
 `;
 __conf.defaultEventConf = [];

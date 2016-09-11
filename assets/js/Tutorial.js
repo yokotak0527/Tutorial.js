@@ -29,17 +29,19 @@ class Tutorial{
     let conf      = __conf;
     let $         = conf.$;
     let _         = Object.create(null);
+    _.emit        = (msg)=> this.mediator.appeal(this, 'emit', msg);
     __private.set(this, _);
-    // let animationKind = ['fadeInOut', 'scroll'];
+
     this.mediator   = new TutorialMediator(this, conf);
     this.domCtrl    = this.mediator.domCtrl;
     this.fire       = false;
     this.pointer    = param.startStep ? param.startStep : 0;
-    this.roop       = typeof param.roop === 'boolean' ? param.roop : false;
     this.Deferred   = conf.Deferred;
-    this.pager      = typeof param.pager === 'boolean' ? param.pager : true;
+    this.roop       = typeof param.roop       === 'boolean' ? param.roop       : false;
+    this.pager      = typeof param.pager      === 'boolean' ? param.pager      : true;
     this.controller = typeof param.controller === 'boolean' ? param.controller : true;
-    this.step       = new Step(param.step || false);
+    this.skip       = typeof param.skip       === 'boolean' ? param.skip       : true;
+    this.step       = new Step(this, param.step || false);
 
     if(__first) __first = false;
   }
@@ -76,13 +78,13 @@ class Tutorial{
   * @return {SimplePromise}
   */
   show(order = -1){
-    order     = typeof order === 'string' ? this.step.indexByName(order) : order;
-    order     = !this.step.list[order] ? this.pointer : order;
-    let step  = this.step.list[order];
-    this.fire = true;
+    order        = typeof order === 'string' ? this.step.indexByName(order) : order;
+    order        = !this.step.list[order] ? this.pointer : order;
+    this.fire    = true;
+    this.pointer = order;
 
     // 内容の切り替えはメディエータに任せる。
-    let promise = this.mediator.appeal(this, 'show', step);
+    let promise = this.mediator.appeal(this, 'show', this.step.list[order]);
     let def     = new this.Deferred();
     promise.then(()=>{
       this.fire = false;

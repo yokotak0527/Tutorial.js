@@ -1,12 +1,14 @@
 class Step{
   /*
   * @constructor
-  * @param    {Object[]} step
+  * @param    {Tutorial} tutorial
+  * @param    {Object[]} [step]
   * @return   Step
   */
-  constructor(step){
-    this.list   = [];
-    this.length = 0;
+  constructor(tutorial, step){
+    this.list     = [];
+    this.length   = 0;
+    this.tutorial = tutorial;
     if(step) this.add(step);
   }
   /* */
@@ -16,10 +18,7 @@ class Step{
   * @return Object
   */
   static setDefaultProperties(step, name = ''){
-    step.pager      = typeof step.pager === 'boolean' ? step.pager : true;
-    step.controller = typeof step.controller === 'boolean' ? step.controller : true;
-    step.skipBtn    = typeof step.skipBtn === 'boolean' ? step.skipBtn : true;
-    step.pos        = Array.isArray(step.pos) ? step.pos : ['center', 'center'];
+    step.pos = Array.isArray(step.pos) ? step.pos : ['center', 'center'];
     if(!step.name){
       step.name = `step-#{Step.id}`;
       Step.id++;
@@ -47,6 +46,7 @@ class Step{
       if(!step.name) step.name = name;
       this.list[order] = Step.setDefaultProperties(step);
     }
+    __private.get(this.tutorial).emit('step changed');
     return this;
   }
   /*
@@ -60,6 +60,7 @@ class Step{
     let steps = Array.isArray(step) ? step : [step];
     steps.forEach( step => this.list.push( Step.setDefaultProperties(step) ) );
     this.length = this.list.length;
+    __private.get(this.tutorial).emit('step added');
     return this;
   }
   /*
@@ -89,6 +90,7 @@ class Step{
       this.list   = newStep;
       this.length = this.list.length;
     }
+    __private.get(this.tutorial).emit('step deleted');
     return this;
   }
   /*

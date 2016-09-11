@@ -51,33 +51,7 @@ class DOMController{
       this.$contentWrap.css('z-index', zIndex+2);
       this.$bg.css('z-index', zIndex+1);
 
-
-      // this.$pager
-      // eventContainer
-
-
-      // add click skip btn event.
-      // $('.controller .skip span', $cnt).on('click', (e)=>{
-        // if(__activeInstance) __activeInstance.skip();
-      // });
-
-          //// add click prev btn event.
-          //$('.controller .prev span', $cnt).on('click', (e)=>{
-          //  if(__activeInstance) __activeInstance.prev();
-          //});
-      //
-          //// add click next btn event.
-          //$('.controller .next span', $cnt).on('click', (e)=>{
-          //    if(__activeInstance) __activeInstance.next();
-          //});
-      //
-          //// add click end btn event.
-          //$('.controller .end span', $cnt).on('click', (e)=>{
-          //  if(__activeInstance) __activeInstance.end();
-          //});
-
       this.$parent.append(this.$template);
-
     }
     /**
     *
@@ -88,34 +62,24 @@ class DOMController{
       switch(name){
         case 'all' :
           return this.$template;
-          break;
         case 'content-wrap' :
           return this.$contentWrap;
-          break;
         case 'content' :
           return this.$content;
-          break;
         case 'controller' :
           return this.$controller;
-          break;
         case 'skipBtn' :
           return this.$skipBtn;
-          break;
         case 'prevBtn' :
           return this.$prevBtn;
-          break;
         case 'nextBtn' :
           return this.$nextBtn;
-          break;
         case 'endBtn' :
           return this.$nextBtn;
-          break;
         case 'pager' :
           return this.$pager;
-          break;
         case 'bg' :
           return this.$bg;
-          break;
       }
     }
     /**
@@ -133,5 +97,46 @@ class DOMController{
         });
         bgCvs.draw();
       }
+      return this;
+    }
+    /**
+    * @param {String} name
+    */
+    disable(name){
+      let $target = this.get$obj(name);
+      $target.css('display', 'none');
+      return this;
+    }
+    /*
+    * @param {String} name
+    */
+    enable(name){
+      let $target = this.get$obj(name);
+      $target.css('display', '');
+      return this;
+    }
+    /*
+    * @param {jQuery | String} cnt
+    */
+    content(cnt){
+      this.get$obj('content').empty().append(cnt);
+      return this;
+    }
+    /*
+    * @param {Number} num
+    */
+    pager(num){
+      let cnt = '';
+      for(let i = 0, l = num; i<l; i++) cnt += `<li><span>${i}</span></li>`;
+      this.get$obj('pager').empty().append(cnt);
+      return this;
+    }
+    /*
+    * @param {Number} index
+    */
+    pagerActive(index){
+      $('li span', this.get$obj('pager')).removeClass('active');
+      $(`li:eq(${index}) span`, this.get$obj('pager')).addClass('active');
+      return this;
     }
 }

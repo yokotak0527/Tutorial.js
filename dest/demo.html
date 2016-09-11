@@ -56,7 +56,7 @@
         },
         {
           name : 'step1-1',
-          $cnt : $('<span>fuga</span>')
+          $cnt : $('<span>yokota</span>')
         },
       ]
     });
@@ -70,10 +70,14 @@
         },
       ]
     });
-    tutorial1.step.change('step1-0', {
-      'hoge' : 'fuga'
-    });
     tutorial1.show();
+
+    setTimeout(()=>{
+      tutorial1.step.add({
+        name : 'add step'
+      });
+      // tutorial1.show(1);
+    }, 2000)
 
     //setTimeout(function(){
     //  tutorial1.hide();

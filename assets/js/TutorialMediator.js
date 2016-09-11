@@ -31,14 +31,14 @@ class TutorialMediator{
       self.Deferred  = conf.Deferred;
       self.animation = new conf.Animation(self.$, self.Deferred);
       self.domCtlr   = new conf.DOMController({
-        '$'              : self.$,
-        '$window'        : self.$window,
-        '$template'      : self.$(conf.template()),
-        'zIndex'         : conf.zIndex,
-        '$parent'        : self.$parent,
-        'mode'           : conf.mode,
-        'BGCanvas'       : conf.BGCanvas,
-        'bgColor'        : conf.bgColor
+        '$'         : self.$,
+        '$window'   : self.$window,
+        '$template' : self.$(conf.template()),
+        'zIndex'    : conf.zIndex,
+        '$parent'   : self.$parent,
+        'mode'      : conf.mode,
+        'BGCanvas'  : conf.BGCanvas,
+        'bgColor'   : conf.bgColor
       });
       if(self.domCtlr.bgCanvas){
         self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
@@ -63,6 +63,7 @@ class TutorialMediator{
       /* $ pager event listener */
       let $pager = self.domCtlr.get$obj('pager');
       $pager.on('click', 'li span', ()=>{
+        console.log("ddd");
         // self.eventCtnr.trigger('pager');
       });
 
@@ -114,28 +115,41 @@ class TutorialMediator{
   /*
   * @param {Tutorial} tutorial
   * @param {String}   type
-  * @param {Step}     ops
+  * @param {*}        ops
   */
   appeal(tutorial, type, ops){
-    let def = new this.Deferred();
 
     // 表示するための処理
-    let showFunc = (step)=>{
-      let conf     = this.conf;
-      let speed    = conf.animation === true || conf.animation.show ? conf.showSpeed : 0 ;
-      let $parent  = this.domCtlr.get$obj('content');
-      let $pager   = this.domCtlr.get$obj('pager');
-      let $skipBtn = this.domCtlr.get$obj('skipBtn');
-      let $prevBtn = this.domCtlr.get$obj('prevBtn');
-      let $nextBtn = this.domCtlr.get$obj('nextBtn');
-      let $endBtn  = this.domCtlr.get$obj('endBtn');
-      if(!this.active){
+    let showFunc = (def, step)=>{
+      let conf        = this.conf;
+      let showSpeed   = conf.animation === true || conf.animation.show ? conf.showSpeed : 0 ;
+      let hideSpeed   = 0;
+
+      // console.log();
+      /* アクティブな状態なtutorialがない */
+      if(!this.hasActive()){
+        this.domCtlr
+          .content(step.$cnt || '')
+          .pager(tutorial.step.length)
+          .pagerActive(tutorial.pointer);
+
+        if(!tutorial.controller) this.domCtlr.disable('controller');
+        if(!tutorial.pager)      this.domCtlr.disable('pager');
+        if(!tutorial.skipBtn)    this.domCtlr.disable('skipBtn');
+
         this.active = tutorial;
-        $parent.empty().append(step.$cnt || '');
-        // ここから
-        let promise = this.animation.show(this.domCtlr.get$obj('all'), speed);
+        // アニメーション
+        let promise = this.animation.show(this.domCtlr.get$obj('all'), showSpeed);
         promise.then( () => def.resolve() );
-      }else{
+      }
+      /* アクティブな状態なtutorialがある */
+      if(this.hasActive() && tutorial === this.active){
+        this.domCtlr
+          .content(step.$cnt || '')
+          .pagerActive(tutorial.pointer);
+      }
+      else{
+
 
         // let promise = this.active.hide();
 
@@ -147,24 +161,37 @@ class TutorialMediator{
     }
 
     // 非表示するための処理
-    let hideFunc = (tutorial)=>{
+    let hideFunc = (def, tutorial)=>{
       if(this.active !== tutorial){
         def.reject();
         return false;
+      }else if(this.active === tutorial){
       }
       // 処理
     }
 
 
-    switch(type){
-      // -----------------------------------------------------------------------
-      case 'show' :
-        setTimeout(showFunc.bind(this, ops), 10);
-        return def.promise();
-      // -----------------------------------------------------------------------
-      case 'hide' :
-        setTimeout(hideFunc.bind(this, tutorial), 10);
-        return def.promise();
+    if(type === 'show'){
+      let def = new this.Deferred();
+      setTimeout(showFunc.bind(this, def, ops), 10);
+      return def.promise();
+    }
+    else if(type === 'hide'){
+      let def = new this.Deferred();
+      setTimeout(hideFunc.bind(this, def, tutorial), 10);
+      return def.promise();
+    }
+    else if(type === 'next'){
+      let def = new this.Deferred();
+      return def.promise();
+    }
+    else if(type === 'emit'){
+      let msg = ops;
+      if(!this.hasActive() || tutorial !== this.active) return false;
+      if(!msg.match(/^step/)) return false;
+      this.domCtlr
+          .pager(tutorial.step.length)
+          .pagerActive(tutorial.pointer);
     }
   }
   /*
