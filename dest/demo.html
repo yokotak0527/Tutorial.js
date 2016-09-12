@@ -63,19 +63,23 @@
     var tutorial2 = new Tutorial({
       step : [
         {
-          name : 'step2-0'
+          name : 'step2-0',
+          $cnt : $('<span>横田</span>')
         },
         {
-          name : 'step2-1'
+          name : 'step2-1',
+          $cnt : $('<span>賢司</span>')
         },
       ]
     });
     tutorial1.show();
 
     setTimeout(()=>{
-      tutorial1.step.add({
-        name : 'add step'
-      });
+      tutorial2.show();
+      // tutorial1.hide();
+      // tutorial1.step.add({
+      //   name : 'add step'
+      // });
       // tutorial1.show(1);
     }, 2000)
 

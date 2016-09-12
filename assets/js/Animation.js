@@ -27,8 +27,14 @@ class Animation{
   /*
   *
   */
-  hide(){
+  hide($target, speed){
     let def = new this.Deferred();
+    $target.stop().animate({
+      'opacity' : 0
+    }, speed, ()=>{
+      $target.css('display', 'none');
+      def.resolve();
+    });
     return def.promise();
   }
 }

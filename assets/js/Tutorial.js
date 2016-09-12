@@ -89,16 +89,24 @@ class Tutorial{
     promise.then(()=>{
       this.fire = false;
       def.resolve();
+    },()=>{
+      def.reject();
     });
     return def.promise();
   }
   /*
   * @return {SimplePromise}
   */
-  hide(){
-    // if(!this.fire) return false;
-    let promise = this.mediator.appeal(this, 'hide');
-    let def = new this.Deferred();
+  hide(first = false){
+    this.fire   = true;
+    let def     = new this.Deferred();
+    let promise = this.mediator.appeal(this, 'hide', first);
+    promise.then(()=>{
+      this.fire = false;
+      def.resolve();
+    },()=>{
+      def.reject();
+    });
     return def.promise();
   }
   /*

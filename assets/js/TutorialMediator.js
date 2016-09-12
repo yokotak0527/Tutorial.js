@@ -118,59 +118,63 @@ class TutorialMediator{
   * @param {*}        ops
   */
   appeal(tutorial, type, ops){
-
+    // -------------------------------------------------------------------------
     // 表示するための処理
+    // -------------------------------------------------------------------------
     let showFunc = (def, step)=>{
-      let conf        = this.conf;
-      let showSpeed   = conf.animation === true || conf.animation.show ? conf.showSpeed : 0 ;
-      let hideSpeed   = 0;
+      let conf  = this.conf;
+      let speed = conf.animation === true || conf.animation.show ? conf.showSpeed : 0 ;
 
-      // console.log();
       /* アクティブな状態なtutorialがない */
       if(!this.hasActive()){
-        this.domCtlr
-          .content(step.$cnt || '')
-          .pager(tutorial.step.length)
-          .pagerActive(tutorial.pointer);
+        this.domCtlr.content(step.$cnt || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
 
         if(!tutorial.controller) this.domCtlr.disable('controller');
         if(!tutorial.pager)      this.domCtlr.disable('pager');
         if(!tutorial.skipBtn)    this.domCtlr.disable('skipBtn');
+        if(!tutorial.roop)       this.domCtlr.disable('endBtn');
 
         this.active = tutorial;
         // アニメーション
-        let promise = this.animation.show(this.domCtlr.get$obj('all'), showSpeed);
+        let promise = this.animation.show(this.domCtlr.get$obj('all'), speed);
         promise.then( () => def.resolve() );
       }
-      /* アクティブな状態なtutorialがある */
+      /* アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由) */
       if(this.hasActive() && tutorial === this.active){
         this.domCtlr
           .content(step.$cnt || '')
           .pagerActive(tutorial.pointer);
+        def.resolve();
       }
+      /* アクティブな状態なtutorialがある */
       else{
-
-
-        // let promise = this.active.hide();
-
-      //  promise.then(()=>{
-      //    this.active = tutorial;
-      //    def.resolve();
-      //  });
+        this.active.hide(true);
+        // 0秒での非表示処理
       }
     }
-
+    // -------------------------------------------------------------------------
     // 非表示するための処理
-    let hideFunc = (def, tutorial)=>{
+    // -------------------------------------------------------------------------
+    let hideFunc = (def, tutorial, first)=>{
+      let conf  = this.conf;
+      let speed = conf.animation === true || conf.animation.hide ? conf.hideSpeed : 0 ;
+      if(first) speed = 10;
       if(this.active !== tutorial){
         def.reject();
         return false;
       }else if(this.active === tutorial){
+        this.active = undefined;
+        let promise = this.animation.hide(this.domCtlr.get$obj('all'), speed);
+        promise.then(()=>{
+          if(!tutorial.controller) this.domCtlr.enable('controller');
+          if(!tutorial.pager)      this.domCtlr.enable('pager');
+          if(!tutorial.skipBtn)    this.domCtlr.enable('skipBtn');
+          if(!tutorial.roop)       this.domCtlr.enable('endBtn');
+          def.resolve();
+        });
       }
-      // 処理
     }
-
-
+    // -------------------------------------------------------------------------
     if(type === 'show'){
       let def = new this.Deferred();
       setTimeout(showFunc.bind(this, def, ops), 10);
@@ -178,7 +182,7 @@ class TutorialMediator{
     }
     else if(type === 'hide'){
       let def = new this.Deferred();
-      setTimeout(hideFunc.bind(this, def, tutorial), 10);
+      setTimeout(hideFunc.bind(this, def, tutorial, ops), 10);
       return def.promise();
     }
     else if(type === 'next'){
@@ -200,4 +204,8 @@ class TutorialMediator{
   hasActive(){
     return this.active ? true : false;
   }
+}
+
+let __TutorialMediator_showFunc = function(){
+  console.log(this);
 }

@@ -51,6 +51,24 @@ class DOMController{
       this.$contentWrap.css('z-index', zIndex+2);
       this.$bg.css('z-index', zIndex+1);
 
+      // add event listener
+      this.$skipBtn.on('click', ()=>{
+        if(!this.active || this.active.fire) return false;
+        this.active.skip();
+      });
+      this.$prevBtn.on('click', ()=>{
+        if(!this.active || this.active.fire) return false;
+        this.active.prev();
+      });
+      this.$nextBtn.on('click', ()=>{
+          if(!this.active || this.active.fire) return false;
+          this.active.next();
+      });
+      this.$endBtn.on('click', ()=>{
+          if(!this.active || this.active.fire) return false;
+          this.active.next();
+      });
+
       this.$parent.append(this.$template);
     }
     /**
@@ -75,7 +93,7 @@ class DOMController{
         case 'nextBtn' :
           return this.$nextBtn;
         case 'endBtn' :
-          return this.$nextBtn;
+          return this.$endBtn;
         case 'pager' :
           return this.$pager;
         case 'bg' :

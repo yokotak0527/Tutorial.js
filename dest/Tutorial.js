@@ -137,6 +137,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           promise.then(function () {
             _this2.fire = false;
             def.resolve();
+          }, function () {
+            def.reject();
           });
           return def.promise();
         }
@@ -147,9 +149,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'hide',
         value: function hide() {
-          // if(!this.fire) return false;
-          var promise = this.mediator.appeal(this, 'hide');
+          var _this3 = this;
+
+          var first = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+
+          this.fire = true;
           var def = new this.Deferred();
+          var promise = this.mediator.appeal(this, 'hide', first);
+          promise.then(function () {
+            _this3.fire = false;
+            def.resolve();
+          }, function () {
+            def.reject();
+          });
           return def.promise();
         }
         /*
@@ -294,60 +306,72 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'appeal',
         value: function appeal(tutorial, type, ops) {
-          var _this3 = this;
+          var _this4 = this;
 
+          // -------------------------------------------------------------------------
           // 表示するための処理
+          // -------------------------------------------------------------------------
           var showFunc = function showFunc(def, step) {
-            var conf = _this3.conf;
-            var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed : 0;
-            var hideSpeed = 0;
+            var conf = _this4.conf;
+            var speed = conf.animation === true || conf.animation.show ? conf.showSpeed : 0;
 
-            // console.log();
             /* アクティブな状態なtutorialがない */
-            if (!_this3.hasActive()) {
-              _this3.domCtlr.content(step.$cnt || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
+            if (!_this4.hasActive()) {
+              _this4.domCtlr.content(step.$cnt || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
 
-              if (!tutorial.controller) _this3.domCtlr.disable('controller');
-              if (!tutorial.pager) _this3.domCtlr.disable('pager');
-              if (!tutorial.skipBtn) _this3.domCtlr.disable('skipBtn');
+              if (!tutorial.controller) _this4.domCtlr.disable('controller');
+              if (!tutorial.pager) _this4.domCtlr.disable('pager');
+              if (!tutorial.skipBtn) _this4.domCtlr.disable('skipBtn');
+              if (!tutorial.roop) _this4.domCtlr.disable('endBtn');
 
-              _this3.active = tutorial;
+              _this4.active = tutorial;
               // アニメーション
-              var promise = _this3.animation.show(_this3.domCtlr.get$obj('all'), showSpeed);
+              var promise = _this4.animation.show(_this4.domCtlr.get$obj('all'), speed);
               promise.then(function () {
                 return def.resolve();
               });
             }
-            /* アクティブな状態なtutorialがある */
-            if (_this3.hasActive() && tutorial === _this3.active) {
-              _this3.domCtlr.content(step.$cnt || '').pagerActive(tutorial.pointer);
-            } else {
-
-              // let promise = this.active.hide();
-
-              //  promise.then(()=>{
-              //    this.active = tutorial;
-              //    def.resolve();
-              //  });
+            /* アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由) */
+            if (_this4.hasActive() && tutorial === _this4.active) {
+              _this4.domCtlr.content(step.$cnt || '').pagerActive(tutorial.pointer);
+              def.resolve();
             }
+            /* アクティブな状態なtutorialがある */
+            else {
+                _this4.active.hide(true);
+                // 0秒での非表示処理
+              }
           };
-
+          // -------------------------------------------------------------------------
           // 非表示するための処理
-          var hideFunc = function hideFunc(def, tutorial) {
-            if (_this3.active !== tutorial) {
+          // -------------------------------------------------------------------------
+          var hideFunc = function hideFunc(def, tutorial, first) {
+            var conf = _this4.conf;
+            var speed = conf.animation === true || conf.animation.hide ? conf.hideSpeed : 0;
+            if (first) speed = 10;
+            if (_this4.active !== tutorial) {
               def.reject();
               return false;
-            } else if (_this3.active === tutorial) {}
-            // 処理
+            } else if (_this4.active === tutorial) {
+              _this4.active = undefined;
+              var promise = _this4.animation.hide(_this4.domCtlr.get$obj('all'), speed);
+              promise.then(function () {
+                if (!tutorial.controller) _this4.domCtlr.enable('controller');
+                if (!tutorial.pager) _this4.domCtlr.enable('pager');
+                if (!tutorial.skipBtn) _this4.domCtlr.enable('skipBtn');
+                if (!tutorial.roop) _this4.domCtlr.enable('endBtn');
+                def.resolve();
+              });
+            }
           };
-
+          // -------------------------------------------------------------------------
           if (type === 'show') {
             var def = new this.Deferred();
             setTimeout(showFunc.bind(this, def, ops), 10);
             return def.promise();
           } else if (type === 'hide') {
             var _def = new this.Deferred();
-            setTimeout(hideFunc.bind(this, _def, tutorial), 10);
+            setTimeout(hideFunc.bind(this, _def, tutorial, ops), 10);
             return _def.promise();
           } else if (type === 'next') {
             var _def2 = new this.Deferred();
@@ -375,6 +399,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     TutorialMediator.instance = undefined;
     TutorialMediator.idNum = 0;
+
+
+    var __TutorialMediator_showFunc = function __TutorialMediator_showFunc() {
+      console.log(this);
+    };
 
     var CustomEvent = function () {
       /*
@@ -552,11 +581,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(CustomEventContainer, [{
         key: 'addEvent',
         value: function addEvent(event) {
-          var _this4 = this;
+          var _this5 = this;
 
           if (!Array.isArray(event)) event = [event];
           event.forEach(function (val) {
-            return _this4.list[val.name] = val;
+            return _this5.list[val.name] = val;
           });
           return this;
         }
@@ -649,7 +678,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'addRelation',
         value: function addRelation(target, eventList) {
-          var _this5 = this;
+          var _this6 = this;
 
           var _target = __private.get(target);
           var _ = __private.get(this);
@@ -660,7 +689,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           eventList = typeof eventList === 'string' ? [eventList] : eventList;
           eventList.forEach(function (name) {
-            if (target.list[name]) relationList[name] = _this5.list[name];
+            if (target.list[name]) relationList[name] = _this6.list[name];
           });
           _.otherContainers[target.name] = target;
         }
@@ -781,11 +810,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'add',
         value: function add(step) {
-          var _this6 = this;
+          var _this7 = this;
 
           var steps = Array.isArray(step) ? step : [step];
           steps.forEach(function (step) {
-            return _this6.list.push(Step.setDefaultProperties(step));
+            return _this7.list.push(Step.setDefaultProperties(step));
           });
           this.length = this.list.length;
           __private.get(this.tutorial).emit('step added');
@@ -802,7 +831,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'delete',
         value: function _delete(order) {
-          var _this7 = this;
+          var _this8 = this;
 
           if (order === undefined) {
             this.list = [];
@@ -810,7 +839,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           } else {
             if (!Array.isArray(order)) order = [order];
             order = order.map(function (val) {
-              return typeof val === 'string' ? _this7.indexByName(val) : val;
+              return typeof val === 'string' ? _this8.indexByName(val) : val;
             });
             var newStep = this.list.filter(function (val, i) {
               var flg = true;
@@ -889,6 +918,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       *
       */
       function DOMController(param) {
+        var _this9 = this;
+
         _classCallCheck(this, DOMController);
 
         if (DOMController.instance) return DOMController.instance;
@@ -931,6 +962,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$contentWrap.css('z-index', zIndex + 2);
         this.$bg.css('z-index', zIndex + 1);
 
+        // add event listener
+        this.$skipBtn.on('click', function () {
+          if (!_this9.active || _this9.active.fire) return false;
+          _this9.active.skip();
+        });
+        this.$prevBtn.on('click', function () {
+          if (!_this9.active || _this9.active.fire) return false;
+          _this9.active.prev();
+        });
+        this.$nextBtn.on('click', function () {
+          if (!_this9.active || _this9.active.fire) return false;
+          _this9.active.next();
+        });
+        this.$endBtn.on('click', function () {
+          if (!_this9.active || _this9.active.fire) return false;
+          _this9.active.next();
+        });
+
         this.$parent.append(this.$template);
       }
       /**
@@ -963,7 +1012,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             case 'nextBtn':
               return this.$nextBtn;
             case 'endBtn':
-              return this.$nextBtn;
+              return this.$endBtn;
             case 'pager':
               return this.$pager;
             case 'bg':
@@ -1215,8 +1264,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'hide',
-        value: function hide() {
+        value: function hide($target, speed) {
           var def = new this.Deferred();
+          $target.stop().animate({
+            'opacity': 0
+          }, speed, function () {
+            $target.css('display', 'none');
+            def.resolve();
+          });
           return def.promise();
         }
       }]);
