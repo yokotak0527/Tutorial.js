@@ -65,13 +65,13 @@ class Tutorial{
   *
   */
   skip(){
-    let promise = this.mediator.appeal(this, 'prev');
+    let promise = this.mediator.appeal(this, 'skip');
   }
   /*
   *
   */
   end(){
-    let promise = this.mediator.appeal(this, 'prev');
+    let promise = this.mediator.appeal(this, 'end');
   }
   /*
   * @param  {String} order
@@ -97,7 +97,7 @@ class Tutorial{
   /*
   * @return {SimplePromise}
   */
-  hide(first = false){
+  hide(){
     this.fire   = true;
     let def     = new this.Deferred();
     let promise = this.mediator.appeal(this, 'hide', first);
