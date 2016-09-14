@@ -86,6 +86,34 @@ Tutorial.changeConfig({
 
 ※ このメソッドはTutorial.jsのインスタンスが無い場合のみ利用できます。
 
+## チュートリアルの操作
+
+### tutorial.next()
+
+### tutorial.prev()
+
+### tutorial.skip()
+
+### tutorial.end()
+
+### tutorial.destroy()
+
+### tutorial.show(order)
+
+### tutorial.hide()
+
+## ステップの操作
+
+## tutorial.step.add(step)
+
+## tutorial.step.delete(order)
+
+## tutorial.step.change(order, step, partial = true)
+
+## tutorial.step.indexByName(name)
+
+## tutorial.step.nameByIndex(index)
+
 ## イベント
 
 Tutorial.jsは表示前・後、移動前・後など色々な動作タイミングで外部の処理を実行できる様な
