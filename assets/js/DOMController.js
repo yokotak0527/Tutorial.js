@@ -31,10 +31,10 @@ class DOMController{
       this.$bg          = $('.bg',           this.$template);
       this.$pager       = $('.pager',        this.$template);
       this.$controller  = $('.controller',   this.$template);
-      this.$skipBtn     = $('.skip',         this.$controller);
-      this.$prevBtn     = $('.prev',         this.$controller);
-      this.$nextBtn     = $('.next',         this.$controller);
-      this.$endBtn      = $('.end',          this.$controller);
+      this.$skipBtn     = $('.skip span',    this.$controller);
+      this.$prevBtn     = $('.prev span',    this.$controller);
+      this.$nextBtn     = $('.next span',    this.$controller);
+      this.$endBtn      = $('.end span',     this.$controller);
       this.$parent      = $parent;
       $template.css({
         'z-index' : zIndex,
@@ -56,6 +56,7 @@ class DOMController{
         if(!this.active || this.active.fire) return false;
         this.active.skip();
       });
+      console.log(this.$prevBtn);
       this.$prevBtn.on('click', ()=>{
         if(!this.active || this.active.fire) return false;
         this.active.prev();
@@ -134,7 +135,7 @@ class DOMController{
       return this;
     }
     /*
-    * @param {jQuery | String} cnt
+    * @param {jQuery | String | DOMObject} cnt
     */
     content(cnt){
       this.get$obj('content').empty().append(cnt);

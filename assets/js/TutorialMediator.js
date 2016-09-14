@@ -140,7 +140,7 @@ class TutorialMediator{
 
       /* アクティブな状態なtutorialがない */
       if(!this.hasActive()){
-        this.domCtlr.content(step.$cnt || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
+        this.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
 
         if(!tutorial.controller) this.domCtlr.disable('controller');
         if(!tutorial.pager)      this.domCtlr.disable('pager');
@@ -148,15 +148,16 @@ class TutorialMediator{
         // if(!tutorial.roop)       this.domCtlr.disable('endBtn');
 
         this.active = tutorial;
-        // アニメーション
+        // 表示＆移動アニメーション
+        // ここ
         let promise = this.animation.show(this.domCtlr.get$obj('all'), speed);
         promise.then( () => def.resolve() );
       }
       /* アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由) */
       if(this.hasActive() && tutorial === this.active){
-        this.domCtlr
-          .content(step.$cnt || '')
-          .pagerActive(tutorial.pointer);
+        // 表示＆移動アニメーション
+        // ここ
+        this.domCtlr.content(step.content || '').pagerActive(tutorial.pointer);
         def.resolve();
       }
       /* アクティブな状態なtutorialがある */
@@ -167,7 +168,6 @@ class TutorialMediator{
         this.domCtlr.enable('endBtn');
         this.active = undefined;
         showFunc(def, step);
-        // 0秒での非表示処理
       }
     }
     // -------------------------------------------------------------------------
@@ -204,8 +204,19 @@ class TutorialMediator{
       return def.promise();
     }
     else if(type === 'next'){
-      let def = new this.Deferred();
+      let def        = new this.Deferred();
+      let newPointer = ops;
+      let promise    = tutorial.show(newPointer);
+      promise.then(()=>{
+        return def.resolve();
+      });
       return def.promise();
+    }
+    else if(type === 'prev'){
+      console.log("ddsd");
+      let def        = new this.Deferred();
+      let newPointer = ops;
+      console.log(newPointer);
     }
     else if(type === 'emit'){
       let msg = ops;

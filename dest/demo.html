@@ -49,35 +49,36 @@
   <script>
     Tutorial.changeConfig('skipLabel', 'スキップ');
     var tutorial1 = new Tutorial({
+      'roop' : true,
       step : [
         {
-          name : 'step1-0',
-          $cnt : $('<span>hoge</span>')
+          name    : 'step1-0',
+          content : $('<span>hoge</span>')[0]
         },
         {
-          name : 'step1-1',
-          $cnt : $('<span>yokota</span>')
+          name    : 'step1-1',
+          content : $('<span>yokota</span>')
         },
       ]
     });
     var tutorial2 = new Tutorial({
       step : [
         {
-          name : 'step2-0',
-          $cnt : $('<span>横田</span>')
+          name    : 'step2-0',
+          content : $('<span>横田</span>')
         }
       ]
     });
     tutorial1.show();
 
-    setTimeout(()=>{
-      tutorial2.show();
-      // tutorial1.hide();
-      // tutorial1.step.add({
-      //   name : 'add step'
-      // });
-      // tutorial1.show(1);
-    }, 2000)
+    // setTimeout(()=>{
+    //   tutorial2.show();
+    //   // tutorial1.hide();
+    //   // tutorial1.step.add({
+    //   //   name : 'add step'
+    //   // });
+    //   // tutorial1.show(1);
+    // }, 2000)
 
     //setTimeout(function(){
     //  tutorial1.hide();

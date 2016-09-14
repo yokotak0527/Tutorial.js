@@ -49,17 +49,27 @@ class Tutorial{
   *
   */
   next(){
+    let newPointer = this.pointer + 1;
     if(this.fire) return false;
-    let promise = this.mediator.appeal(this, 'next');
-    // this.pointer
+    if(this.roop && newPointer >= this.step.length) newPointer = 0;
+    if(newPointer >= this.step.length) return false;
+    let promise = this.mediator.appeal(this, 'next', newPointer);
+    promise.then(()=>{
+      this.pointer = newPointer;
+    });
   }
   /*
   *
   */
   prev(){
+    let newPointer = this.pointer - 1;
     if(this.fire) return false;
-    let promise = this.mediator.appeal(this, 'prev');
-    // this.pointer
+    if(this.roop && this.pointer - 1 < 0) newPointer = this.step.length - 1;
+    if(this.pointer - 1 < 0) return false;
+    let promise = this.mediator.appeal(this, 'prev', this.pointer - 1);
+    promise.then(()=>{
+      this.pointer = newPointer;
+    });
   }
   /*
   *
