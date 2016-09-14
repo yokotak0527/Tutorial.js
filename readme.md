@@ -1,6 +1,6 @@
 # Tutorial.js
 
-**DON'T WORK YET.**
+**THIS STILL HAVEN'T WORK.**
 
 Tutorial.js provides introduction function on your WEB site, service, and so on.
 
@@ -22,21 +22,20 @@ var introduction = new Tutorial({
   'pager'      : false,
   'controller' : true,
   'auto'       : false,
+  'startStep'  : 0,
   'step'       : [
     {
-      'name'    : 'step1',
-      'target'  : $('#target-name'),
-      'pos'     : ['right', 'top'],
-      'content' : 'step1 message'
+      'name'   : 'step1',
+      'target' : $('#target-name'),
+      'pos'    : ['right', 'top'],
+      '$cnt'   : 'step1 message'
     },{
-      'name'    : 'step2',
-      'pos'     : ['center', 'center'],
-      'content' : $('#step2-html').clone()
+      'name' : 'step2',
+      'pos'  : ['center', 'center'],
+      '$cnt' : $('#step2-html').clone()
     }
   ]
 });
 
-introduction.start();
+introduction.show();
 ```
-
-If you wanna learning Tutorial.js, much further. see here.
