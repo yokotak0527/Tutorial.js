@@ -1,21 +1,21 @@
 # Tutorial.js
 
-**THIS STILL HAVEN'T WORK.**
+**まだ動作しません。**
 
-Tutorial.js provides introduction function on your WEB site, service, and so on.
+Tutorial.js はWEBサイトやサービスなどのチュートリアル機能を提供します。
 
-## Dependencies
+## 依存しているライブラリ、フレームワーク
 
 * jQuery
 
-## Support browsers
+## 動作サポート
 
 * iE9+
 * Chrome
 * safari
 * Firefox
 
-## Usage
+## 使い方
 
 ```
 var introduction = new Tutorial({
