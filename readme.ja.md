@@ -39,3 +39,11 @@ var introduction = new Tutorial({
 
 introduction.show();
 ```
+
+# Tutorial.jsの設定
+
+Tutorial.jsの設定はTutorial.js自体の設定と各チュートリアルの設定の２つに分かれます。
+
+Tutorial.js自体の設定はTutorial.changeConfig()を使って変更します。
+
+## Tutorial.changeConfig(key, val)
