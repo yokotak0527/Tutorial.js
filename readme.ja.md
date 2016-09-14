@@ -85,3 +85,41 @@ Tutorial.changeConfig({
 | bgColor             | String            | 'rgba(0, 0, 0, 0.5)' | |
 
 ※ このメソッドはTutorial.jsのインスタンスが無い場合のみ利用できます。
+
+## イベント
+
+Tutorial.jsは表示前・後、移動前・後など色々な動作タイミングで外部の処理を実行できる様な
+イベント機能があります。
+
+### tutorial.event.addEventListener(eventName, listenerName = undefined, callback)
+
+### tutorial.event.removeEventListener(eventName, listenerName = undefined)
+
+### tutorial.event.trigger(eventName)
+
+イベントは以下の種類があります。
+
+| イベント名       | タイミング |
+|------------------|------------|
+| resize           |  |
+| scroll           |  |
+| beforeAddStep    |  |
+| afterAddStep     |  |
+| beforeRemoveStep |  |
+| afterRemoveStep  |  |
+| beforeChangeStep |  |
+| afterChangeStep  |  |
+| beforeShow       |  |
+| afterShow        |  |
+| beforeNext       |  |
+| afterNext        |  |
+| beforePrev       |  |
+| afterPrev        |  |
+| beforeHide       |  |
+| afterHide        |  |
+| beforeDestory    |  |
+| afterDestory     |  |
+| beforeSkip       |  |
+| afterSkip        |  |
+
+## カスタムイベント
