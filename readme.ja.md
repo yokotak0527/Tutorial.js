@@ -104,15 +104,15 @@ Tutorial.changeConfig({
 
 ## ステップの操作
 
-## tutorial.step.add(step)
+### tutorial.step.add(step)
 
-## tutorial.step.delete(order)
+### tutorial.step.delete(order)
 
-## tutorial.step.change(order, step, partial = true)
+### tutorial.step.change(order, step, partial = true)
 
-## tutorial.step.indexByName(name)
+### tutorial.step.indexByName(name)
 
-## tutorial.step.nameByIndex(index)
+### tutorial.step.nameByIndex(index)
 
 ## イベント
 
