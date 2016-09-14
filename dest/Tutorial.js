@@ -104,8 +104,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           var newPointer = this.pointer - 1;
           if (this.fire) return false;
           if (this.roop && this.pointer - 1 < 0) newPointer = this.step.length - 1;
-          if (this.pointer - 1 < 0) return false;
-          var promise = this.mediator.appeal(this, 'prev', this.pointer - 1);
+          if (newPointer < 0) return false;
+          var promise = this.mediator.appeal(this, 'prev', newPointer);
           promise.then(function () {
             _this3.pointer = newPointer;
           });
@@ -428,10 +428,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
           } else if (type === 'prev') {
-            console.log("ddsd");
-            var _def2 = new this.Deferred();
-            var _newPointer = ops;
-            console.log(_newPointer);
+            var _ret4 = function () {
+              var def = new _this6.Deferred();
+              var newPointer = ops;
+              var promise = tutorial.show(newPointer);
+              promise.then(function () {
+                return def.resolve();
+              });
+              return {
+                v: def.promise()
+              };
+            }();
+
+            if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
           } else if (type === 'emit') {
             var msg = ops;
             if (!this.hasActive() || tutorial !== this.active) return false;
@@ -1023,7 +1032,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (!_this11.active || _this11.active.fire) return false;
           _this11.active.skip();
         });
-        console.log(this.$prevBtn);
         this.$prevBtn.on('click', function () {
           if (!_this11.active || _this11.active.fire) return false;
           _this11.active.prev();

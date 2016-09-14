@@ -56,7 +56,6 @@ class DOMController{
         if(!this.active || this.active.fire) return false;
         this.active.skip();
       });
-      console.log(this.$prevBtn);
       this.$prevBtn.on('click', ()=>{
         if(!this.active || this.active.fire) return false;
         this.active.prev();

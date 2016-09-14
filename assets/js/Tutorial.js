@@ -65,8 +65,8 @@ class Tutorial{
     let newPointer = this.pointer - 1;
     if(this.fire) return false;
     if(this.roop && this.pointer - 1 < 0) newPointer = this.step.length - 1;
-    if(this.pointer - 1 < 0) return false;
-    let promise = this.mediator.appeal(this, 'prev', this.pointer - 1);
+    if(newPointer < 0) return false;
+    let promise = this.mediator.appeal(this, 'prev', newPointer);
     promise.then(()=>{
       this.pointer = newPointer;
     });

@@ -213,10 +213,13 @@ class TutorialMediator{
       return def.promise();
     }
     else if(type === 'prev'){
-      console.log("ddsd");
       let def        = new this.Deferred();
       let newPointer = ops;
-      console.log(newPointer);
+      let promise    = tutorial.show(newPointer);
+      promise.then(()=>{
+        return def.resolve();
+      });
+      return def.promise();
     }
     else if(type === 'emit'){
       let msg = ops;
