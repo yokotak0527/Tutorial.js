@@ -4,6 +4,8 @@
 
 Tutorial.js はWEBサイトやサービスなどのチュートリアル機能を提供します。
 
+## デモ
+
 ## 依存しているライブラリ、フレームワーク
 
 * jQuery
@@ -40,12 +42,26 @@ var introduction = new Tutorial({
 introduction.show();
 ```
 
-# Tutorial.jsの設定
+## Tutorial.jsの設定
 
 Tutorial.jsの設定はTutorial.js自体の設定と各チュートリアルの設定の２つに分かれます。  
 Tutorial.js自体の設定はTutorial.changeConfig()を使って変更します。
 
-## Tutorial.changeConfig(key, val)
+### Tutorial.changeConfig(key, val)
+
+```js
+Tutorial.changeConfig('resizeInterval', 500);
+```
+
+このように指定することで設定を変更することができます。  
+またObjectを渡すことで一括で変更することも可能です。
+
+```js
+Tutorial.changeConfig({
+  'resizeInterval' : 500,
+  'showSpeed'      : 250
+});
+```
 
 | key                 | val               | 初期値               | 説明 |
 |---------------------|-------------------|----------------------|------|
@@ -66,5 +82,6 @@ Tutorial.js自体の設定はTutorial.changeConfig()を使って変更します�
 | $parent             | jQuery            | $('body')            | |
 | $scroll             | jQuery            | $('body')            | |
 | zIndex              | Number            | 9000                 | |
-| zIndex              | Number            | 9000                 | |
 | bgColor             | String            | 'rgba(0, 0, 0, 0.5)' | |
+
+※ このメソッドはTutorial.jsのインスタンスが無い場合のみ利用できます。
