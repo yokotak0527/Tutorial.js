@@ -56,7 +56,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var $ = conf.$;
         var _ = Object.create(null);
         _.emit = function (msg) {
-          return _this.mediator.appeal(_this, 'emit', msg);
+          return _this.mediator.offer(_this, 'emit', msg);
         };
         __private.set(this, _);
 
@@ -87,7 +87,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (this.fire) return false;
           if (this.roop && newPointer >= this.step.length) newPointer = 0;
           if (newPointer >= this.step.length) return false;
-          var promise = this.mediator.appeal(this, 'next', newPointer);
+          var promise = this.mediator.offer(this, 'next', newPointer);
           promise.then(function () {
             _this2.pointer = newPointer;
           });
@@ -105,7 +105,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (this.fire) return false;
           if (this.roop && this.pointer - 1 < 0) newPointer = this.step.length - 1;
           if (newPointer < 0) return false;
-          var promise = this.mediator.appeal(this, 'prev', newPointer);
+          var promise = this.mediator.offer(this, 'prev', newPointer);
           promise.then(function () {
             _this3.pointer = newPointer;
           });
@@ -117,7 +117,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'skip',
         value: function skip() {
-          var promise = this.mediator.appeal(this, 'skip');
+          var promise = this.mediator.offer(this, 'skip');
         }
         /*
         *
@@ -126,7 +126,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'end',
         value: function end() {
-          var promise = this.mediator.appeal(this, 'end');
+          var promise = this.mediator.offer(this, 'end');
         }
         /*
         * @param  {String} order
@@ -146,7 +146,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.pointer = order;
 
           // 内容の切り替えはメディエータに任せる。
-          var promise = this.mediator.appeal(this, 'show', this.step.list[order]);
+          var promise = this.mediator.offer(this, 'show', this.step.list[order]);
           var def = new this.Deferred();
           promise.then(function () {
             _this4.fire = false;
@@ -167,7 +167,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           this.fire = true;
           var def = new this.Deferred();
-          var promise = this.mediator.appeal(this, 'hide', first);
+          var promise = this.mediator.offer(this, 'hide');
           promise.then(function () {
             _this5.fire = false;
             def.resolve();
@@ -183,7 +183,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'destroy',
         value: function destroy() {
-          // let promise = this.mediator.appeal(this, 'show');
+          // let promise = this.mediator.offer(this, 'show');
         }
       }]);
 
@@ -323,139 +323,37 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         */
 
       }, {
-        key: 'appeal',
-        value: function appeal(tutorial, type, ops) {
+        key: 'offer',
+        value: function offer(tutorial, type, ops) {
           var _this6 = this;
 
-          // let _ = __private.get(this);
-          // =========================================================================
-          // 表示するための処理
-          // =========================================================================
-          var showFunc = function showFunc(def, step) {
-            var minSpeed = 10;
-            var conf = _this6.conf;
-            var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
-            var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
-            if (showSpeed <= 0) showSpeed = minSpeed;
-            if (scrollSpeed <= 0) scrollSpeed = minSpeed;
-
-            // -----------------------------------------------------------------------
-            // アクティブな状態なtutorialがない
-            // -----------------------------------------------------------------------
-            if (!_this6.hasActive()) {
-              var count = 0; // show, scroll, target
-
-              _this6.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
-
-              if (!tutorial.controller) _this6.domCtlr.disable('controller');
-              if (!tutorial.pager) _this6.domCtlr.disable('pager');
-              if (!tutorial.skipBtn) _this6.domCtlr.disable('skipBtn');
-              if (!tutorial.roop) {
-                if (tutorial.step.length - 1 <= tutorial.pointer) _this6.domCtlr.disable('nextBtn');
-                if (tutorial.pointer === 0) _this6.domCtlr.disable('prevBtn');
-              }
-
-              var pointer = tutorial.pointer;
-              _this6.domCtlr.addTutorialID(tutorial.id);
-              _this6.domCtlr.addStepID(tutorial.step.list[pointer].name);
-              _this6.active = tutorial;
-
-              // 表示＆移動アニメーション
-              // ここ
-              var showAnimPromise = _this6.animation.show(_this6.domCtlr.get$obj('all'), showSpeed);
-              showAnimPromise.then(function () {
-                def.resolve();
-                // count++;
-                // if(count === 3) def.resolve();
-              });
-
-              var scrollAnimPromise = _this6.animation.scroll(conf.$scroll, scrollSpeed);
-            }
-            // -----------------------------------------------------------------------
-            // アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由)
-            // -----------------------------------------------------------------------
-            else if (_this6.hasActive() && tutorial === _this6.active) {
-                _this6.domCtlr.enable('nextBtn');
-                _this6.domCtlr.enable('prevBtn');
-                if (!tutorial.roop) {
-                  if (tutorial.step.length - 1 <= tutorial.pointer) _this6.domCtlr.disable('nextBtn');
-                  if (tutorial.pointer === 0) _this6.domCtlr.disable('prevBtn');
-                }
-
-                // 表示＆移動アニメーション
-                // ここ
-                _this6.domCtlr.content(step.content || '').pagerActive(tutorial.pointer).removeStepID().addStepID(tutorial.step.list[tutorial.pointer].name);
-                def.resolve();
-              }
-              // -----------------------------------------------------------------------
-              // アクティブな状態な別のtutorialがある
-              // -----------------------------------------------------------------------
-              else {
-                  _this6.domCtlr.enable('nextBtn');
-                  _this6.domCtlr.enable('prevBtn');
-                  _this6.domCtlr.enable('controller');
-                  _this6.domCtlr.enable('pager');
-                  _this6.domCtlr.enable('skipBtn');
-                  _this6.domCtlr.enable('endBtn');
-                  _this6.domCtlr.removeTutorialID().removeStepID();
-                  _this6.active = undefined;
-                  showFunc(def, step);
-                }
-          };
-          // =========================================================================
-          // 非表示するための処理
-          // =========================================================================
-          var hideFunc = function hideFunc(def, tutorial) {
-            var conf = _this6.conf;
-            var speed = conf.animation === true || conf.animation.hide ? conf.hideSpeed : 10;
-            if (speed <= 0) speed = 10;
-            if (_this6.active !== tutorial) {
-              def.reject();
-              return false;
-            } else if (_this6.active === tutorial) {
-              var promise = _this6.animation.hide(_this6.domCtlr.get$obj('all'), speed);
-              promise.then(function () {
-                _this6.domCtlr.enable('controller');
-                _this6.domCtlr.enable('pager');
-                _this6.domCtlr.enable('skipBtn');
-                _this6.domCtlr.enable('nextBtn');
-                _this6.domCtlr.enable('prevBtn');
-                _this6.domCtlr.enable('endBtn');
-                _this6.domCtlr.removeTutorialID().removeStepID();
-                _this6.active = undefined;
-                def.resolve();
-              });
-            }
-          };
-          // =========================================================================
           if (type === 'show') {
-            var def = new this.Deferred();
-            setTimeout(showFunc.bind(this, def, ops), 10);
-            return def.promise();
-          } else if (type === 'hide') {
-            var _def = new this.Deferred();
-            setTimeout(hideFunc.bind(this, _def, tutorial), 10);
-            return _def.promise();
-          } else if (type === 'next') {
             var _ret3 = function () {
               var def = new _this6.Deferred();
-              var newPointer = ops;
-              var promise = tutorial.show(newPointer);
-              promise.then(function () {
-                // if(!tutorial.roop && tutorial.step.length - 1 === newPointer){
-                //   // tutorial.skipBtn = false;
-                //   this.domCtlr.disable('skipBtn');
-                // }
-                return def.resolve();
-              });
+              setTimeout(function () {
+                return proposalOfShowing.call(_this6, tutorial, def, ops);
+              }, 10);
               return {
                 v: def.promise()
               };
             }();
 
             if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
-          } else if (type === 'prev') {
+          } else if (type === 'hide') {
             var _ret4 = function () {
+              var def = new _this6.Deferred();
+              // setTimeout(hideFunc.bind(this, def, tutorial), 10);
+              setTimeout(function () {
+                return proposalOfHiding.call(_this6, def, tutorial);
+              }, 10);
+              return {
+                v: def.promise()
+              };
+            }();
+
+            if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
+          } else if (type === 'next') {
+            var _ret5 = function () {
               var def = new _this6.Deferred();
               var newPointer = ops;
               var promise = tutorial.show(newPointer);
@@ -467,7 +365,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               };
             }();
 
-            if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
+            if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
+          } else if (type === 'prev') {
+            var _ret6 = function () {
+              var def = new _this6.Deferred();
+              var newPointer = ops;
+              var promise = tutorial.show(newPointer);
+              promise.then(function () {
+                return def.resolve();
+              });
+              return {
+                v: def.promise()
+              };
+            }();
+
+            if ((typeof _ret6 === 'undefined' ? 'undefined' : _typeof(_ret6)) === "object") return _ret6.v;
           } else if (type === 'emit') {
             var msg = ops;
             if (!this.hasActive() || tutorial !== this.active) return false;
@@ -490,61 +402,110 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }();
 
     // /////////////////////////////////////////////////////////////////////////////
-    //
-    // let setTutorialMediatorPrivateFunc = function(){
-    //   let _ = Object.create(null);
-    //
-    //
-    //
-    //
-    //   // ---------------------------------------------------------------------------
-    //   // 表示するための処理
-    //   // ---------------------------------------------------------------------------
-    //   _.show = (def, step)=>{
-    //     let minSpeed = 10;
-    //     let conf     = this.conf;
-    //     let speed    = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed ;
-    //     if(speed <= 0) speed = minSpeed;
-    //
-    //     /* アクティブな状態なtutorialがない */
-    //     if(!this.hasActive()){
-    //       this.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
-    //
-    //       if(!tutorial.controller) this.domCtlr.disable('controller');
-    //       if(!tutorial.pager)      this.domCtlr.disable('pager');
-    //       if(!tutorial.skipBtn)    this.domCtlr.disable('skipBtn');
-    //       // if(!tutorial.roop)       this.domCtlr.disable('endBtn');
-    //
-    //       this.active = tutorial;
-    //       // 表示＆移動アニメーション
-    //       // ここ
-    //       let promise = this.animation.show(this.domCtlr.get$obj('all'), speed);
-    //       promise.then( () => def.resolve() );
-    //     }
-    //     /* アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由) */
-    //     if(this.hasActive() && tutorial === this.active){
-    //       // 表示＆移動アニメーション
-    //       // ここ
-    //       this.domCtlr.content(step.content || '').pagerActive(tutorial.pointer);
-    //       def.resolve();
-    //     }
-    //     /* アクティブな状態なtutorialがある */
-    //     else{
-    //       this.domCtlr.enable('controller');
-    //       this.domCtlr.enable('pager');
-    //       this.domCtlr.enable('skipBtn');
-    //       this.domCtlr.enable('endBtn');
-    //       this.active = undefined;
-    //       showFunc(def, step);
-    //     }
-    //   }
-    //
-    //
-    //   __private.set(this, _);
-    // }
+    // 表示処理
+    // =============================================================================
+
 
     TutorialMediator.instance = undefined;
     TutorialMediator.idNum = 0;
+    var proposalOfShowing = function proposalOfShowing(tutorial, def, step) {
+      var minSpeed = 10;
+      var conf = this.conf;
+      var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
+      var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
+      if (showSpeed <= 0) showSpeed = minSpeed;
+      if (scrollSpeed <= 0) scrollSpeed = minSpeed;
+      // ---------------------------------------------------------------------------
+      // アクティブな状態なtutorialがない
+      // ---------------------------------------------------------------------------
+      if (!this.hasActive()) {
+        var count = 0; // show, scroll, target
+
+        this.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
+
+        if (!tutorial.controller) this.domCtlr.disable('controller');
+        if (!tutorial.pager) this.domCtlr.disable('pager');
+        if (!tutorial.skipBtn) this.domCtlr.disable('skipBtn');
+        if (!tutorial.roop) {
+          if (tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
+          if (tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
+        }
+
+        var pointer = tutorial.pointer;
+        this.domCtlr.addTutorialID(tutorial.id);
+        this.domCtlr.addStepID(tutorial.step.list[pointer].name);
+        this.active = tutorial;
+
+        // 表示＆移動アニメーション
+        // ここ
+        var showAnimPromise = this.animation.show(this.domCtlr.get$obj('all'), showSpeed);
+        showAnimPromise.then(function () {
+          def.resolve();
+          // count++;
+          // if(count === 3) def.resolve();
+        });
+
+        var scrollAnimPromise = this.animation.scroll(conf.$scroll, scrollSpeed);
+      }
+      // ---------------------------------------------------------------------------
+      // アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由)
+      // ---------------------------------------------------------------------------
+      else if (this.hasActive() && tutorial === this.active) {
+          this.domCtlr.enable('nextBtn');
+          this.domCtlr.enable('prevBtn');
+          if (!tutorial.roop) {
+            if (tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
+            if (tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
+          }
+
+          // 表示＆移動アニメーション
+          // ここ
+          this.domCtlr.content(step.content || '').pagerActive(tutorial.pointer).removeStepID().addStepID(tutorial.step.list[tutorial.pointer].name);
+          def.resolve();
+        }
+        // ---------------------------------------------------------------------------
+        // アクティブな状態な別のtutorialがある
+        // ---------------------------------------------------------------------------
+        else {
+            this.domCtlr.enable('nextBtn');
+            this.domCtlr.enable('prevBtn');
+            this.domCtlr.enable('controller');
+            this.domCtlr.enable('pager');
+            this.domCtlr.enable('skipBtn');
+            this.domCtlr.enable('endBtn');
+            this.domCtlr.removeTutorialID().removeStepID();
+            this.active = undefined;
+            showFunc(def, step);
+          }
+    };
+
+    // =============================================================================
+    // 非表示処理
+    // =============================================================================
+    var proposalOfHiding = function proposalOfHiding(def, tutorial) {
+      var _this7 = this;
+
+      var conf = this.conf;
+      var speed = conf.animation === true || conf.animation.hide ? conf.hideSpeed : 10;
+      if (speed <= 0) speed = 10;
+      if (this.active !== tutorial) {
+        def.reject();
+        return false;
+      } else if (this.active === tutorial) {
+        var promise = this.animation.hide(this.domCtlr.get$obj('all'), speed);
+        promise.then(function () {
+          _this7.domCtlr.enable('controller');
+          _this7.domCtlr.enable('pager');
+          _this7.domCtlr.enable('skipBtn');
+          _this7.domCtlr.enable('nextBtn');
+          _this7.domCtlr.enable('prevBtn');
+          _this7.domCtlr.enable('endBtn');
+          _this7.domCtlr.removeTutorialID().removeStepID();
+          _this7.active = undefined;
+          def.resolve();
+        });
+      }
+    };
 
     var CustomEvent = function () {
       /*
@@ -722,11 +683,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(CustomEventContainer, [{
         key: 'addEvent',
         value: function addEvent(event) {
-          var _this7 = this;
+          var _this8 = this;
 
           if (!Array.isArray(event)) event = [event];
           event.forEach(function (val) {
-            return _this7.list[val.name] = val;
+            return _this8.list[val.name] = val;
           });
           return this;
         }
@@ -819,7 +780,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'addRelation',
         value: function addRelation(target, eventList) {
-          var _this8 = this;
+          var _this9 = this;
 
           var _target = __private.get(target);
           var _ = __private.get(this);
@@ -830,7 +791,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           eventList = typeof eventList === 'string' ? [eventList] : eventList;
           eventList.forEach(function (name) {
-            if (target.list[name]) relationList[name] = _this8.list[name];
+            if (target.list[name]) relationList[name] = _this9.list[name];
           });
           _.otherContainers[target.name] = target;
         }
@@ -966,13 +927,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'add',
         value: function add(step) {
-          var _this9 = this;
+          var _this10 = this;
 
           var steps = Array.isArray(step) ? step : [step];
           steps.forEach(function (step) {
             var newStep = Step.setDefaultProperties(step);
-            newStep = Step.setPropertiesFormat(newStep, _this9.$);
-            _this9.list.push(newStep);
+            newStep = Step.setPropertiesFormat(newStep, _this10.$);
+            _this10.list.push(newStep);
           });
           this.length = this.list.length;
           __private.get(this.tutorial).emit('step added');
@@ -989,7 +950,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'delete',
         value: function _delete(order) {
-          var _this10 = this;
+          var _this11 = this;
 
           if (order === undefined) {
             this.list = [];
@@ -997,7 +958,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           } else {
             if (!Array.isArray(order)) order = [order];
             order = order.map(function (val) {
-              return typeof val === 'string' ? _this10.indexByName(val) : val;
+              return typeof val === 'string' ? _this11.indexByName(val) : val;
             });
             var newStep = this.list.filter(function (val, i) {
               var flg = true;
@@ -1096,7 +1057,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       *
       */
       function DOMController(param) {
-        var _this11 = this;
+        var _this12 = this;
 
         _classCallCheck(this, DOMController);
 
@@ -1142,20 +1103,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         // add event listener
         this.$skipBtn.on('click', function () {
-          if (!_this11.active || _this11.active.fire) return false;
-          _this11.active.skip();
+          if (!_this12.active || _this12.active.fire) return false;
+          _this12.active.skip();
         });
         this.$prevBtn.on('click', function () {
-          if (!_this11.active || _this11.active.fire) return false;
-          _this11.active.prev();
+          if (!_this12.active || _this12.active.fire) return false;
+          _this12.active.prev();
         });
         this.$nextBtn.on('click', function () {
-          if (!_this11.active || _this11.active.fire) return false;
-          _this11.active.next();
+          if (!_this12.active || _this12.active.fire) return false;
+          _this12.active.next();
         });
         this.$endBtn.on('click', function () {
-          if (!_this11.active || _this11.active.fire) return false;
-          _this11.active.next();
+          if (!_this12.active || _this12.active.fire) return false;
+          _this12.active.next();
         });
 
         this.$parent.append(this.$template);

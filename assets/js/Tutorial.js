@@ -29,7 +29,7 @@ class Tutorial{
     let conf      = __conf;
     let $         = conf.$;
     let _         = Object.create(null);
-    _.emit        = (msg)=> this.mediator.appeal(this, 'emit', msg);
+    _.emit        = (msg)=> this.mediator.offer(this, 'emit', msg);
     __private.set(this, _);
 
     this.mediator   = new TutorialMediator(this, conf);
@@ -53,7 +53,7 @@ class Tutorial{
     if(this.fire) return false;
     if(this.roop && newPointer >= this.step.length) newPointer = 0;
     if(newPointer >= this.step.length) return false;
-    let promise = this.mediator.appeal(this, 'next', newPointer);
+    let promise = this.mediator.offer(this, 'next', newPointer);
     promise.then(()=>{
       this.pointer = newPointer;
     });
@@ -66,7 +66,7 @@ class Tutorial{
     if(this.fire) return false;
     if(this.roop && this.pointer - 1 < 0) newPointer = this.step.length - 1;
     if(newPointer < 0) return false;
-    let promise = this.mediator.appeal(this, 'prev', newPointer);
+    let promise = this.mediator.offer(this, 'prev', newPointer);
     promise.then(()=>{
       this.pointer = newPointer;
     });
@@ -75,13 +75,13 @@ class Tutorial{
   *
   */
   skip(){
-    let promise = this.mediator.appeal(this, 'skip');
+    let promise = this.mediator.offer(this, 'skip');
   }
   /*
   *
   */
   end(){
-    let promise = this.mediator.appeal(this, 'end');
+    let promise = this.mediator.offer(this, 'end');
   }
   /*
   * @param  {String} order
@@ -94,7 +94,7 @@ class Tutorial{
     this.pointer = order;
 
     // 内容の切り替えはメディエータに任せる。
-    let promise = this.mediator.appeal(this, 'show', this.step.list[order]);
+    let promise = this.mediator.offer(this, 'show', this.step.list[order]);
     let def     = new this.Deferred();
     promise.then(()=>{
       this.fire = false;
@@ -110,7 +110,7 @@ class Tutorial{
   hide(){
     this.fire   = true;
     let def     = new this.Deferred();
-    let promise = this.mediator.appeal(this, 'hide', first);
+    let promise = this.mediator.offer(this, 'hide');
     promise.then(()=>{
       this.fire = false;
       def.resolve();
@@ -123,6 +123,6 @@ class Tutorial{
   *
   */
   destroy(){
-    // let promise = this.mediator.appeal(this, 'show');
+    // let promise = this.mediator.offer(this, 'show');
   }
 }
