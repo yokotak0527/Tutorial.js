@@ -5,6 +5,7 @@
   <title>Document</title>
   <script src="./lib/js/jquery-2.2.4.min.js"></script>
   <script src="./Tutorial.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
   <link rel="stylesheet" href="./Tutorial.css">
   <style>
     *{
@@ -35,41 +36,101 @@
       background : #FFF;
       height     : 100%;
       box-sizing : border-box;
-      padding    : 20px;
+      padding    : 40px;
+      overflow-y : scroll;
     }
-
+    h1{
+      font-size     : 45px;
+      line-height   : 1.2;
+    }
+    h2{
+      font-size      : 30px;
+      line-height    : 1.3;
+      padding-top    : 0.9em;
+      padding-bottom : 0.2em;
+    }
+    li,p{
+      font-size   : 14px;
+      line-height : 1.6;
+      margin-top  : 1.4em;
+    }
+    li{
+      list-style: decimal inside;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <section><div>
       <h1>Tutorial.js</h1>
+      <ul>
+        <li><a href="#" class="demo" id="d1">standard</a></li>
+      </ul>
+    </div></section>
+    <section><div>
+      <h1>Section 2</h1>
+    </div></section>
+    <section><div>
+      <h1>Section 3</h1>
+    </div></section>
+    <section><div>
+      <h1>Section 4</h1>
+      <ul>
+        <li id="d1Target">d1 target</li>
+      </ul>
     </div></section>
   </div>
   <script>
     Tutorial.changeConfig('skipLabel', 'スキップ');
-    var tutorial1 = new Tutorial({
-      'roop' : true,
-      step : [
-        {
-          name    : 'step1-0',
-          content : $('<span>hoge</span>')[0]
-        },
-        {
-          name    : 'step1-1',
-          content : $('<span>yokota</span>')
-        },
-      ]
+    var tutorialSet = {};
+    tutorialSet.d1 = new Tutorial();
+    tutorialSet.d1.step.add([
+      {
+        'name'    : 'step1',
+        'content' : 'step1',
+        'pos'     : ['center', 'center'],
+        'target'  : $('#d1Target'),
+      },{
+        'name'    : 'step2',
+        'content' : 'step2<br>step2',
+        'pos'     : ['center', 'center']
+      }
+    ]);
+
+
+
+
+    $('.demo').on('click', function(e){
+      e.preventDefault();
+      var $this = $(this);
+      var id    = $this.attr('id');
+      tutorialSet[id].show();
     });
-    var tutorial2 = new Tutorial({
-      step : [
-        {
-          name    : 'step2-0',
-          content : $('<span>横田</span>')
-        }
-      ]
-    });
-    tutorial1.show();
+    // var tutorial1 = new Tutorial({
+    //   'roop' : true,
+    //   step : [
+    //     {
+    //       name    : 'step1-0',
+    //       content : $('<span>hoge</span>')[0]
+    //     },
+    //     {
+    //       name    : 'step1-1',
+    //       content : $('<span>yokota</span>')
+    //     },
+    //   ]
+    // });
+    // var tutorial2 = new Tutorial({
+    //   step : [
+    //     {
+    //       name    : 'step2-0',
+    //       content : $('<span>横田</span>')
+    //     }
+    //   ]
+    // });
+
+
+
+    // tutorial1.show();
 
     // setTimeout(()=>{
     //   tutorial2.show();

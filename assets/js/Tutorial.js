@@ -41,7 +41,7 @@ class Tutorial{
     this.pager      = typeof param.pager      === 'boolean' ? param.pager      : true;
     this.controller = typeof param.controller === 'boolean' ? param.controller : true;
     this.skip       = typeof param.skip       === 'boolean' ? param.skip       : true;
-    this.step       = new Step(this, param.step || false);
+    this.step       = new Step(this, param.step || false, $);
 
     if(__first) __first = false;
   }

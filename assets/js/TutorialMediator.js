@@ -92,22 +92,8 @@ class TutorialMediator{
       // self.DOMController = conf.DOMController;
 
       self.active = false; /* active tutorial */
-
-      // let events  = [];
-
-      // globalEvent = new EventContainer('global');
-      //   conf.defaultEventConf.forEach((val)=>{
-      //     let name        = val[0];
-      //     let triggerHook = val[1];
-      //     events.push(new CustomEvent(name, triggerHook));
-      //   });
-      //   new EventContainer('global', events);
-      // }
-      // let globalEvent = EventContainer.getInstance('global');
-
-
-
       self.list   = Object.create(null);
+      // setTutorialMediatorPrivateFunc.call(self);
       TM.instance = self;
     }
 
@@ -130,49 +116,88 @@ class TutorialMediator{
   * @param {*}        ops
   */
   appeal(tutorial, type, ops){
-    // -------------------------------------------------------------------------
+    // let _ = __private.get(this);
+    // =========================================================================
     // 表示するための処理
-    // -------------------------------------------------------------------------
+    // =========================================================================
     let showFunc = (def, step)=>{
-      let conf  = this.conf;
-      let speed = conf.animation === true || conf.animation.show ? conf.showSpeed : 10 ;
-      if(speed <= 0) speed = 10;
+      let minSpeed    = 10;
+      let conf        = this.conf;
+      let showSpeed   = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed ;
+      let scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed ;
+      if(showSpeed <= 0) showSpeed = minSpeed;
+      if(scrollSpeed <= 0) scrollSpeed = minSpeed;
 
-      /* アクティブな状態なtutorialがない */
+      // -----------------------------------------------------------------------
+      // アクティブな状態なtutorialがない
+      // -----------------------------------------------------------------------
       if(!this.hasActive()){
+        let count = 0; // show, scroll, target
+
         this.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
 
         if(!tutorial.controller) this.domCtlr.disable('controller');
         if(!tutorial.pager)      this.domCtlr.disable('pager');
         if(!tutorial.skipBtn)    this.domCtlr.disable('skipBtn');
-        // if(!tutorial.roop)       this.domCtlr.disable('endBtn');
+        if(!tutorial.roop){
+          if(tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
+          if(tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
+        }
 
+        let pointer = tutorial.pointer;
+        this.domCtlr.addTutorialID(tutorial.id);
+        this.domCtlr.addStepID(tutorial.step.list[pointer].name);
         this.active = tutorial;
+
         // 表示＆移動アニメーション
         // ここ
-        let promise = this.animation.show(this.domCtlr.get$obj('all'), speed);
-        promise.then( () => def.resolve() );
+        let showAnimPromise = this.animation.show(this.domCtlr.get$obj('all'), showSpeed);
+        showAnimPromise.then( ()=>{
+          def.resolve();
+          // count++;
+          // if(count === 3) def.resolve();
+        });
+
+        let scrollAnimPromise = this.animation.scroll(conf.$scroll, scrollSpeed);
       }
-      /* アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由) */
-      if(this.hasActive() && tutorial === this.active){
+      // -----------------------------------------------------------------------
+      // アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由)
+      // -----------------------------------------------------------------------
+      else if(this.hasActive() && tutorial === this.active){
+        this.domCtlr.enable('nextBtn');
+        this.domCtlr.enable('prevBtn');
+        if(!tutorial.roop){
+          if(tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
+          if(tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
+        }
+
         // 表示＆移動アニメーション
         // ここ
-        this.domCtlr.content(step.content || '').pagerActive(tutorial.pointer);
+        this.domCtlr
+          .content(step.content || '')
+          .pagerActive(tutorial.pointer)
+          .removeStepID()
+          .addStepID(tutorial.step.list[tutorial.pointer].name);
         def.resolve();
       }
-      /* アクティブな状態なtutorialがある */
+      // -----------------------------------------------------------------------
+      // アクティブな状態な別のtutorialがある
+      // -----------------------------------------------------------------------
       else{
+        this.domCtlr.enable('nextBtn');
+        this.domCtlr.enable('prevBtn');
         this.domCtlr.enable('controller');
         this.domCtlr.enable('pager');
         this.domCtlr.enable('skipBtn');
         this.domCtlr.enable('endBtn');
+        this.domCtlr.removeTutorialID().removeStepID();
         this.active = undefined;
         showFunc(def, step);
       }
     }
-    // -------------------------------------------------------------------------
+    // =========================================================================
     // 非表示するための処理
-    // -------------------------------------------------------------------------
+    // =========================================================================
     let hideFunc = (def, tutorial)=>{
       let conf  = this.conf;
       let speed = conf.animation === true || conf.animation.hide ? conf.hideSpeed : 10 ;
@@ -181,18 +206,21 @@ class TutorialMediator{
         def.reject();
         return false;
       }else if(this.active === tutorial){
-        this.active = undefined;
         let promise = this.animation.hide(this.domCtlr.get$obj('all'), speed);
         promise.then(()=>{
           this.domCtlr.enable('controller');
           this.domCtlr.enable('pager');
           this.domCtlr.enable('skipBtn');
+          this.domCtlr.enable('nextBtn');
+          this.domCtlr.enable('prevBtn');
           this.domCtlr.enable('endBtn');
+          this.domCtlr.removeTutorialID().removeStepID();
+          this.active = undefined;
           def.resolve();
         });
       }
     }
-    // -------------------------------------------------------------------------
+    // =========================================================================
     if(type === 'show'){
       let def = new this.Deferred();
       setTimeout(showFunc.bind(this, def, ops), 10);
@@ -208,6 +236,10 @@ class TutorialMediator{
       let newPointer = ops;
       let promise    = tutorial.show(newPointer);
       promise.then(()=>{
+        // if(!tutorial.roop && tutorial.step.length - 1 === newPointer){
+        //   // tutorial.skipBtn = false;
+        //   this.domCtlr.disable('skipBtn');
+        // }
         return def.resolve();
       });
       return def.promise();
@@ -238,6 +270,56 @@ class TutorialMediator{
   }
 }
 
-let __TutorialMediator_showFunc = function(){
-  console.log(this);
-}
+// /////////////////////////////////////////////////////////////////////////////
+//
+// let setTutorialMediatorPrivateFunc = function(){
+//   let _ = Object.create(null);
+//
+//
+//
+//
+//   // ---------------------------------------------------------------------------
+//   // 表示するための処理
+//   // ---------------------------------------------------------------------------
+//   _.show = (def, step)=>{
+//     let minSpeed = 10;
+//     let conf     = this.conf;
+//     let speed    = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed ;
+//     if(speed <= 0) speed = minSpeed;
+//
+//     /* アクティブな状態なtutorialがない */
+//     if(!this.hasActive()){
+//       this.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
+//
+//       if(!tutorial.controller) this.domCtlr.disable('controller');
+//       if(!tutorial.pager)      this.domCtlr.disable('pager');
+//       if(!tutorial.skipBtn)    this.domCtlr.disable('skipBtn');
+//       // if(!tutorial.roop)       this.domCtlr.disable('endBtn');
+//
+//       this.active = tutorial;
+//       // 表示＆移動アニメーション
+//       // ここ
+//       let promise = this.animation.show(this.domCtlr.get$obj('all'), speed);
+//       promise.then( () => def.resolve() );
+//     }
+//     /* アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由) */
+//     if(this.hasActive() && tutorial === this.active){
+//       // 表示＆移動アニメーション
+//       // ここ
+//       this.domCtlr.content(step.content || '').pagerActive(tutorial.pointer);
+//       def.resolve();
+//     }
+//     /* アクティブな状態なtutorialがある */
+//     else{
+//       this.domCtlr.enable('controller');
+//       this.domCtlr.enable('pager');
+//       this.domCtlr.enable('skipBtn');
+//       this.domCtlr.enable('endBtn');
+//       this.active = undefined;
+//       showFunc(def, step);
+//     }
+//   }
+//
+//
+//   __private.set(this, _);
+// }

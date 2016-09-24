@@ -157,4 +157,32 @@ class DOMController{
       $(`li:eq(${index}) span`, this.get$obj('pager')).addClass('active');
       return this;
     }
+    /*
+    *
+    */
+    addTutorialID(id){
+      this.$contentWrap.attr('data-tutorial', id);
+      return this;
+    }
+    /*
+    *
+    */
+    removeTutorialID(){
+      this.$contentWrap.attr('data-tutorial', '');
+      return this;
+    }
+    /*
+    *
+    */
+    addStepID(id){
+      this.$contentWrap.attr('data-step', id);
+      return this;
+    }
+    /*
+    *
+    */
+    removeStepID(){
+      this.$contentWrap.attr('data-step', '');
+      return this;
+    }
 }

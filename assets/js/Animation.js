@@ -15,7 +15,8 @@ class Animation{
     this.Deferred = Deferred;
   }
   /*
-  *
+  * @param {jQuery} $target
+  * @param {Number} speed
   */
   show($target, speed){
     let def = new this.Deferred();
@@ -36,5 +37,11 @@ class Animation{
       def.resolve();
     });
     return def.promise();
+  }
+  /*
+  *
+  */
+  scroll(){
+
   }
 }

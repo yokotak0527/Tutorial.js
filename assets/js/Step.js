@@ -5,10 +5,11 @@ class Step{
   * @param    {Object[]} [step]
   * @return   Step
   */
-  constructor(tutorial, step){
+  constructor(tutorial, step, $){
     this.list     = [];
     this.length   = 0;
     this.tutorial = tutorial;
+    this.$        = $;
     if(step) this.add(step);
   }
   /* */
@@ -23,11 +24,28 @@ class Step{
       step.name = `step-#{Step.id}`;
       Step.id++;
     }
+    if(step.target && !step.scroll) step.scroll = ['left', 'top'];
+    return step;
+  }
+  /*
+  *
+  */
+  static setPropertiesFormat(step, $){
+    if(step.target){
+      step.target = Array.isArray(step.target) ? step.target : [step.target];
+      step.target.map((v, i, arr)=>{
+        if(typeof v === 'string'){
+          return $(v);
+        }else{
+          return v;
+        }
+      });
+    }
     return step;
   }
   /*
   * ステップの内容を変更する
-  * @function changeeStep
+  * @function changee
   * @memberof Step
   * @instance
   * @param    {String | Number} order
@@ -50,6 +68,17 @@ class Step{
     return this;
   }
   /*
+  * ステップの内容を置き換える
+  * @function replace
+  * @memberof Step
+  * @instance
+  * @param    {String | Number} order
+  * @param    {Object}          step
+  */
+  replace(order, step){
+    return this.change(order, step, false);
+  }
+  /*
   * @function addStep
   * @memberof Step
   * @instance
@@ -58,7 +87,11 @@ class Step{
   */
   add(step){
     let steps = Array.isArray(step) ? step : [step];
-    steps.forEach( step => this.list.push( Step.setDefaultProperties(step) ) );
+    steps.forEach( step =>{
+      let newStep = Step.setDefaultProperties(step);
+      newStep     = Step.setPropertiesFormat(newStep, this.$);
+      this.list.push(newStep);
+    });
     this.length = this.list.length;
     __private.get(this.tutorial).emit('step added');
     return this;
