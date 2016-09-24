@@ -29,7 +29,12 @@ class TutorialMediator{
       self.$parent   = conf.$parent;
       self.$scroll   = conf.$scroll;
       self.Deferred  = conf.Deferred;
-      self.animation = new conf.Animation(self.$, self.Deferred);
+      self.animation = new conf.Animation({
+        '$'        : self.$,
+        'Deferred' : self.Deferred,
+        '$window'  : conf.$window,
+        '$scroll'  : conf.$scroll
+      });
       self.domCtlr   = new conf.DOMController({
         '$'         : self.$,
         '$window'   : self.$window,
@@ -197,12 +202,15 @@ let proposalOfShowing = function(tutorial, def, step){
     // ここ
     let showAnimPromise = this.animation.show(this.domCtlr.get$obj('all'), showSpeed);
     showAnimPromise.then( ()=>{
-      def.resolve();
-      // count++;
+      count++;
       // if(count === 3) def.resolve();
+      def.resolve();
     });
-
-    let scrollAnimPromise = this.animation.scroll(conf.$scroll, scrollSpeed);
+    let scrollAnimPromise = this.animation.scroll(step.target, step.targetPos, scrollSpeed);
+    scrollAnimPromise.then( ()=>{
+      count++;
+      if(count === 3) def.resolve();
+    });
 
   }
   // ---------------------------------------------------------------------------

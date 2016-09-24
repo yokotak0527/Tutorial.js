@@ -24,7 +24,7 @@ class Step{
       step.name = `step-#{Step.id}`;
       Step.id++;
     }
-    if(step.target && !step.scroll) step.scroll = ['left', 'top'];
+    if(step.target && !step.targetPos) step.targetPos = ['left', 'top'];
     return step;
   }
   /*

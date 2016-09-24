@@ -69,27 +69,39 @@
     </div></section>
     <section><div>
       <h1>Section 2</h1>
+      <ul>
+        <li>asdfadsf</li>
+        <li>asdfadsf</li>
+        <li>asdfadsf</li>
+        <li>asdfadsf</li>
+        <li>asdfadsf</li>
+        <li>asdfadsf</li>
+        <li>asdfadsf</li>
+        <li>asdfadsf</li>
+        <li>asdfadsf</li>
+        <li id="d1Target"><span>d1 target</span></li>
+      </ul>
     </div></section>
     <section><div>
       <h1>Section 3</h1>
     </div></section>
     <section><div>
       <h1>Section 4</h1>
-      <ul>
-        <li id="d1Target">d1 target</li>
-      </ul>
     </div></section>
   </div>
   <script>
     Tutorial.changeConfig('skipLabel', 'スキップ');
+    Tutorial.changeConfig('nextLabel', '次へ');
+    Tutorial.changeConfig('prevLabel', '前へ');
+    Tutorial.changeConfig('endLabel',  '終了');
     var tutorialSet = {};
     tutorialSet.d1 = new Tutorial();
     tutorialSet.d1.step.add([
       {
-        'name'    : 'step1',
-        'content' : 'step1',
-        'pos'     : ['center', 'center'],
-        'target'  : $('#d1Target'),
+        'name'      : 'step1',
+        'content'   : 'step1',
+        'pos'       : ['center', 'center'],
+        'target'    : $('#d1Target span')
       },{
         'name'    : 'step2',
         'content' : 'step2<br>step2',
@@ -105,9 +117,9 @@
       var $this = $(this);
       var id    = $this.attr('id');
       tutorialSet[id].show();
-      setTimeout(function(){
-        tutorialSet[id].hide();
-      }, 2000);
+      // setTimeout(function(){
+      //   tutorialSet[id].hide();
+      // }, 2000);
     });
     // var tutorial1 = new Tutorial({
     //   'roop' : true,
