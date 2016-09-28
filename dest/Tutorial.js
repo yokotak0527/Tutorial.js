@@ -126,7 +126,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'end',
         value: function end() {
-          var promise = this.mediator.offer(this, 'end');
+          this.hide();
         }
         /*
         * @param  {String} order
@@ -236,7 +236,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               '$parent': self.$parent,
               'mode': conf.mode,
               'BGCanvas': conf.BGCanvas,
-              'bgColor': conf.bgColor
+              'bgColor': conf.bgColor,
+              'tutorialMediator': self
             });
             if (self.domCtlr.bgCanvas) {
               self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
@@ -258,47 +259,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 self.domCtlr.bgCanvas.draw();
               }
             });
-            /* $ pager event listener */
-            var $pager = self.domCtlr.get$obj('pager');
-            $pager.on('click', 'li span', function (e) {
-              if (!$(this).hasClass('active')) self.active.show($(this).text() * 1);
-            });
-            /* $ next event listener */
-            var $nextBtn = self.domCtlr.get$obj('nextBtn');
-            $nextBtn.on('click', function () {
-              return self.active.next();
-            });
-            /* $ prev event listener */
-            var $prevBtn = self.domCtlr.get$obj('prevBtn');
-            $prevBtn.on('click', function () {
-              return self.active.prev();
-            });
-            /* $ skip event listener */
-            var $skipBtn = self.domCtlr.get$obj('skipBtn');
-            $skipBtn.on('click', function () {
-              return self.active.skip();
-            });
-            /* $ end event listener */
-            var $endBtn = self.domCtlr.get$obj('endBtn');
-            $endBtn.on('click', function () {
-              return self.active.end();
-            });
-
-            /* $ */
-
-            // eventContainer.trigger('resize');
-            //
-            //       // pager event
-            //       this.$pager.on('click', 'li span', ()=>{
-            //         console.log("ddd");
-            //       });
-            // self.domCtlr
-
-            // self.DOMController = conf.DOMController;
 
             self.active = false; /* active tutorial */
             self.list = Object.create(null);
-            // setTutorialMediatorPrivateFunc.call(self);
             TM.instance = self;
           })();
         }
@@ -420,7 +383,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
       var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
       var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
-      console.log(conf.animation);
       if (showSpeed <= 0) showSpeed = minSpeed;
       if (scrollSpeed <= 0) scrollSpeed = minSpeed;
       // ---------------------------------------------------------------------------
@@ -1075,8 +1037,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       *
       */
       function DOMController(param) {
-        var _this13 = this;
-
         _classCallCheck(this, DOMController);
 
         if (DOMController.instance) return DOMController.instance;
@@ -1089,6 +1049,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var mode = param.mode;
         var BGCanvas = param.BGCanvas;
         var bgColor = param.bgColor;
+        var tutorialMediator = param.tutorialMediator;
 
 
         this.$ = $;
@@ -1119,22 +1080,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$contentWrap.css('z-index', zIndex + 2);
         this.$bg.css('z-index', zIndex + 1);
 
-        // add event listener
+        // -----------------------------------------------------------------------
+        // events
+        // -----------------------------------------------------------------------
+        var tm = tutorialMediator;
+        /* $ pager */
+        this.$pager.on('click', 'li span', function (e) {
+          if (!$(this).hasClass('active')) tm.active.show($(this).text() * 1);
+        });
+        // skip
         this.$skipBtn.on('click', function () {
-          if (!_this13.active || _this13.active.fire) return false;
-          _this13.active.skip();
+          return tm.active.skip();
         });
-        this.$prevBtn.on('click', function () {
-          if (!_this13.active || _this13.active.fire) return false;
-          _this13.active.prev();
-        });
+        // next
         this.$nextBtn.on('click', function () {
-          if (!_this13.active || _this13.active.fire) return false;
-          _this13.active.next();
+          return tm.active.next();
         });
+        // prev
+        this.$prevBtn.on('click', function () {
+          return tm.active.prev();
+        });
+        // end
         this.$endBtn.on('click', function () {
-          if (!_this13.active || _this13.active.fire) return false;
-          _this13.active.next();
+          return tm.active.end();
         });
 
         this.$parent.append(this.$template);
@@ -1665,9 +1633,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.resizeInterval = 250;
     __conf.scrollInterval = 100;
     __conf.scrollSpeed = 500;
-    __conf.showSpeed = 1000;
-    __conf.hideSpeed = 500;
-    __conf.posFitSpeed = 500;
+    __conf.showSpeed = 300;
+    __conf.hideSpeed = 300;
+    __conf.posFitSpeed = 300;
     __conf.animation = Object.create(null);
     __conf.animation.show = true;
     __conf.animation.hide = true;

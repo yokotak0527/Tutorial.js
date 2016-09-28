@@ -36,14 +36,15 @@ class TutorialMediator{
         '$scroll'  : conf.$scroll
       });
       self.domCtlr   = new conf.DOMController({
-        '$'         : self.$,
-        '$window'   : self.$window,
-        '$template' : self.$(conf.template()),
-        'zIndex'    : conf.zIndex,
-        '$parent'   : self.$parent,
-        'mode'      : conf.mode,
-        'BGCanvas'  : conf.BGCanvas,
-        'bgColor'   : conf.bgColor
+        '$'                : self.$,
+        '$window'          : self.$window,
+        '$template'        : self.$(conf.template()),
+        'zIndex'           : conf.zIndex,
+        '$parent'          : self.$parent,
+        'mode'             : conf.mode,
+        'BGCanvas'         : conf.BGCanvas,
+        'bgColor'          : conf.bgColor,
+        'tutorialMediator' : self
       });
       if(self.domCtlr.bgCanvas){
         self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
@@ -65,39 +66,9 @@ class TutorialMediator{
           self.domCtlr.bgCanvas.draw();
         }
       });
-      /* $ pager event listener */
-      let $pager = self.domCtlr.get$obj('pager');
-      $pager.on('click', 'li span', function(e){
-        if(!$(this).hasClass('active')) self.active.show($(this).text() * 1);
-      });
-      /* $ next event listener */
-      let $nextBtn = self.domCtlr.get$obj('nextBtn');
-      $nextBtn.on('click', ()=> self.active.next() );
-      /* $ prev event listener */
-      let $prevBtn = self.domCtlr.get$obj('prevBtn');
-      $prevBtn.on('click', ()=> self.active.prev() );
-      /* $ skip event listener */
-      let $skipBtn = self.domCtlr.get$obj('skipBtn');
-      $skipBtn.on('click', ()=> self.active.skip() );
-      /* $ end event listener */
-      let $endBtn = self.domCtlr.get$obj('endBtn');
-      $endBtn.on('click', ()=> self.active.end() );
-
-      /* $ */
-
-      // eventContainer.trigger('resize');
-      //
-      //       // pager event
-      //       this.$pager.on('click', 'li span', ()=>{
-      //         console.log("ddd");
-      //       });
-      // self.domCtlr
-
-      // self.DOMController = conf.DOMController;
 
       self.active = false; /* active tutorial */
       self.list   = Object.create(null);
-      // setTutorialMediatorPrivateFunc.call(self);
       TM.instance = self;
     }
 
@@ -175,7 +146,6 @@ let proposalOfShowing = function(tutorial, def, step){
   let showSpeed   = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
   let scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
   let posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
-  console.log(conf.animation);
   if(showSpeed <= 0) showSpeed = minSpeed;
   if(scrollSpeed <= 0) scrollSpeed = minSpeed;
   // ---------------------------------------------------------------------------

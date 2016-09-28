@@ -20,7 +20,8 @@ class DOMController{
         $parent,
         mode,
         BGCanvas,
-        bgColor
+        bgColor,
+        tutorialMediator
       } = param;
 
       this.$            = $;
@@ -51,23 +52,25 @@ class DOMController{
       this.$contentWrap.css('z-index', zIndex+2);
       this.$bg.css('z-index', zIndex+1);
 
-      // add event listener
-      this.$skipBtn.on('click', ()=>{
-        if(!this.active || this.active.fire) return false;
-        this.active.skip();
+      // -----------------------------------------------------------------------
+      // events
+      // -----------------------------------------------------------------------
+      let tm = tutorialMediator;
+      /* $ pager */
+      this.$pager.on('click', 'li span', function(e){
+        if(!$(this).hasClass('active')) tm.active.show($(this).text() * 1);
       });
-      this.$prevBtn.on('click', ()=>{
-        if(!this.active || this.active.fire) return false;
-        this.active.prev();
-      });
-      this.$nextBtn.on('click', ()=>{
-          if(!this.active || this.active.fire) return false;
-          this.active.next();
-      });
-      this.$endBtn.on('click', ()=>{
-          if(!this.active || this.active.fire) return false;
-          this.active.next();
-      });
+      // skip
+      this.$skipBtn.on('click', ()=> tm.active.skip() );
+      // next
+      this.$nextBtn.on('click', ()=> tm.active.next() );
+      // prev
+      this.$prevBtn.on('click', ()=> tm.active.prev() );
+      // end
+      this.$endBtn.on('click', ()=> tm.active.end() );
+
+
+
 
       this.$parent.append(this.$template);
     }

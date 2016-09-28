@@ -81,7 +81,7 @@ class Tutorial{
   *
   */
   end(){
-    let promise = this.mediator.offer(this, 'end');
+    this.hide();
   }
   /*
   * @param  {String} order
