@@ -67,9 +67,8 @@ class TutorialMediator{
       });
       /* $ pager event listener */
       let $pager = self.domCtlr.get$obj('pager');
-      $pager.on('click', 'li span', ()=>{
-        console.log("ddd");
-        // self.active.show();
+      $pager.on('click', 'li span', function(e){
+        if(!$(this).hasClass('active')) self.active.show($(this).text() * 1);
       });
       /* $ next event listener */
       let $nextBtn = self.domCtlr.get$obj('nextBtn');
@@ -173,8 +172,10 @@ class TutorialMediator{
 let proposalOfShowing = function(tutorial, def, step){
   let minSpeed    = 10;
   let conf        = this.conf;
-  let showSpeed   = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed ;
-  let scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed ;
+  let showSpeed   = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
+  let scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
+  let posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
+  console.log(conf.animation);
   if(showSpeed <= 0) showSpeed = minSpeed;
   if(scrollSpeed <= 0) scrollSpeed = minSpeed;
   // ---------------------------------------------------------------------------
@@ -199,19 +200,21 @@ let proposalOfShowing = function(tutorial, def, step){
     this.active = tutorial;
 
     // 表示＆移動アニメーション
-    // ここ
     let showAnimPromise = this.animation.show(this.domCtlr.get$obj('all'), showSpeed);
     showAnimPromise.then( ()=>{
       count++;
-      // if(count === 3) def.resolve();
-      def.resolve();
+      if(count === 3) def.resolve();
     });
     let scrollAnimPromise = this.animation.scroll(step.target, step.targetPos, scrollSpeed);
     scrollAnimPromise.then( ()=>{
       count++;
       if(count === 3) def.resolve();
     });
-
+    let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), posFitSpeed);
+    posAnimationPromise.then( ()=>{
+      count++;
+      if(count === 3) def.resolve();
+    });
   }
   // ---------------------------------------------------------------------------
   // アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由)
@@ -231,6 +234,8 @@ let proposalOfShowing = function(tutorial, def, step){
       .pagerActive(tutorial.pointer)
       .removeStepID()
       .addStepID(tutorial.step.list[tutorial.pointer].name);
+
+    let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), posFitSpeed);
     def.resolve();
   }
   // ---------------------------------------------------------------------------

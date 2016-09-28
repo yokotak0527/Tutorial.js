@@ -41,7 +41,9 @@ class Animation{
     return def.promise();
   }
   /*
-  *
+  * @param {jQuery[]}            target
+  * @param {String[] | Number[]} offset
+  * @param {Number}              speed
   */
   scroll(target = false, offset, speed){
     let def = new this.Deferred();
@@ -102,6 +104,39 @@ class Animation{
         scrollLeft : x
       }, speed, ()=> def.resolve() );
     }
+    return def.promise();
+  }
+  /*
+  * @param {String[] | number[]} orderPos
+  * @param {jQuery}              $target
+  */
+  tooltipPosFit(orderPos, $target, speed){
+    let def = new this.Deferred();
+    let w   = $target.innerWidth();
+    let h   = $target.innerHeight();
+    // IE9 can't use transform property.
+    let orderX = orderPos[0];
+    let orderY = orderPos[1];
+    let mgnX   = 0;
+    let mgnY   = 0;
+    if(orderX === 'left'){
+      mgnX = '-50%';
+    }else if(orderX === 'middle' || orderX === 'center'){
+      mgnX = w / -2 + 'px';
+    }else if(orderX === 'right'){
+      mgnX = ( this.$window.innerWidth() / 2 - w ) + 'px';
+    }
+    if(orderY === 'top'){
+      mgnY = 0;
+    }else if(orderY === 'middle' || orderY === 'center'){
+      mgnY = h / -2 + 'px';
+    }else if(orderY === 'bottom'){
+      mgnX = ( this.$window.innerHeight() / 2 - h ) + 'px';
+    }
+    $target.animate({
+      'margin-left' : mgnX,
+      'margin-top'  : mgnY
+    }, speed, ()=> def.resolve() );
     return def.promise();
   }
 }

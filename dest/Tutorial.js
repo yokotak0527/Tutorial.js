@@ -260,9 +260,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             });
             /* $ pager event listener */
             var $pager = self.domCtlr.get$obj('pager');
-            $pager.on('click', 'li span', function () {
-              console.log("ddd");
-              // self.active.show();
+            $pager.on('click', 'li span', function (e) {
+              if (!$(this).hasClass('active')) self.active.show($(this).text() * 1);
             });
             /* $ next event listener */
             var $nextBtn = self.domCtlr.get$obj('nextBtn');
@@ -420,6 +419,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       var conf = this.conf;
       var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
       var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
+      var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
+      console.log(conf.animation);
       if (showSpeed <= 0) showSpeed = minSpeed;
       if (scrollSpeed <= 0) scrollSpeed = minSpeed;
       // ---------------------------------------------------------------------------
@@ -445,15 +446,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           _this7.active = tutorial;
 
           // 表示＆移動アニメーション
-          // ここ
           var showAnimPromise = _this7.animation.show(_this7.domCtlr.get$obj('all'), showSpeed);
           showAnimPromise.then(function () {
             count++;
-            // if(count === 3) def.resolve();
-            def.resolve();
+            if (count === 3) def.resolve();
           });
           var scrollAnimPromise = _this7.animation.scroll(step.target, step.targetPos, scrollSpeed);
           scrollAnimPromise.then(function () {
+            count++;
+            if (count === 3) def.resolve();
+          });
+          var posAnimationPromise = _this7.animation.tooltipPosFit(step.pos, _this7.domCtlr.get$obj('content-wrap'), posFitSpeed);
+          posAnimationPromise.then(function () {
             count++;
             if (count === 3) def.resolve();
           });
@@ -473,6 +477,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           // 表示＆移動アニメーション
           // ここ
           this.domCtlr.content(step.content || '').pagerActive(tutorial.pointer).removeStepID().addStepID(tutorial.step.list[tutorial.pointer].name);
+
+          var _posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), posFitSpeed);
           def.resolve();
         }
         // ---------------------------------------------------------------------------
@@ -1469,7 +1475,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return def.promise();
         }
         /*
-        *
+        * @param {jQuery[]}            target
+        * @param {String[] | Number[]} offset
+        * @param {Number}              speed
         */
 
       }, {
@@ -1541,6 +1549,44 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               return def.resolve();
             });
           }
+          return def.promise();
+        }
+        /*
+        * @param {String[] | number[]} orderPos
+        * @param {jQuery}              $target
+        */
+
+      }, {
+        key: 'tooltipPosFit',
+        value: function tooltipPosFit(orderPos, $target, speed) {
+          var def = new this.Deferred();
+          var w = $target.innerWidth();
+          var h = $target.innerHeight();
+          // IE9 can't use transform property.
+          var orderX = orderPos[0];
+          var orderY = orderPos[1];
+          var mgnX = 0;
+          var mgnY = 0;
+          if (orderX === 'left') {
+            mgnX = '-50%';
+          } else if (orderX === 'middle' || orderX === 'center') {
+            mgnX = w / -2 + 'px';
+          } else if (orderX === 'right') {
+            mgnX = this.$window.innerWidth() / 2 - w + 'px';
+          }
+          if (orderY === 'top') {
+            mgnY = 0;
+          } else if (orderY === 'middle' || orderY === 'center') {
+            mgnY = h / -2 + 'px';
+          } else if (orderY === 'bottom') {
+            mgnX = this.$window.innerHeight() / 2 - h + 'px';
+          }
+          $target.animate({
+            'margin-left': mgnX,
+            'margin-top': mgnY
+          }, speed, function () {
+            return def.resolve();
+          });
           return def.promise();
         }
       }]);
@@ -1621,10 +1667,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.scrollSpeed = 500;
     __conf.showSpeed = 1000;
     __conf.hideSpeed = 500;
+    __conf.posFitSpeed = 500;
     __conf.animation = Object.create(null);
     __conf.animation.show = true;
     __conf.animation.hide = true;
     __conf.animation.scroll = true;
+    __conf.animation.posFit = true;
     __conf.animationFPS = 60;
     __conf.skipLabel = 'Skip';
     __conf.prevLabel = 'Prev';
