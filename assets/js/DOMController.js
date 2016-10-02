@@ -1,8 +1,16 @@
+/**
+* @class DOMController
+*
+* @param {Object} param
+* @param {jQuery} param.$
+* @param {jQuery} param.$window
+* @param {jQuery} param.$template
+* @param {jQuery} param.$parent
+* @param {Number} param.zIndex
+* @param {String} param.mode
+*/
 class DOMController{
     static instance = undefined;
-    /**
-    *
-    */
     static getInstance = ()=>{
         return DOMController.instance || false;
     };
@@ -19,14 +27,17 @@ class DOMController{
         zIndex,
         $parent,
         mode,
+        theme,
         BGCanvas,
         bgColor,
-        tutorialMediator
+        tutorialMediator,
+        globalEvent
       } = param;
 
       this.$            = $;
       this.$window      = $window;
       this.$template    = $template;
+      this.$posFit      = $('.pos-fit',      this.$template);
       this.$contentWrap = $('.content-wrap', this.$template);
       this.$content     = $('.content',      this.$template);
       this.$bg          = $('.bg',           this.$template);
@@ -42,21 +53,23 @@ class DOMController{
         'display' : 'none',
         'opacity' : 0
       });
+      
+      this.$template.addClass(mode).addClass(theme);
       if(mode === 'focus'){
         this.bgCanvas = new BGCanvas({
           '$'       : this.$,
           '$parent' : this.$bg,
           'bgColor' : bgColor
         });
+        this.setCanvasSize($window.innerWidth(), $window.innerHeight());
       }
-      this.$contentWrap.css('z-index', zIndex+2);
+      this.$posFit.css('z-index', zIndex+2);
       this.$bg.css('z-index', zIndex+1);
-
-      // -----------------------------------------------------------------------
+      // =======================================================================
       // events
-      // -----------------------------------------------------------------------
+      // =======================================================================
       let tm = tutorialMediator;
-      /* $ pager */
+      // pager
       this.$pager.on('click', 'li span', function(e){
         if(!$(this).hasClass('active')) tm.active.show($(this).text() * 1);
       });
@@ -68,15 +81,21 @@ class DOMController{
       this.$prevBtn.on('click', ()=> tm.active.prev() );
       // end
       this.$endBtn.on('click', ()=> tm.active.end() );
-
-
-
+      // resize
+      globalEvent.addEventListener('resize', (size)=>{
+        if(!tm.hasActive()) return false;
+        this.setCanvasSize(size.width, size.height);
+      });
 
       this.$parent.append(this.$template);
+      DOMController.instance = this;
     }
     /**
+    * @function get$obj
+    * @memberof DOMController
+    * @instance
     *
-    * @param  {String} name -
+    * @param  {String} name
     * @return jQuery Object
     */
     get$obj(name){
@@ -85,6 +104,8 @@ class DOMController{
           return this.$template;
         case 'content-wrap' :
           return this.$contentWrap;
+        case 'pos-fit' :
+          return this.$posFit;
         case 'content' :
           return this.$content;
         case 'controller' :
@@ -104,22 +125,25 @@ class DOMController{
       }
     }
     /**
+    * @function get$obj
+    * @memberof DOMController
+    * @instance
     *
     */
-    addMode(mode, color, interval){
-      if(mode === 'focus'){
-        this.$template.addClass('focus');
-        let bgCvs = new BGCanvas({
-          '$'              : this.$,
-          '$window'        : this.$window,
-          '$parent'        : this.$bg,
-          'bgColor'        : color,
-          'resizeInterval' : interval
-        });
-        bgCvs.draw();
-      }
-      return this;
-    }
+    // addMode(mode, color, interval){
+    //   if(mode === 'focus'){
+    //     this.$template.addClass('focus');
+    //     let bgCvs = new BGCanvas({
+    //       '$'              : this.$,
+    //       '$window'        : this.$window,
+    //       '$parent'        : this.$bg,
+    //       'bgColor'        : color,
+    //       'resizeInterval' : interval
+    //     });
+    //     bgCvs.draw();
+    //   }
+    //   return this;
+    // }
     /**
     * @param {String} name
     */
@@ -128,7 +152,7 @@ class DOMController{
       $target.css('display', 'none');
       return this;
     }
-    /*
+    /**
     * @param {String} name
     */
     enable(name){
@@ -136,14 +160,14 @@ class DOMController{
       $target.css('display', '');
       return this;
     }
-    /*
+    /**
     * @param {jQuery | String | DOMObject} cnt
     */
     content(cnt){
       this.get$obj('content').empty().append(cnt);
       return this;
     }
-    /*
+    /**
     * @param {Number} num
     */
     pager(num){
@@ -152,7 +176,7 @@ class DOMController{
       this.get$obj('pager').empty().append(cnt);
       return this;
     }
-    /*
+    /**
     * @param {Number} index
     */
     pagerActive(index){
@@ -160,32 +184,41 @@ class DOMController{
       $(`li:eq(${index}) span`, this.get$obj('pager')).addClass('active');
       return this;
     }
-    /*
+    /**
     *
     */
     addTutorialID(id){
       this.$contentWrap.attr('data-tutorial', id);
       return this;
     }
-    /*
+    /**
     *
     */
     removeTutorialID(){
       this.$contentWrap.attr('data-tutorial', '');
       return this;
     }
-    /*
+    /**
     *
     */
     addStepID(id){
       this.$contentWrap.attr('data-step', id);
       return this;
     }
-    /*
+    /**
     *
     */
     removeStepID(){
       this.$contentWrap.attr('data-step', '');
+      return this;
+    }
+    /**
+    *
+    */
+    setCanvasSize(w, h){
+      if(!this.bgCanvas) return this;
+      this.bgCanvas.setSize(w, h);
+      this.bgCanvas.draw();
       return this;
     }
 }

@@ -110,33 +110,52 @@ class Animation{
   * @param {String[] | number[]} orderPos
   * @param {jQuery}              $target
   */
-  tooltipPosFit(orderPos, $target, speed){
+  tooltipPosFit(orderPos, $target, $parent, speed){
     let def = new this.Deferred();
     let w   = $target.innerWidth();
     let h   = $target.innerHeight();
     // IE9 can't use transform property.
-    let orderX = orderPos[0];
-    let orderY = orderPos[1];
-    let mgnX   = 0;
-    let mgnY   = 0;
+    let orderX  = orderPos[0];
+    let orderY  = orderPos[1];
+    let left    = null;
+    let marginX = null;
+    let top     = null;
+    let marginY = null;
+    let count   = 0;
     if(orderX === 'left'){
-      mgnX = '-50%';
-    }else if(orderX === 'middle' || orderX === 'center'){
-      mgnX = w / -2 + 'px';
+      left    = '-50%';
+      marginX = 0;
+    }else if(orderX === 'center' || orderX === 'middle'){
+      left    = 0;
+      marginX = w / -2;
     }else if(orderX === 'right'){
-      mgnX = ( this.$window.innerWidth() / 2 - w ) + 'px';
+      left    = '50%';
+      marginX = w * -1;
     }
     if(orderY === 'top'){
-      mgnY = 0;
-    }else if(orderY === 'middle' || orderY === 'center'){
-      mgnY = h / -2 + 'px';
-    }else if(orderY === 'bottom'){
-      mgnX = ( this.$window.innerHeight() / 2 - h ) + 'px';
+      top     = 0;
+      marginY = 0;
+    }else if(orderY === 'center' || orderY === 'middle'){
+      top     = '50%';
+      marginY = h / -2;
+    }else if('bottom'){
+        top     = '100%';
+        marginY = h * -1;
     }
     $target.animate({
-      'margin-left' : mgnX,
-      'margin-top'  : mgnY
-    }, speed, ()=> def.resolve() );
+      'left'        : left,
+      'margin-top'  : marginY,
+      'margin-left' : marginX
+    }, speed, ()=>{
+      count++;
+      if(count === 2) def.resolve();
+    });
+    $parent.animate({
+      'top' : top
+    }, speed, ()=>{
+      count++;
+      if(count === 2) def.resolve();
+    });
     return def.promise();
   }
 }

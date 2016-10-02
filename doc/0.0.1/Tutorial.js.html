@@ -1,8 +1,48 @@
-"use strict";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tutorial.js - Documentation</title>
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Tutorial.html">Tutorial</a><ul class='methods'><li data-type='method'><a href="Tutorial.html#.changeConfig">changeConfig</a></li></ul></li><li><a href="TutorialMediator.html">TutorialMediator</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Tutorial.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+
+var _typeof = typeof Symbol === "function" &amp;&amp; typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj &amp;&amp; typeof Symbol === "function" &amp;&amp; obj.constructor === Symbol &amp;&amp; obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i &lt; props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -26,7 +66,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       function Tutorial() {
         var _this = this;
 
-        var param = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var param = arguments.length > 0 &amp;&amp; arguments[0] !== undefined ? arguments[0] : {};
 
         _classCallCheck(this, Tutorial);
 
@@ -53,38 +93,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
       /**
       *
-      * Change overall behavior of Tutorial.js.  
-      * **You are able to use it, As far as Tutorial.js instance is not exist.**
+      * Change overall behavior of Tutorial.js.
+      * **You are able to use it, As far as  Tutorial.js instance is not exist.**
       *
-      * | Key              | Type              | Default val.         |
-      * |------------------|-------------------|----------------------|
-      * | resizeInterval   | Number            | 250                  |
-      * | scrollInterval   | Number            | 100                  |
-      * | showSpeed        | Number            | 300                  |
-      * | hideSpeed        | Number            | 300                  |
-      * | scrollSpeed      | Number            | 500                  |
-      * | posFitSpeed      | Number            | 300                  |
-      * | animation        | Boolean / Object  | Object               |
-      * | animation.show   | Boolean           | true                 |
-      * | animation.hide   | Boolean           | true                 |
-      * | animation.scroll | Boolean           | true                 |
-      * | animation.posFit | Boolean           | true                 |
-      * | skipLabel        | String            | 'Skip'               |
-      * | prevLabel        | String            | 'Prev'               |
-      * | nextLabel        | String            | 'Next'               |
-      * | endLabel         | String            | 'End'                |
-      * | $                | jQuery            | $                    |
-      * | $window          | jQuery            | $(window)            |
-      * | $parent          | jQuery            | $('body')            |
-      * | $scroll          | jQuery            | $('body')            |
-      * | zIndex           | Number            | 9000                 |
-      * | bgColor          | String            | 'rgba(0, 0, 0, 0.5)' |
-      * | theme            | String            | 'default'            |
+      * | Key              | Type              | Default val.         | Desc. |
+      * |------------------|-------------------|----------------------|-------|
+      * | resizeInterval   | Number            | 250                  |  |
+      * | showSpeed        | Number            | 250                  |  |
+      * | hideSpeed        | Number            | 250                  |  |
+      * | scrollSpeed      | Number            | 250                  |  |
+      * | posFitSpeed      | Number            | 250                  |  |
+      * | animation        | Boolean \| Object | Object               |  |
+      * | animation.show   | Boolean           | true                 |  |
+      * | animation.hide   | Boolean           | true                 |  |
+      * | animation.scroll | Boolean           | true                 |  |
+      * | animation.posFit | Boolean           | true                 |  |
+      * | skipLabel        | String            | 'Skip'               |  |
+      * | prevLabel        | String            | 'Prev'               |  |
+      * | nextLabel        | String            | 'Next'               |  |
+      * | endLabel         | String            | 'End'                |  |
+      * | $                | jQuery            | $                    |  |
+      * | $window          | jQuery            |                      |  |
+      * | $parent          | jQuery            |                      |  |
+      * | $scroll          | jQuery            |                      |  |
+      * | zIndex           | Number            | 9000                 |  |
+      * | bgColor          | String            | 'rgba(0, 0, 0, 0.5)' |  |
       *
-      * @function changeConfig
-      * @memberof Tutorial
-      * @static
-      *
+      * @function Tutorial.changeConfig
       * @param    {(String|Object[])} name
       * @param    {String}            name.name
       * @param    {*}                 name.val
@@ -95,27 +130,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(Tutorial, [{
         key: 'next',
 
-        /**
-        * @function next
-        * @memberof Tutorial
-        * @instance
+        /*
+        *
         */
         value: function next() {
           var _this2 = this;
 
           var newPointer = this.pointer + 1;
           if (this.fire) return false;
-          if (this.roop && newPointer >= this.step.length) newPointer = 0;
+          if (this.roop &amp;&amp; newPointer >= this.step.length) newPointer = 0;
           if (newPointer >= this.step.length) return false;
           var promise = this.mediator.offer(this, 'next', newPointer);
           promise.then(function () {
             _this2.pointer = newPointer;
           });
         }
-        /**
-        * @function prev
-        * @memberof Tutorial
-        * @instance
+        /*
+        *
         */
 
       }, {
@@ -125,18 +156,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           var newPointer = this.pointer - 1;
           if (this.fire) return false;
-          if (this.roop && this.pointer - 1 < 0) newPointer = this.step.length - 1;
-          if (newPointer < 0) return false;
+          if (this.roop &amp;&amp; this.pointer - 1 &lt; 0) newPointer = this.step.length - 1;
+          if (newPointer &lt; 0) return false;
           var promise = this.mediator.offer(this, 'prev', newPointer);
           promise.then(function () {
             _this3.pointer = newPointer;
           });
         }
-        /**
+        /*
         *
-        * @function skip
-        * @memberof Tutorial
-        * @instance
         */
 
       }, {
@@ -144,11 +172,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function skip() {
           var promise = this.mediator.offer(this, 'skip');
         }
-        /**
+        /*
         *
-        * @function end
-        * @memberof Tutorial
-        * @instance
         */
 
       }, {
@@ -156,14 +181,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function end() {
           this.hide();
         }
-        /**
-        * Show tutorial step.
-        *
-        * @function show
-        * @memberof Tutorial
-        * @instance
-        *
-        * @param {String | Number} [order]
+        /*
+        * @param  {String} order
+        * @return {SimplePromise}
         */
 
       }, {
@@ -171,7 +191,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function show() {
           var _this4 = this;
 
-          var order = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : -1;
+          var order = arguments.length > 0 &amp;&amp; arguments[0] !== undefined ? arguments[0] : -1;
 
           order = typeof order === 'string' ? this.step.indexByName(order) : order;
           order = !this.step.list[order] ? this.pointer : order;
@@ -189,10 +209,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           });
           return def.promise();
         }
-        /**
-        * @function hide
-        * @memberof Tutorial
-        * @instance
+        /*
+        * @return {SimplePromise}
         */
 
       }, {
@@ -211,10 +229,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           });
           return def.promise();
         }
-        /**
-        * @function destroy
-        * @memberof Tutorial
-        * @instance
+        /*
+        *
         */
 
       }, {
@@ -236,14 +252,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return Tutorial;
     }();
 
-    /**
-    * @class  TutorialMediator
-    * @param  {Tutorial} tutorial
-    * @param  {Object}   conf      - configuration object.
-    */
-
-
     var TutorialMediator = function () {
+      /**
+      * @constructor TutorialMediator
+      * @param      {Tutorial} tutorial
+      * @return     TutorialMediator
+      */
       function TutorialMediator(tutorial, conf) {
         _classCallCheck(this, TutorialMediator);
 
@@ -283,18 +297,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               'zIndex': conf.zIndex,
               '$parent': self.$parent,
               'mode': conf.mode,
-              'theme': conf.theme,
               'BGCanvas': conf.BGCanvas,
               'bgColor': conf.bgColor,
-              'tutorialMediator': self,
-              'globalEvent': self.eventCtnr
+              'tutorialMediator': self
             });
-
-            // if(self.domCtlr.bgCanvas){
-            //   self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
-            //   self.domCtlr.bgCanvas.draw();
-            // }
-
+            if (self.domCtlr.bgCanvas) {
+              self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
+              self.domCtlr.bgCanvas.draw();
+            }
             /* $ resize event listener */
             var resizeInterval = conf.resizeInterval || 250;
             var resizeTimer = null;
@@ -304,13 +314,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 self.eventCtnr.trigger('resize');
               }, resizeInterval);
             });
-            // /* custom resize event listener */
-            // self.eventCtnr.addEventListener('resize', (size)=>{
-            //   if(self.domCtlr.bgCanvas){
-            //     self.domCtlr.bgCanvas.setSize(size.width, size.height);
-            //     self.domCtlr.bgCanvas.draw();
-            //   }
-            // });
+            /* custom resize event listener */
+            self.eventCtnr.addEventListener('resize', function (size) {
+              if (self.domCtlr.bgCanvas) {
+                self.domCtlr.bgCanvas.setSize(size.width, size.height);
+                self.domCtlr.bgCanvas.draw();
+              }
+            });
 
             self.active = false; /* active tutorial */
             self.list = Object.create(null);
@@ -321,13 +331,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         self.list[tutorial.id] = tutorial;
         return self;
       }
-      /**
+      /*
       * 新しいIDを発行する
-      *
-      * @function issuanceNewID
-      * @memberof TutorialMediator
-      * @instance
-      *
       * @return String
       */
 
@@ -340,12 +345,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           TM.idNum++;
           return rtn;
         }
-        /**
-        *
-        * @function offer
-        * @memberof TutorialMediator
-        * @instance
-        *
+        /*
         * @param {Tutorial} tutorial
         * @param {String}   type
         * @param {*}        ops
@@ -445,8 +445,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
       var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
       var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
-      if (showSpeed <= 0) showSpeed = minSpeed;
-      if (scrollSpeed <= 0) scrollSpeed = minSpeed;
+      if (showSpeed &lt;= 0) showSpeed = minSpeed;
+      if (scrollSpeed &lt;= 0) scrollSpeed = minSpeed;
       // ---------------------------------------------------------------------------
       // アクティブな状態なtutorialがない
       // ---------------------------------------------------------------------------
@@ -460,7 +460,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (!tutorial.pager) _this7.domCtlr.disable('pager');
           if (!tutorial.skipBtn) _this7.domCtlr.disable('skipBtn');
           if (!tutorial.roop) {
-            if (tutorial.step.length - 1 <= tutorial.pointer) _this7.domCtlr.disable('nextBtn');
+            if (tutorial.step.length - 1 &lt;= tutorial.pointer) _this7.domCtlr.disable('nextBtn');
             if (tutorial.pointer === 0) _this7.domCtlr.disable('prevBtn');
           }
 
@@ -469,7 +469,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           _this7.domCtlr.addStepID(tutorial.step.list[pointer].name);
           _this7.active = tutorial;
 
-          _this7.domCtlr.setCanvasSize(_this7.$window.innerWidth(), _this7.$window.innerHeight());
           // 表示＆移動アニメーション
           var showAnimPromise = _this7.animation.show(_this7.domCtlr.get$obj('all'), showSpeed);
           showAnimPromise.then(function () {
@@ -481,7 +480,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             count++;
             if (count === 3) def.resolve();
           });
-          var posAnimationPromise = _this7.animation.tooltipPosFit(step.pos, _this7.domCtlr.get$obj('content-wrap'), _this7.domCtlr.get$obj('pos-fit'), posFitSpeed);
+          var posAnimationPromise = _this7.animation.tooltipPosFit(step.pos, _this7.domCtlr.get$obj('content-wrap'), posFitSpeed);
           posAnimationPromise.then(function () {
             count++;
             if (count === 3) def.resolve();
@@ -491,11 +490,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       // ---------------------------------------------------------------------------
       // アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由)
       // ---------------------------------------------------------------------------
-      else if (this.hasActive() && tutorial === this.active) {
+      else if (this.hasActive() &amp;&amp; tutorial === this.active) {
           this.domCtlr.enable('nextBtn');
           this.domCtlr.enable('prevBtn');
           if (!tutorial.roop) {
-            if (tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
+            if (tutorial.step.length - 1 &lt;= tutorial.pointer) this.domCtlr.disable('nextBtn');
             if (tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
           }
 
@@ -503,7 +502,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           // ここ
           this.domCtlr.content(step.content || '').pagerActive(tutorial.pointer).removeStepID().addStepID(tutorial.step.list[tutorial.pointer].name);
 
-          var _posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
+          var _posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), posFitSpeed);
           def.resolve();
         }
         // ---------------------------------------------------------------------------
@@ -530,7 +529,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       var conf = this.conf;
       var speed = conf.animation === true || conf.animation.hide ? conf.hideSpeed : 10;
-      if (speed <= 0) speed = 10;
+      if (speed &lt;= 0) speed = 10;
       if (this.active !== tutorial) {
         def.reject();
         return false;
@@ -561,7 +560,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       * @return      CustomEvent
       */
       function CustomEvent(name) {
-        var triggerHookParam = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var triggerHookParam = arguments.length > 1 &amp;&amp; arguments[1] !== undefined ? arguments[1] : false;
 
         _classCallCheck(this, CustomEvent);
 
@@ -623,7 +622,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'addTriggerHook',
         value: function addTriggerHook() {
-          var param = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+          var param = arguments.length > 0 &amp;&amp; arguments[0] !== undefined ? arguments[0] : {};
 
           var _ = __private.get(this);
           this.removeTriggerHook();
@@ -661,7 +660,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'changeTriggerHook',
         value: function changeTriggerHook() {
-          var param = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+          var param = arguments.length > 0 &amp;&amp; arguments[0] !== undefined ? arguments[0] : {};
 
           this.addTriggerHook(param);
           return this;
@@ -695,7 +694,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       * @return      CustomEventContainer
       */
       function CustomEventContainer(name) {
-        var list = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var list = arguments.length > 1 &amp;&amp; arguments[1] !== undefined ? arguments[1] : false;
 
         _classCallCheck(this, CustomEventContainer);
 
@@ -888,19 +887,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return CustomEventContainer;
     }();
 
-    /**
-    * @class Step
-    *
-    * | Step parameters        ||
-    * |--------------------|----|
-    * | a | b |
-    *
-    * @param       {Tutorial} tutorial
-    * @param       {Object[]} [step]
-    * @return      Step
-    */
-
-
     CustomEventContainer.instance = Object.create(null);
 
     CustomEventContainer.getInstance = function (name) {
@@ -909,6 +895,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     };
 
     var Step = function () {
+      /*
+      * @constructor
+      * @param    {Tutorial} tutorial
+      * @param    {Object[]} [step]
+      * @return   Step
+      */
       function Step(tutorial, step, $) {
         _classCallCheck(this, Step);
 
@@ -918,33 +910,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$ = $;
         if (step) this.add(step);
       }
-      /**
-      *
-      * @function setDefaultProperties
-      * @memberof Step
-      * @static
-      *
-      * @param  {Object} step
-      * @param  {String} [name = '']
-      * @return Step
-      */
+      /* */
 
 
       _createClass(Step, [{
         key: 'change',
 
-        /**
-        * Change step parameters.
-        * @function change
+        /*
+        * ステップの内容を変更する
+        * @function changee
         * @memberof Step
         * @instance
-        *
         * @param    {String | Number} order
         * @param    {Object}          step
+        * @param    {Boolean}         [partial = true]
         * @return   Step
         */
         value: function change(order, step) {
-          var partial = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+          var partial = arguments.length > 2 &amp;&amp; arguments[2] !== undefined ? arguments[2] : true;
 
           order = typeof order === 'string' ? this.indexByName(order) : order;
           if (!this.list[order]) return this;
@@ -961,9 +944,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           __private.get(this.tutorial).emit('step changed');
           return this;
         }
-        /**
-        * Replace step parameters.
-        *
+        /*
+        * ステップの内容を置き換える
         * @function replace
         * @memberof Step
         * @instance
@@ -976,9 +958,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function replace(order, step) {
           return this.change(order, step, false);
         }
-        /**
-        * Add new step.
-        *
+        /*
         * @function addStep
         * @memberof Step
         * @instance
@@ -1001,13 +981,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           __private.get(this.tutorial).emit('step added');
           return this;
         }
-        /**
-        * delete specified step.
-        *
+        /*
         * @function deleteStep
         * @memberof Step
         * @instance
-        * @param    {String | Number | Array.<String|Number>} order
+        * @param    {String | Number | Array.&lt;String|Number>} order
         * @return   Step
         */
 
@@ -1026,7 +1004,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             });
             var newStep = this.list.filter(function (val, i) {
               var flg = true;
-              for (var _i = 0, _l = order.length; _i < _l; _i++) {
+              for (var _i = 0, _l = order.length; _i &lt; _l; _i++) {
                 if (order[_i] === i) {
                   flg = false;
                   break;
@@ -1054,7 +1032,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (typeof name !== 'string') return -1;
           var arr = [];
           this.list.forEach(function (el, i) {
-            if ((typeof el === 'undefined' ? 'undefined' : _typeof(el)) === 'object' && el.name === name) arr.push(i);
+            if ((typeof el === 'undefined' ? 'undefined' : _typeof(el)) === 'object' &amp;&amp; el.name === name) arr.push(i);
           });
           return arr.length > 1 ? arr : arr.length === 1 ? arr[0] : -1;
         }
@@ -1074,25 +1052,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
       }], [{
         key: 'setDefaultProperties',
+
+        /*
+        * @param  {Object} step
+        * @return Object
+        */
         value: function setDefaultProperties(step) {
-          var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+          var name = arguments.length > 1 &amp;&amp; arguments[1] !== undefined ? arguments[1] : '';
 
           step.pos = Array.isArray(step.pos) ? step.pos : ['center', 'center'];
           if (!step.name) {
             step.name = 'step-#{Step.id}';
             Step.id++;
           }
-          if (step.target && !step.targetPos) step.targetPos = ['left', 'top'];
+          if (step.target &amp;&amp; !step.targetPos) step.targetPos = ['left', 'top'];
           return step;
         }
-        /**
-        * @function setPropertiesFormat
-        * @memberof Step
-        * @static
+        /*
         *
-        * @param {Step}   step
-        * @param {jQuery} $
-        * @return Step
         */
 
       }, {
@@ -1115,19 +1092,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return Step;
     }();
 
-    /**
-    * @class DOMController
-    *
-    * @param {Object} param
-    * @param {jQuery} param.$
-    * @param {jQuery} param.$window
-    * @param {jQuery} param.$template
-    * @param {jQuery} param.$parent
-    * @param {Number} param.zIndex
-    * @param {String} param.mode
-    */
-
-
     Step.id = 0;
 
     var DOMController = function () {
@@ -1135,8 +1099,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       *
       */
       function DOMController(param) {
-        var _this13 = this;
-
         _classCallCheck(this, DOMController);
 
         if (DOMController.instance) return DOMController.instance;
@@ -1147,17 +1109,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var zIndex = param.zIndex;
         var $parent = param.$parent;
         var mode = param.mode;
-        var theme = param.theme;
         var BGCanvas = param.BGCanvas;
         var bgColor = param.bgColor;
         var tutorialMediator = param.tutorialMediator;
-        var globalEvent = param.globalEvent;
 
 
         this.$ = $;
         this.$window = $window;
         this.$template = $template;
-        this.$posFit = $('.pos-fit', this.$template);
         this.$contentWrap = $('.content-wrap', this.$template);
         this.$content = $('.content', this.$template);
         this.$bg = $('.bg', this.$template);
@@ -1173,23 +1132,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           'display': 'none',
           'opacity': 0
         });
-
-        this.$template.addClass(mode).addClass(theme);
         if (mode === 'focus') {
           this.bgCanvas = new BGCanvas({
             '$': this.$,
             '$parent': this.$bg,
             'bgColor': bgColor
           });
-          this.setCanvasSize($window.innerWidth(), $window.innerHeight());
         }
-        this.$posFit.css('z-index', zIndex + 2);
+        this.$contentWrap.css('z-index', zIndex + 2);
         this.$bg.css('z-index', zIndex + 1);
-        // =======================================================================
+
+        // -----------------------------------------------------------------------
         // events
-        // =======================================================================
+        // -----------------------------------------------------------------------
         var tm = tutorialMediator;
-        // pager
+        /* $ pager */
         this.$pager.on('click', 'li span', function (e) {
           if (!$(this).hasClass('active')) tm.active.show($(this).text() * 1);
         });
@@ -1209,22 +1166,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$endBtn.on('click', function () {
           return tm.active.end();
         });
-        // resize
-        globalEvent.addEventListener('resize', function (size) {
-          if (!tm.hasActive()) return false;
-          _this13.setCanvasSize(size.width, size.height);
-        });
 
         this.$parent.append(this.$template);
-        DOMController.instance = this;
       }
       /**
-      * @function get$obj
-      * @memberof DOMController
-      * @instance
       *
-      * @param  {String} name
+      * @param  {String} name -
       * @return jQuery Object
+      */
+
+      /**
+      *
       */
 
 
@@ -1236,8 +1188,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               return this.$template;
             case 'content-wrap':
               return this.$contentWrap;
-            case 'pos-fit':
-              return this.$posFit;
             case 'content':
               return this.$content;
             case 'controller':
@@ -1257,25 +1207,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           }
         }
         /**
-        * @function get$obj
-        * @memberof DOMController
-        * @instance
         *
         */
-        // addMode(mode, color, interval){
-        //   if(mode === 'focus'){
-        //     this.$template.addClass('focus');
-        //     let bgCvs = new BGCanvas({
-        //       '$'              : this.$,
-        //       '$window'        : this.$window,
-        //       '$parent'        : this.$bg,
-        //       'bgColor'        : color,
-        //       'resizeInterval' : interval
-        //     });
-        //     bgCvs.draw();
-        //   }
-        //   return this;
-        // }
+
+      }, {
+        key: 'addMode',
+        value: function addMode(mode, color, interval) {
+          if (mode === 'focus') {
+            this.$template.addClass('focus');
+            var bgCvs = new BGCanvas({
+              '$': this.$,
+              '$window': this.$window,
+              '$parent': this.$bg,
+              'bgColor': color,
+              'resizeInterval': interval
+            });
+            bgCvs.draw();
+          }
+          return this;
+        }
         /**
         * @param {String} name
         */
@@ -1287,7 +1237,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           $target.css('display', 'none');
           return this;
         }
-        /**
+        /*
         * @param {String} name
         */
 
@@ -1298,7 +1248,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           $target.css('display', '');
           return this;
         }
-        /**
+        /*
         * @param {jQuery | String | DOMObject} cnt
         */
 
@@ -1308,7 +1258,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.get$obj('content').empty().append(cnt);
           return this;
         }
-        /**
+        /*
         * @param {Number} num
         */
 
@@ -1316,12 +1266,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         key: 'pager',
         value: function pager(num) {
           var cnt = '';
-          for (var i = 0, l = num; i < l; i++) {
-            cnt += '<li><span>' + i + '</span></li>';
+          for (var i = 0, l = num; i &lt; l; i++) {
+            cnt += '&lt;li>&lt;span>' + i + '&lt;/span>&lt;/li>';
           }this.get$obj('pager').empty().append(cnt);
           return this;
         }
-        /**
+        /*
         * @param {Number} index
         */
 
@@ -1332,7 +1282,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           $('li:eq(' + index + ') span', this.get$obj('pager')).addClass('active');
           return this;
         }
-        /**
+        /*
         *
         */
 
@@ -1342,7 +1292,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.$contentWrap.attr('data-tutorial', id);
           return this;
         }
-        /**
+        /*
         *
         */
 
@@ -1352,7 +1302,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.$contentWrap.attr('data-tutorial', '');
           return this;
         }
-        /**
+        /*
         *
         */
 
@@ -1362,7 +1312,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.$contentWrap.attr('data-step', id);
           return this;
         }
-        /**
+        /*
         *
         */
 
@@ -1370,18 +1320,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         key: 'removeStepID',
         value: function removeStepID() {
           this.$contentWrap.attr('data-step', '');
-          return this;
-        }
-        /**
-        *
-        */
-
-      }, {
-        key: 'setCanvasSize',
-        value: function setCanvasSize(w, h) {
-          if (!this.bgCanvas) return this;
-          this.bgCanvas.setSize(w, h);
-          this.bgCanvas.draw();
           return this;
         }
       }]);
@@ -1575,7 +1513,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'scroll',
         value: function scroll() {
-          var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+          var target = arguments.length > 0 &amp;&amp; arguments[0] !== undefined ? arguments[0] : false;
           var offset = arguments[1];
           var speed = arguments[2];
 
@@ -1650,51 +1588,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'tooltipPosFit',
-        value: function tooltipPosFit(orderPos, $target, $parent, speed) {
+        value: function tooltipPosFit(orderPos, $target, speed) {
           var def = new this.Deferred();
           var w = $target.innerWidth();
           var h = $target.innerHeight();
           // IE9 can't use transform property.
           var orderX = orderPos[0];
           var orderY = orderPos[1];
-          var left = null;
-          var marginX = null;
-          var top = null;
-          var marginY = null;
-          var count = 0;
+          var mgnX = 0;
+          var mgnY = 0;
           if (orderX === 'left') {
-            left = '-50%';
-            marginX = 0;
-          } else if (orderX === 'center' || orderX === 'middle') {
-            left = 0;
-            marginX = w / -2;
+            mgnX = '-50%';
+          } else if (orderX === 'middle' || orderX === 'center') {
+            mgnX = w / -2 + 'px';
           } else if (orderX === 'right') {
-            left = '50%';
-            marginX = w * -1;
+            mgnX = this.$window.innerWidth() / 2 - w + 'px';
           }
           if (orderY === 'top') {
-            top = 0;
-            marginY = 0;
-          } else if (orderY === 'center' || orderY === 'middle') {
-            top = '50%';
-            marginY = h / -2;
-          } else if ('bottom') {
-            top = '100%';
-            marginY = h * -1;
+            mgnY = 0;
+          } else if (orderY === 'middle' || orderY === 'center') {
+            mgnY = h / -2 + 'px';
+          } else if (orderY === 'bottom') {
+            mgnX = this.$window.innerHeight() / 2 - h + 'px';
           }
           $target.animate({
-            'left': left,
-            'margin-top': marginY,
-            'margin-left': marginX
+            'margin-left': mgnX,
+            'margin-top': mgnY
           }, speed, function () {
-            count++;
-            if (count === 2) def.resolve();
-          });
-          $parent.animate({
-            'top': top
-          }, speed, function () {
-            count++;
-            if (count === 2) def.resolve();
+            return def.resolve();
           });
           return def.promise();
         }
@@ -1717,7 +1638,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
         this.bgColor = bgColor;
-        this.$cvs = $('<canvas>');
+        this.$cvs = $('&lt;canvas>');
         this.cvs = this.$cvs[0];
         this.ctx = this.cvs.getContext('2d');
         $parent.append(this.$cvs);
@@ -1747,7 +1668,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'draw',
         value: function draw() {
-          var rect = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+          var rect = arguments.length > 0 &amp;&amp; arguments[0] !== undefined ? arguments[0] : false;
 
           this.ctx.fillStyle = this.bgColor;
           this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
@@ -1777,7 +1698,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.showSpeed = 300;
     __conf.hideSpeed = 300;
     __conf.posFitSpeed = 300;
-    __conf.theme = 'default';
     __conf.animation = Object.create(null);
     __conf.animation.show = true;
     __conf.animation.hide = true;
@@ -1795,7 +1715,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.zIndex = 9000;
     __conf.bgColor = 'rgba(0, 0, 0, 0.5)';
     __conf.template = function () {
-      return '\n<div class="tutorial">\n  <div class="pos-fit"><div class="content-wrap center-middle">\n    <ol class="pager"></ol>\n    <div class="content"></div>\n    <div class="controller">\n      <ul class="left">\n        <li class="skip"><span>' + __conf.skipLabel + '</span></li>\n      </ul>\n      <ul class="right">\n        <li class="prev"><span>' + __conf.prevLabel + '</span></li>\n        <li class="next"><span>' + __conf.nextLabel + '</span></li>\n        <li class="end"><span>' + __conf.endLabel + '</span></li>\n      </ul>\n    </div>\n  </div></div>\n  <div class="bg"></div>\n</div>\n';
+      return '\n&lt;div class="tutorial">\n  &lt;div class="content-wrap center-middle">\n    &lt;ol class="pager">&lt;/ol>\n    &lt;div class="content">&lt;/div>\n    &lt;div class="controller">\n      &lt;ul class="left">\n        &lt;li class="skip">&lt;span>' + __conf.skipLabel + '&lt;/span>&lt;/li>\n      &lt;/ul>\n      &lt;ul class="right">\n        &lt;li class="prev">&lt;span>' + __conf.prevLabel + '&lt;/span>&lt;/li>\n        &lt;li class="next">&lt;span>' + __conf.nextLabel + '&lt;/span>&lt;/li>\n        &lt;li class="end">&lt;span>' + __conf.endLabel + '&lt;/span>&lt;/li>\n      &lt;/ul>\n    &lt;/div>\n  &lt;/div>\n  &lt;div class="bg">&lt;/div>\n&lt;/div>\n';
     };
     __conf.defaultEventConf = [];
     __conf.defaultEventConf.push(['resize', {
@@ -1836,4 +1756,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     window.Tutorial = Tutorial;
   })();
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Sun Oct 02 2016 04:40:11 GMT+0900 (JST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

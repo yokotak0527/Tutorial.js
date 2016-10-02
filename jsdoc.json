@@ -1,0 +1,15 @@
+{
+  "tags" : {
+    "allowUnknownTags" : true
+  },
+  "opts": {
+    "encoding" : "utf8",
+    "template" : "./node_modules/jaguarjs-jsdoc",
+    "recurse"  : false
+  },
+  "plugins" : ["plugins/markdown"],
+  "templates" : {
+    "cleverLinks"    : false,
+    "monospaceLinks" : false
+  }
+}

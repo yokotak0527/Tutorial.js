@@ -1,10 +1,16 @@
+/**
+* @class Step
+*
+* | Step parameters        ||
+* |--------------------|----|
+* | a | b |
+*
+* @param       {Tutorial} tutorial
+* @param       {Object[]} [step]
+* @return      Step
+*/
 class Step{
-  /*
-  * @constructor
-  * @param    {Tutorial} tutorial
-  * @param    {Object[]} [step]
-  * @return   Step
-  */
+  static id = 0;
   constructor(tutorial, step, $){
     this.list     = [];
     this.length   = 0;
@@ -12,11 +18,15 @@ class Step{
     this.$        = $;
     if(step) this.add(step);
   }
-  /* */
-  static id = 0;
-  /*
+  /**
+  *
+  * @function setDefaultProperties
+  * @memberof Step
+  * @static
+  *
   * @param  {Object} step
-  * @return Object
+  * @param  {String} [name = '']
+  * @return Step
   */
   static setDefaultProperties(step, name = ''){
     step.pos = Array.isArray(step.pos) ? step.pos : ['center', 'center'];
@@ -27,8 +37,14 @@ class Step{
     if(step.target && !step.targetPos) step.targetPos = ['left', 'top'];
     return step;
   }
-  /*
+  /**
+  * @function setPropertiesFormat
+  * @memberof Step
+  * @static
   *
+  * @param {Step}   step
+  * @param {jQuery} $
+  * @return Step
   */
   static setPropertiesFormat(step, $){
     if(step.target){
@@ -43,14 +59,14 @@ class Step{
     }
     return step;
   }
-  /*
-  * ステップの内容を変更する
-  * @function changee
+  /**
+  * Change step parameters.
+  * @function change
   * @memberof Step
   * @instance
+  *
   * @param    {String | Number} order
   * @param    {Object}          step
-  * @param    {Boolean}         [partial = true]
   * @return   Step
   */
   change(order, step, partial = true){
@@ -67,8 +83,9 @@ class Step{
     __private.get(this.tutorial).emit('step changed');
     return this;
   }
-  /*
-  * ステップの内容を置き換える
+  /**
+  * Replace step parameters.
+  *
   * @function replace
   * @memberof Step
   * @instance
@@ -78,7 +95,9 @@ class Step{
   replace(order, step){
     return this.change(order, step, false);
   }
-  /*
+  /**
+  * Add new step.
+  *
   * @function addStep
   * @memberof Step
   * @instance
@@ -96,7 +115,9 @@ class Step{
     __private.get(this.tutorial).emit('step added');
     return this;
   }
-  /*
+  /**
+  * delete specified step.
+  *
   * @function deleteStep
   * @memberof Step
   * @instance

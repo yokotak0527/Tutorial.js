@@ -8,6 +8,7 @@ __conf.scrollSpeed      = 500;
 __conf.showSpeed        = 300;
 __conf.hideSpeed        = 300;
 __conf.posFitSpeed      = 300;
+__conf.theme            = 'default';
 __conf.animation        = Object.create(null);
 __conf.animation.show   = true;
 __conf.animation.hide   = true;
@@ -26,7 +27,7 @@ __conf.zIndex           = 9000;
 __conf.bgColor          = 'rgba(0, 0, 0, 0.5)';
 __conf.template         = ()=> `
 <div class="tutorial">
-  <div class="content-wrap center-middle">
+  <div class="pos-fit"><div class="content-wrap center-middle">
     <ol class="pager"></ol>
     <div class="content"></div>
     <div class="controller">
@@ -39,7 +40,7 @@ __conf.template         = ()=> `
         <li class="end"><span>${__conf.endLabel}</span></li>
       </ul>
     </div>
-  </div>
+  </div></div>
   <div class="bg"></div>
 </div>
 `;

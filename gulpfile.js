@@ -10,11 +10,10 @@ const sourcemaps = require('gulp-sourcemaps');
 const pleeease   = require('gulp-pleeease');
 const uglify     = require('gulp-uglify');
 const rename     = require('gulp-rename');
-const jsdoc      = require('gulp-jsdoc');
 let packageJson  = require('./package.json');
+let exec         = require('child_process').exec;
 
 packageJson.name = 'Tutorial.js';
-// console.log(packageJson.version);
 
 let concatJSList = [
   'assets/js/header.js',
@@ -29,35 +28,6 @@ let concatJSList = [
   'assets/js/BGCanvas.js',
   'assets/js/config.js',
   'assets/js/footer.js'
-  //'assets/js/header.js',
-  //'assets/js/class.BGCanvas.js',
-  //'assets/js/class.CustomEvent.js',
-  //'assets/js/class.EventContainer.js',
-  //'assets/js/class.DOMController.js',
-  //'assets/js/class.InstanceManager.js',
-  //'assets/js/static-private-properties.js',
-  //'assets/js/static-private-property.animation.js',
-  //'assets/js/static-private-method.adjustStepNum.js',
-  //'assets/js/static-private-method.eventListenerRelation.js',
-  //'assets/js/static-private-method.changePointer.js',
-  //'assets/js/class-start.js',
-  //'assets/js/static-method.changeConfig.js',
-  //'assets/js/constructor.js',
-  //'assets/js/method.addStep.js',
-  //'assets/js/method.removeStep.js',
-  //'assets/js/method.changeStep.js',
-  //'assets/js/method.prev.js',
-  //'assets/js/method.next.js',
-  //'assets/js/method.hide.js',
-  //'assets/js/method.show.js',
-  //'assets/js/method.getPointer.js',
-  //'assets/js/method.addEventListener.js',
-  //'assets/js/method.removeEventListener.js',
-  //'assets/js/method.isActive.js',
-  //'assets/js/method.isFire.js',
-  //'assets/js/method.indexByName.js',
-  //'assets/js/class-end.js',
-  //'assets/js/footer.js'
 ];
 // -----------------------------------------------------------------------------
 gulp.task('build:js', ()=>{
@@ -99,18 +69,67 @@ gulp.task('minify', ()=>{
 });
 // -----------------------------------------------------------------------------
 gulp.task('jsdoc', ()=>{
-  return gulp.src(path.join('dest', packageJson.name))
-    .pipe(jsdoc.parser({
-      'name'    : packageJson.name,
-      'version' : packageJson.version
-    }))
-    .pipe(jsdoc.generator( 'doc', null, { 'outputSourceFiles' : false } ))
-    // {
-      // 'path'       : 'ink-docstrap',
-      // 'systemName' : packageJson.name + ' Document',
-      // 'copyright'  : packageJson.author,
-      // 'theme'      : 'minami'
-    // },
+
+  let target = path.join('dest', packageJson.name);
+  let outDir = `./doc/${packageJson.version}`;
+  // console.log(outDir);
+  //  -c ./jsdoc.json
+
+  exec(`./node_modules/.bin/jsdoc ${target} -c ./jsdoc.json -d ${outDir}`, (error, stdout, stderr)=>{
+    if(error !== null) console.error(error);
+    // console.log('stdout: ' + stdout);
+    // console.log('stderr: ' + stderr);
+    // if (error !== null) {
+    //     console.log('exec error: ' + error);
+    // }
+  });
+  // ./node_modules/.bin/jsdoc
+  // console.log(jsdoc);
+  // let infos = {
+  //   'name'    : packageJson.name,
+  //   'version' : packageJson.version
+  // };
+  // let tmpl = {
+  //   'path' : 'minami',
+  //   'systemName' : packageJson.name,
+  //   'inverseNav'     : true,
+  //   'systemName'     : packageJson.name,
+  //   'search'         : false,
+  //   'cleverLinks'    : false,
+  //   'monospaceLinks' : true
+  // };
+  // let ops = {
+  //   outputSourceFiles: false
+  // };
+
+  // let config = {
+  //   'tags' : {
+  //     'allowUnknownTags' : true
+  //   },
+  //   'opts': {
+  //     'destination' : './doc/' + packageJson.version,
+  //     'encoding'    : 'utf8',
+  //     // 'template'    : './node_modules/minami'
+  //   },
+  //   'plugins' : [ 'plugins/markdown' ],
+  //   'templates' : {
+  //     // 'default' : {
+  //     //   'layoutFile' : 'tutorial.tmpl'
+  //     // },
+  //     'inverseNav'     : true,
+  //     'systemName'     : packageJson.name,
+  //     'search'         : false,
+  //     'cleverLinks'    : false,
+  //     'monospaceLinks' : true
+  //   },
+  //   // 'path' : path.join(process.cwd(),'node_modules/minami'),
+  //   'navType'  : 'vertical',
+  //   'linenums' : true
+  // };
+  // gulp.src(path.join('dest', packageJson.name), { raed : false }).pipe(jsdoc(config))
+  // gulp.src(path.join('dest', packageJson.name))
+  //   .pipe(jsdoc.parser(infos))
+  //   .pipe(jsdoc.generator('./doc/' + packageJson.version, tmpl, ops));
 });
 // -----------------------------------------------------------------------------
 gulp.task('watch', ()=>{

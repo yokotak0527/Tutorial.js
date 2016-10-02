@@ -1,30 +1,15 @@
+/**
+* @class Tutorial
+* @param {Object}          [param]                   - Behavior of Tutorial.js parameter.
+* @param {Boolean}         [param.skip = true]       - use skip button.
+* @param {String | Number} [param.startStep = true]
+* @param {Boolean}         [param.roop = false]
+* @param {Boolean}         [param.pager = true]      - use pager.
+* @param {Boolean}         [param.controller = true] - use controller.
+* @param {Object[]}        [param.step]
+* @return Tutorial
+*/
 class Tutorial{
-  /**
-  * Tutorial全体の動作を変更する。Tutorialのインスタンスを作成する前のみ可能
-  *
-  * @param {(String|Object[])} name
-  * @param {String}            name.name
-  * @param {*}                 name.val
-  * @param {*}                 [val]
-  */
-  static changeConfig(key, val){
-    if(!__first) return false;
-    let confArr = Array.isArray(key) ? key : [{'key' : key, 'val' : val}];
-    confArr.forEach( obj => __conf[obj.key] = obj.val );
-  }
-  /*
-  * @constructor Tutorial
-  *
-  * @param {Object}          [param]                   - Tutorial instance setting parameter
-  * @param {Boolean}         [param.auto = false]      - auto start.
-  * @param {Boolean}         [param.skip = true]       - use skip button.
-  * @param {String | Number} [param.startStep = true]
-  * @param {Boolean}         [roop = false]
-  * @param {Boolean}         [param.pager = true]      - use pager.
-  * @param {Boolean}         [param.controller = true] - use controller.
-  * @param {Object[]}        [param.step]
-  * @return Tutorial
-  */
   constructor(param = {}){
     let conf      = __conf;
     let $         = conf.$;
@@ -45,8 +30,54 @@ class Tutorial{
 
     if(__first) __first = false;
   }
-  /*
+  /**
   *
+  * Change overall behavior of Tutorial.js.  
+  * **You are able to use it, As far as Tutorial.js instance is not exist.**
+  *
+  * | Key              | Type              | Default val.         |
+  * |------------------|-------------------|----------------------|
+  * | resizeInterval   | Number            | 250                  |
+  * | scrollInterval   | Number            | 100                  |
+  * | showSpeed        | Number            | 300                  |
+  * | hideSpeed        | Number            | 300                  |
+  * | scrollSpeed      | Number            | 500                  |
+  * | posFitSpeed      | Number            | 300                  |
+  * | animation        | Boolean / Object  | Object               |
+  * | animation.show   | Boolean           | true                 |
+  * | animation.hide   | Boolean           | true                 |
+  * | animation.scroll | Boolean           | true                 |
+  * | animation.posFit | Boolean           | true                 |
+  * | skipLabel        | String            | 'Skip'               |
+  * | prevLabel        | String            | 'Prev'               |
+  * | nextLabel        | String            | 'Next'               |
+  * | endLabel         | String            | 'End'                |
+  * | $                | jQuery            | $                    |
+  * | $window          | jQuery            | $(window)            |
+  * | $parent          | jQuery            | $('body')            |
+  * | $scroll          | jQuery            | $('body')            |
+  * | zIndex           | Number            | 9000                 |
+  * | bgColor          | String            | 'rgba(0, 0, 0, 0.5)' |
+  * | theme            | String            | 'default'            |
+  *
+  * @function changeConfig
+  * @memberof Tutorial
+  * @static
+  *
+  * @param    {(String|Object[])} name
+  * @param    {String}            name.name
+  * @param    {*}                 name.val
+  * @param    {*}                 [val]
+  */
+  static changeConfig(key, val){
+    if(!__first) return false;
+    let confArr = Array.isArray(key) ? key : [{'key' : key, 'val' : val}];
+    confArr.forEach( obj => __conf[obj.key] = obj.val );
+  }
+  /**
+  * @function next
+  * @memberof Tutorial
+  * @instance
   */
   next(){
     let newPointer = this.pointer + 1;
@@ -58,8 +89,10 @@ class Tutorial{
       this.pointer = newPointer;
     });
   }
-  /*
-  *
+  /**
+  * @function prev
+  * @memberof Tutorial
+  * @instance
   */
   prev(){
     let newPointer = this.pointer - 1;
@@ -71,21 +104,32 @@ class Tutorial{
       this.pointer = newPointer;
     });
   }
-  /*
+  /**
   *
+  * @function skip
+  * @memberof Tutorial
+  * @instance
   */
   skip(){
     let promise = this.mediator.offer(this, 'skip');
   }
-  /*
+  /**
   *
+  * @function end
+  * @memberof Tutorial
+  * @instance
   */
   end(){
     this.hide();
   }
-  /*
-  * @param  {String} order
-  * @return {SimplePromise}
+  /**
+  * Show tutorial step.
+  *
+  * @function show
+  * @memberof Tutorial
+  * @instance
+  *
+  * @param {String | Number} [order]
   */
   show(order = -1){
     order        = typeof order === 'string' ? this.step.indexByName(order) : order;
@@ -104,8 +148,10 @@ class Tutorial{
     });
     return def.promise();
   }
-  /*
-  * @return {SimplePromise}
+  /**
+  * @function hide
+  * @memberof Tutorial
+  * @instance
   */
   hide(){
     this.fire   = true;
@@ -119,8 +165,10 @@ class Tutorial{
     });
     return def.promise();
   }
-  /*
-  *
+  /**
+  * @function destroy
+  * @memberof Tutorial
+  * @instance
   */
   destroy(){
     // let promise = this.mediator.offer(this, 'show');

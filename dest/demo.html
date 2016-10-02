@@ -65,6 +65,7 @@
       <h1>Tutorial.js</h1>
       <ul>
         <li><a href="#" class="demo" id="d1">standard</a></li>
+        <li><a href="#" class="demo" id="d2">position list</a></li>
       </ul>
     </div></section>
     <section><div>
@@ -95,17 +96,48 @@
     Tutorial.changeConfig('prevLabel', '前へ');
     Tutorial.changeConfig('endLabel',  '終了');
     var tutorialSet = {};
+    // =========================================================================
+    // step d2 : default
+    // =========================================================================
     tutorialSet.d1 = new Tutorial();
     tutorialSet.d1.step.add([
       {
-        'name'      : 'step1',
-        'content'   : 'step1',
-        'pos'       : ['center', 'center'],
-        'target'    : $('#d1Target span')
-      },{
-        'name'    : 'step2',
-        'content' : 'step2<br>step2',
+        'content' : 'step1',
         'pos'     : ['center', 'center']
+      }
+    ]);
+    // =========================================================================
+    // step d2 : position list
+    // =========================================================================
+    tutorialSet.d2 = new Tutorial();
+    tutorialSet.d2.step.add([
+      {
+        'content' : '1',
+        'pos'     : ['left', 'top']
+      },{
+        'content' : '2',
+        'pos'     : ['center', 'top']
+      },{
+        'content' : '3',
+        'pos'     : ['right', 'top']
+      },{
+        'content' : '4',
+        'pos'     : ['left', 'center']
+      },{
+        'content' : '5',
+        'pos'     : ['center', 'center']
+      },{
+        'content' : '6',
+        'pos'     : ['right', 'center']
+      },{
+        'content' : '7',
+        'pos'     : ['left', 'bottom']
+      },{
+        'content' : '8',
+        'pos'     : ['center', 'bottom']
+      },{
+        'content' : '9',
+        'pos'     : ['right', 'bottom']
       }
     ]);
 

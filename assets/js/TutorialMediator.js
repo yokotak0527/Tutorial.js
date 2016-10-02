@@ -1,11 +1,11 @@
+/**
+* @class  TutorialMediator
+* @param  {Tutorial} tutorial
+* @param  {Object}   conf      - configuration object.
+*/
 class TutorialMediator{
   static instance = undefined;
   static idNum    = 0;
-  /*
-  * @constructor
-  * @param      {Tutorial} tutorial
-  * @return     TutorialMediator
-  */
   constructor(tutorial, conf){
     let TM      = TutorialMediator;
     let self    = TM.instance ? TM.instance : this;
@@ -35,21 +35,25 @@ class TutorialMediator{
         '$window'  : conf.$window,
         '$scroll'  : conf.$scroll
       });
-      self.domCtlr   = new conf.DOMController({
+      self.domCtlr = new conf.DOMController({
         '$'                : self.$,
         '$window'          : self.$window,
         '$template'        : self.$(conf.template()),
         'zIndex'           : conf.zIndex,
         '$parent'          : self.$parent,
         'mode'             : conf.mode,
+        'theme'            : conf.theme,
         'BGCanvas'         : conf.BGCanvas,
         'bgColor'          : conf.bgColor,
-        'tutorialMediator' : self
+        'tutorialMediator' : self,
+        'globalEvent'      : self.eventCtnr
       });
-      if(self.domCtlr.bgCanvas){
-        self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
-        self.domCtlr.bgCanvas.draw();
-      }
+
+      // if(self.domCtlr.bgCanvas){
+      //   self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
+      //   self.domCtlr.bgCanvas.draw();
+      // }
+
       /* $ resize event listener */
       let resizeInterval = conf.resizeInterval || 250;
       let resizeTimer    = null;
@@ -59,13 +63,13 @@ class TutorialMediator{
           self.eventCtnr.trigger('resize');
         }, resizeInterval);
       });
-      /* custom resize event listener */
-      self.eventCtnr.addEventListener('resize', (size)=>{
-        if(self.domCtlr.bgCanvas){
-          self.domCtlr.bgCanvas.setSize(size.width, size.height);
-          self.domCtlr.bgCanvas.draw();
-        }
-      });
+      // /* custom resize event listener */
+      // self.eventCtnr.addEventListener('resize', (size)=>{
+      //   if(self.domCtlr.bgCanvas){
+      //     self.domCtlr.bgCanvas.setSize(size.width, size.height);
+      //     self.domCtlr.bgCanvas.draw();
+      //   }
+      // });
 
       self.active = false; /* active tutorial */
       self.list   = Object.create(null);
@@ -75,8 +79,13 @@ class TutorialMediator{
     self.list[tutorial.id] = tutorial;
     return self;
   }
-  /*
+  /**
   * 新しいIDを発行する
+  *
+  * @function issuanceNewID
+  * @memberof TutorialMediator
+  * @instance
+  *
   * @return String
   */
   issuanceNewID(){
@@ -85,7 +94,12 @@ class TutorialMediator{
     TM.idNum++;
     return rtn;
   }
-  /*
+  /**
+  *
+  * @function offer
+  * @memberof TutorialMediator
+  * @instance
+  *
   * @param {Tutorial} tutorial
   * @param {String}   type
   * @param {*}        ops
@@ -169,6 +183,7 @@ let proposalOfShowing = function(tutorial, def, step){
     this.domCtlr.addStepID(tutorial.step.list[pointer].name);
     this.active = tutorial;
 
+    this.domCtlr.setCanvasSize(this.$window.innerWidth(), this.$window.innerHeight());
     // 表示＆移動アニメーション
     let showAnimPromise = this.animation.show(this.domCtlr.get$obj('all'), showSpeed);
     showAnimPromise.then( ()=>{
@@ -180,7 +195,7 @@ let proposalOfShowing = function(tutorial, def, step){
       count++;
       if(count === 3) def.resolve();
     });
-    let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), posFitSpeed);
+    let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
     posAnimationPromise.then( ()=>{
       count++;
       if(count === 3) def.resolve();
@@ -205,7 +220,7 @@ let proposalOfShowing = function(tutorial, def, step){
       .removeStepID()
       .addStepID(tutorial.step.list[tutorial.pointer].name);
 
-    let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), posFitSpeed);
+    let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
     def.resolve();
   }
   // ---------------------------------------------------------------------------
