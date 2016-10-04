@@ -21,21 +21,19 @@ class DOMController{
       if(DOMController.instance) return DOMController.instance;
 
       let {
-        $,
-        $window,
         $template,
         zIndex,
-        $parent,
         mode,
         theme,
         BGCanvas,
         bgColor,
-        tutorialMediator,
-        globalEvent
+        tutorialMediator
       } = param;
 
-      this.$            = $;
-      this.$window      = $window;
+      let tm = tutorialMediator;
+      this.$            = tm.$;
+      this.$window      = tm.$window;
+      this.$parent      = tm.$parent;
       this.$template    = $template;
       this.$posFit      = $('.pos-fit',      this.$template);
       this.$contentWrap = $('.content-wrap', this.$template);
@@ -47,7 +45,6 @@ class DOMController{
       this.$prevBtn     = $('.prev span',    this.$controller);
       this.$nextBtn     = $('.next span',    this.$controller);
       this.$endBtn      = $('.end span',     this.$controller);
-      this.$parent      = $parent;
       $template.css({
         'z-index' : zIndex,
         'display' : 'none',
@@ -61,14 +58,13 @@ class DOMController{
           '$parent' : this.$bg,
           'bgColor' : bgColor
         });
-        this.setCanvasSize($window.innerWidth(), $window.innerHeight());
+        this.setCanvasSize(this.$window.innerWidth(), this.$window.innerHeight());
       }
       this.$posFit.css('z-index', zIndex+2);
       this.$bg.css('z-index', zIndex+1);
       // =======================================================================
       // events
       // =======================================================================
-      let tm = tutorialMediator;
       // pager
       this.$pager.on('click', 'li span', function(e){
         if(!$(this).hasClass('active')) tm.active.show($(this).text() * 1);
@@ -82,7 +78,7 @@ class DOMController{
       // end
       this.$endBtn.on('click', ()=> tm.active.end() );
       // resize
-      globalEvent.addEventListener('resize', (size)=>{
+      tm.eventCtnr.addEventListener('resize', (size)=>{
         if(!tm.hasActive()) return false;
         this.setCanvasSize(size.width, size.height);
       });

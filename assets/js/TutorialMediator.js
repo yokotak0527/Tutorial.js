@@ -29,24 +29,18 @@ class TutorialMediator{
       self.$parent   = conf.$parent;
       self.$scroll   = conf.$scroll;
       self.Deferred  = conf.Deferred;
-      self.animation = new conf.Animation({
-        '$'        : self.$,
-        'Deferred' : self.Deferred,
-        '$window'  : conf.$window,
-        '$scroll'  : conf.$scroll
-      });
       self.domCtlr = new conf.DOMController({
-        '$'                : self.$,
-        '$window'          : self.$window,
         '$template'        : self.$(conf.template()),
         'zIndex'           : conf.zIndex,
-        '$parent'          : self.$parent,
         'mode'             : conf.mode,
         'theme'            : conf.theme,
         'BGCanvas'         : conf.BGCanvas,
         'bgColor'          : conf.bgColor,
+        'tutorialMediator' : self
+      });
+      self.animation = new conf.Animation({
         'tutorialMediator' : self,
-        'globalEvent'      : self.eventCtnr
+        'bgCanvas'         : self.domCtlr.bgCanvas
       });
 
       // if(self.domCtlr.bgCanvas){
@@ -155,11 +149,12 @@ class TutorialMediator{
 // 表示処理
 // =============================================================================
 let proposalOfShowing = function(tutorial, def, step){
-  let minSpeed    = 10;
-  let conf        = this.conf;
-  let showSpeed   = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
-  let scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
-  let posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
+  let minSpeed         = 10;
+  let conf             = this.conf;
+  let showSpeed        = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
+  let scrollSpeed      = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
+  let posFitSpeed      = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
+  let targetFocusSpeed = conf.animation === true || conf.animation.targetFocus ? conf.targetFocusSpeed : minSpeed;
   if(showSpeed <= 0) showSpeed = minSpeed;
   if(scrollSpeed <= 0) scrollSpeed = minSpeed;
   // ---------------------------------------------------------------------------
@@ -185,21 +180,24 @@ let proposalOfShowing = function(tutorial, def, step){
 
     this.domCtlr.setCanvasSize(this.$window.innerWidth(), this.$window.innerHeight());
     // 表示＆移動アニメーション
+    let check = (d)=>{
+        count++;
+        if(count === 3 && conf.mode === 'focus'){
+          let step = this.active.getActiveStep();
+          if(step.target){
+            let endPromise = this.animation.targeFocus(step.target, targetFocusSpeed);
+            endPromise.then( ()=> d.resolve() );
+          }else{
+            d.resolve();
+          }
+        }
+    }
     let showAnimPromise = this.animation.show(this.domCtlr.get$obj('all'), showSpeed);
-    showAnimPromise.then( ()=>{
-      count++;
-      if(count === 3) def.resolve();
-    });
+    showAnimPromise.then( ()=> check(def) );
     let scrollAnimPromise = this.animation.scroll(step.target, step.targetPos, scrollSpeed);
-    scrollAnimPromise.then( ()=>{
-      count++;
-      if(count === 3) def.resolve();
-    });
+    scrollAnimPromise.then( ()=> check(def) );
     let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
-    posAnimationPromise.then( ()=>{
-      count++;
-      if(count === 3) def.resolve();
-    });
+    posAnimationPromise.then( ()=> check(def) );
   }
   // ---------------------------------------------------------------------------
   // アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由)

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tutorial.JS DEMO -change label-</title>
+  <script src="./lib/js/jquery-2.2.4.min.js"></script>
+  <script src="./Tutorial.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link rel="stylesheet" href="./Tutorial.css">
+</head>
+<body>
+  <div class="wrap">
+    <section><div>
+      <h1>Tutorial.js</h1>
+      <h2>change label</h2>
+    </div></section>
+  </div>
+  <script>
+    Tutorial.changeConfig('skipLabel', 'スキップ');
+    Tutorial.changeConfig('nextLabel', '次へ');
+    Tutorial.changeConfig('prevLabel', '前へ');
+    Tutorial.changeConfig('endLabel',  '終了');
+    var tutorial = new Tutorial();
+    tutorial.step.add([
+      {
+        'content' : 'step1',
+        'pos'     : ['center', 'center']
+      },{
+        'content' : 'step2',
+        'pos'     : ['center', 'center']
+      },{
+        'content' : 'step3',
+        'pos'     : ['center', 'center']
+      },{
+        'content' : 'step4',
+        'pos'     : ['center', 'center']
+      },{
+        'content' : 'step5',
+        'pos'     : ['center', 'center']
+      }
+    ]);
+    tutorial.show();
+  </script>
+</body>
+</html>

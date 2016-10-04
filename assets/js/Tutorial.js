@@ -35,30 +35,32 @@ class Tutorial{
   * Change overall behavior of Tutorial.js.  
   * **You are able to use it, As far as Tutorial.js instance is not exist.**
   *
-  * | Key              | Type              | Default val.         |
-  * |------------------|-------------------|----------------------|
-  * | resizeInterval   | Number            | 250                  |
-  * | scrollInterval   | Number            | 100                  |
-  * | showSpeed        | Number            | 300                  |
-  * | hideSpeed        | Number            | 300                  |
-  * | scrollSpeed      | Number            | 500                  |
-  * | posFitSpeed      | Number            | 300                  |
-  * | animation        | Boolean / Object  | Object               |
-  * | animation.show   | Boolean           | true                 |
-  * | animation.hide   | Boolean           | true                 |
-  * | animation.scroll | Boolean           | true                 |
-  * | animation.posFit | Boolean           | true                 |
-  * | skipLabel        | String            | 'Skip'               |
-  * | prevLabel        | String            | 'Prev'               |
-  * | nextLabel        | String            | 'Next'               |
-  * | endLabel         | String            | 'End'                |
-  * | $                | jQuery            | $                    |
-  * | $window          | jQuery            | $(window)            |
-  * | $parent          | jQuery            | $('body')            |
-  * | $scroll          | jQuery            | $('body')            |
-  * | zIndex           | Number            | 9000                 |
-  * | bgColor          | String            | 'rgba(0, 0, 0, 0.5)' |
-  * | theme            | String            | 'default'            |
+  * | Key                   | Type              | Default val.         |
+  * |-----------------------|-------------------|----------------------|
+  * | resizeInterval        | Number            | 250                  |
+  * | scrollInterval        | Number            | 100                  |
+  * | showSpeed             | Number            | 300                  |
+  * | hideSpeed             | Number            | 300                  |
+  * | scrollSpeed           | Number            | 500                  |
+  * | posFitSpeed           | Number            | 300                  |
+  * | targetFocusSpeed      | Number            | 300                  |
+  * | animation             | Boolean / Object  | Object               |
+  * | animation.show        | Boolean           | true                 |
+  * | animation.hide        | Boolean           | true                 |
+  * | animation.scroll      | Boolean           | true                 |
+  * | animation.posFit      | Boolean           | true                 |
+  * | animation.targetFocus | Boolean           | true                 |
+  * | skipLabel             | String            | 'Skip'               |
+  * | prevLabel             | String            | 'Prev'               |
+  * | nextLabel             | String            | 'Next'               |
+  * | endLabel              | String            | 'End'                |
+  * | $                     | jQuery            | $                    |
+  * | $window               | jQuery            | $(window)            |
+  * | $parent               | jQuery            | $('body')            |
+  * | $scroll               | jQuery            | $('body')            |
+  * | zIndex                | Number            | 9000                 |
+  * | bgColor               | String            | 'rgba(0, 0, 0, 0.5)' |
+  * | theme                 | String            | 'default'            |
   *
   * @function changeConfig
   * @memberof Tutorial
@@ -105,7 +107,6 @@ class Tutorial{
     });
   }
   /**
-  *
   * @function skip
   * @memberof Tutorial
   * @instance
@@ -114,7 +115,6 @@ class Tutorial{
     let promise = this.mediator.offer(this, 'skip');
   }
   /**
-  *
   * @function end
   * @memberof Tutorial
   * @instance
@@ -172,5 +172,46 @@ class Tutorial{
   */
   destroy(){
     // let promise = this.mediator.offer(this, 'show');
+  }
+  /**
+  * @function getActiveStep
+  * @memberof Tutorial
+  * @instance
+  * 
+  * @return   Step
+  */
+  getActiveStep(){
+    return this.step.list[this.pointer];
+  }
+  /**
+  * @function getPointer
+  * @memberof Tutorial
+  * @instance
+  *
+  * @return   Number
+  */
+  getPointer(){
+    return this.pointer;
+  }
+  /**
+  * @function getStepList
+  * @memberof Tutorial
+  * @instance
+  *
+  * @return Step[]
+  */
+  getStepList(){
+    return this.step.list;
+  }
+  /**
+  * Return step length.
+  * @function stepNumIs
+  * @memberof Tutorial
+  * @instance
+  *
+  * @return   Number
+  */
+  stepNumIs(){
+    return this.step.length;
   }
 }

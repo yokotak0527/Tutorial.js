@@ -11,10 +11,12 @@ class Animation{
   */
   constructor(param){
     if(Animation.instance) return Animation.instance;
-    this.$        = param.$;
-    this.$window  = param.$window;
-    this.$scroll  = param.$scroll;
-    this.Deferred = param.Deferred;
+    let tm = param.tutorialMediator;
+    this.$        = tm.$;
+    this.$window  = tm.$window;
+    this.$scroll  = tm.$scroll;
+    this.Deferred = tm.Deferred;
+    this.bgCanvas = param.bgCanvas;
   }
   /*
   * @param {jQuery} $target
@@ -27,7 +29,7 @@ class Animation{
     }, speed, ()=> def.resolve());
     return def.promise();
   }
-  /*
+  /**
   *
   */
   hide($target, speed){
@@ -40,7 +42,7 @@ class Animation{
     });
     return def.promise();
   }
-  /*
+  /**
   * @param {jQuery[]}            target
   * @param {String[] | Number[]} offset
   * @param {Number}              speed
@@ -106,7 +108,16 @@ class Animation{
     }
     return def.promise();
   }
-  /*
+  /**
+  * @param {jQuery[]} target
+  * @param {Number}   speed
+  */
+  targeFocus(target, speed){
+    let def = new this.Deferred();
+    
+    return def.promise();
+  }
+  /**
   * @param {String[] | number[]} orderPos
   * @param {jQuery}              $target
   */

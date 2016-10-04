@@ -56,30 +56,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       * Change overall behavior of Tutorial.js.  
       * **You are able to use it, As far as Tutorial.js instance is not exist.**
       *
-      * | Key              | Type              | Default val.         |
-      * |------------------|-------------------|----------------------|
-      * | resizeInterval   | Number            | 250                  |
-      * | scrollInterval   | Number            | 100                  |
-      * | showSpeed        | Number            | 300                  |
-      * | hideSpeed        | Number            | 300                  |
-      * | scrollSpeed      | Number            | 500                  |
-      * | posFitSpeed      | Number            | 300                  |
-      * | animation        | Boolean / Object  | Object               |
-      * | animation.show   | Boolean           | true                 |
-      * | animation.hide   | Boolean           | true                 |
-      * | animation.scroll | Boolean           | true                 |
-      * | animation.posFit | Boolean           | true                 |
-      * | skipLabel        | String            | 'Skip'               |
-      * | prevLabel        | String            | 'Prev'               |
-      * | nextLabel        | String            | 'Next'               |
-      * | endLabel         | String            | 'End'                |
-      * | $                | jQuery            | $                    |
-      * | $window          | jQuery            | $(window)            |
-      * | $parent          | jQuery            | $('body')            |
-      * | $scroll          | jQuery            | $('body')            |
-      * | zIndex           | Number            | 9000                 |
-      * | bgColor          | String            | 'rgba(0, 0, 0, 0.5)' |
-      * | theme            | String            | 'default'            |
+      * | Key                   | Type              | Default val.         |
+      * |-----------------------|-------------------|----------------------|
+      * | resizeInterval        | Number            | 250                  |
+      * | scrollInterval        | Number            | 100                  |
+      * | showSpeed             | Number            | 300                  |
+      * | hideSpeed             | Number            | 300                  |
+      * | scrollSpeed           | Number            | 500                  |
+      * | posFitSpeed           | Number            | 300                  |
+      * | targetFocusSpeed      | Number            | 300                  |
+      * | animation             | Boolean / Object  | Object               |
+      * | animation.show        | Boolean           | true                 |
+      * | animation.hide        | Boolean           | true                 |
+      * | animation.scroll      | Boolean           | true                 |
+      * | animation.posFit      | Boolean           | true                 |
+      * | animation.targetFocus | Boolean           | true                 |
+      * | skipLabel             | String            | 'Skip'               |
+      * | prevLabel             | String            | 'Prev'               |
+      * | nextLabel             | String            | 'Next'               |
+      * | endLabel              | String            | 'End'                |
+      * | $                     | jQuery            | $                    |
+      * | $window               | jQuery            | $(window)            |
+      * | $parent               | jQuery            | $('body')            |
+      * | $scroll               | jQuery            | $('body')            |
+      * | zIndex                | Number            | 9000                 |
+      * | bgColor               | String            | 'rgba(0, 0, 0, 0.5)' |
+      * | theme                 | String            | 'default'            |
       *
       * @function changeConfig
       * @memberof Tutorial
@@ -133,7 +135,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           });
         }
         /**
-        *
         * @function skip
         * @memberof Tutorial
         * @instance
@@ -145,7 +146,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           var promise = this.mediator.offer(this, 'skip');
         }
         /**
-        *
         * @function end
         * @memberof Tutorial
         * @instance
@@ -219,8 +219,61 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'destroy',
-        value: function destroy() {
-          // let promise = this.mediator.offer(this, 'show');
+        value: function destroy() {}
+        // let promise = this.mediator.offer(this, 'show');
+
+        /**
+        * @function getActiveStep
+        * @memberof Tutorial
+        * @instance
+        * 
+        * @return   Step
+        */
+
+      }, {
+        key: 'getActiveStep',
+        value: function getActiveStep() {
+          return this.step.list[this.pointer];
+        }
+        /**
+        * @function getPointer
+        * @memberof Tutorial
+        * @instance
+        *
+        * @return   Number
+        */
+
+      }, {
+        key: 'getPointer',
+        value: function getPointer() {
+          return this.pointer;
+        }
+        /**
+        * @function getStepList
+        * @memberof Tutorial
+        * @instance
+        *
+        * @return Step[]
+        */
+
+      }, {
+        key: 'getStepList',
+        value: function getStepList() {
+          return this.step.list;
+        }
+        /**
+        * Return step length.
+        * @function stepNumIs
+        * @memberof Tutorial
+        * @instance
+        *
+        * @return   Number
+        */
+
+      }, {
+        key: 'stepNumIs',
+        value: function stepNumIs() {
+          return this.step.length;
         }
       }], [{
         key: 'changeConfig',
@@ -270,24 +323,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             self.$parent = conf.$parent;
             self.$scroll = conf.$scroll;
             self.Deferred = conf.Deferred;
-            self.animation = new conf.Animation({
-              '$': self.$,
-              'Deferred': self.Deferred,
-              '$window': conf.$window,
-              '$scroll': conf.$scroll
-            });
             self.domCtlr = new conf.DOMController({
-              '$': self.$,
-              '$window': self.$window,
               '$template': self.$(conf.template()),
               'zIndex': conf.zIndex,
-              '$parent': self.$parent,
               'mode': conf.mode,
               'theme': conf.theme,
               'BGCanvas': conf.BGCanvas,
               'bgColor': conf.bgColor,
+              'tutorialMediator': self
+            });
+            self.animation = new conf.Animation({
               'tutorialMediator': self,
-              'globalEvent': self.eventCtnr
+              'bgCanvas': self.domCtlr.bgCanvas
             });
 
             // if(self.domCtlr.bgCanvas){
@@ -445,6 +492,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
       var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
       var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
+      var targetFocusSpeed = conf.animation === true || conf.animation.targetFocus ? conf.targetFocusSpeed : minSpeed;
       if (showSpeed <= 0) showSpeed = minSpeed;
       if (scrollSpeed <= 0) scrollSpeed = minSpeed;
       // ---------------------------------------------------------------------------
@@ -471,20 +519,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           _this7.domCtlr.setCanvasSize(_this7.$window.innerWidth(), _this7.$window.innerHeight());
           // 表示＆移動アニメーション
+          var check = function check(d) {
+            count++;
+            if (count === 3 && conf.mode === 'focus') {
+              var _step = _this7.active.getActiveStep();
+              if (_step.target) {
+                var endPromise = _this7.animation.targeFocus(_step.target, targetFocusSpeed);
+                endPromise.then(function () {
+                  return d.resolve();
+                });
+              } else {
+                d.resolve();
+              }
+            }
+          };
           var showAnimPromise = _this7.animation.show(_this7.domCtlr.get$obj('all'), showSpeed);
           showAnimPromise.then(function () {
-            count++;
-            if (count === 3) def.resolve();
+            return check(def);
           });
           var scrollAnimPromise = _this7.animation.scroll(step.target, step.targetPos, scrollSpeed);
           scrollAnimPromise.then(function () {
-            count++;
-            if (count === 3) def.resolve();
+            return check(def);
           });
           var posAnimationPromise = _this7.animation.tooltipPosFit(step.pos, _this7.domCtlr.get$obj('content-wrap'), _this7.domCtlr.get$obj('pos-fit'), posFitSpeed);
           posAnimationPromise.then(function () {
-            count++;
-            if (count === 3) def.resolve();
+            return check(def);
           });
         })();
       }
@@ -1141,21 +1200,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         if (DOMController.instance) return DOMController.instance;
 
-        var $ = param.$;
-        var $window = param.$window;
         var $template = param.$template;
         var zIndex = param.zIndex;
-        var $parent = param.$parent;
         var mode = param.mode;
         var theme = param.theme;
         var BGCanvas = param.BGCanvas;
         var bgColor = param.bgColor;
         var tutorialMediator = param.tutorialMediator;
-        var globalEvent = param.globalEvent;
 
 
-        this.$ = $;
-        this.$window = $window;
+        var tm = tutorialMediator;
+        this.$ = tm.$;
+        this.$window = tm.$window;
+        this.$parent = tm.$parent;
         this.$template = $template;
         this.$posFit = $('.pos-fit', this.$template);
         this.$contentWrap = $('.content-wrap', this.$template);
@@ -1167,7 +1224,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$prevBtn = $('.prev span', this.$controller);
         this.$nextBtn = $('.next span', this.$controller);
         this.$endBtn = $('.end span', this.$controller);
-        this.$parent = $parent;
         $template.css({
           'z-index': zIndex,
           'display': 'none',
@@ -1181,14 +1237,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             '$parent': this.$bg,
             'bgColor': bgColor
           });
-          this.setCanvasSize($window.innerWidth(), $window.innerHeight());
+          this.setCanvasSize(this.$window.innerWidth(), this.$window.innerHeight());
         }
         this.$posFit.css('z-index', zIndex + 2);
         this.$bg.css('z-index', zIndex + 1);
         // =======================================================================
         // events
         // =======================================================================
-        var tm = tutorialMediator;
         // pager
         this.$pager.on('click', 'li span', function (e) {
           if (!$(this).hasClass('active')) tm.active.show($(this).text() * 1);
@@ -1210,7 +1265,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return tm.active.end();
         });
         // resize
-        globalEvent.addEventListener('resize', function (size) {
+        tm.eventCtnr.addEventListener('resize', function (size) {
           if (!tm.hasActive()) return false;
           _this13.setCanvasSize(size.width, size.height);
         });
@@ -1528,10 +1583,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         _classCallCheck(this, Animation);
 
         if (Animation.instance) return Animation.instance;
-        this.$ = param.$;
-        this.$window = param.$window;
-        this.$scroll = param.$scroll;
-        this.Deferred = param.Deferred;
+        var tm = param.tutorialMediator;
+        this.$ = tm.$;
+        this.$window = tm.$window;
+        this.$scroll = tm.$scroll;
+        this.Deferred = tm.Deferred;
+        this.bgCanvas = param.bgCanvas;
       }
       /*
       * @param {jQuery} $target
@@ -1550,7 +1607,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           });
           return def.promise();
         }
-        /*
+        /**
         *
         */
 
@@ -1566,7 +1623,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           });
           return def.promise();
         }
-        /*
+        /**
         * @param {jQuery[]}            target
         * @param {String[] | Number[]} offset
         * @param {Number}              speed
@@ -1643,7 +1700,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           }
           return def.promise();
         }
-        /*
+        /**
+        * @param {jQuery[]} target
+        * @param {Number}   speed
+        */
+
+      }, {
+        key: 'targeFocus',
+        value: function targeFocus(target, speed) {
+          var def = new this.Deferred();
+
+          return def.promise();
+        }
+        /**
         * @param {String[] | number[]} orderPos
         * @param {jQuery}              $target
         */
@@ -1777,13 +1846,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.showSpeed = 300;
     __conf.hideSpeed = 300;
     __conf.posFitSpeed = 300;
+    __conf.targetFocusSpeed = 300;
     __conf.theme = 'default';
     __conf.animation = Object.create(null);
     __conf.animation.show = true;
     __conf.animation.hide = true;
     __conf.animation.scroll = true;
     __conf.animation.posFit = true;
-    __conf.animationFPS = 60;
+    __conf.animation.targetFocus = true;
     __conf.skipLabel = 'Skip';
     __conf.prevLabel = 'Prev';
     __conf.nextLabel = 'Next';

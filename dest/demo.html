@@ -66,6 +66,7 @@
       <ul>
         <li><a href="#" class="demo" id="d1">standard</a></li>
         <li><a href="#" class="demo" id="d2">position list</a></li>
+        <li><a href="demo-change_label.html">change controler label</a></li>
       </ul>
     </div></section>
     <section><div>
@@ -91,10 +92,6 @@
     </div></section>
   </div>
   <script>
-    Tutorial.changeConfig('skipLabel', 'スキップ');
-    Tutorial.changeConfig('nextLabel', '次へ');
-    Tutorial.changeConfig('prevLabel', '前へ');
-    Tutorial.changeConfig('endLabel',  '終了');
     var tutorialSet = {};
     // =========================================================================
     // step d2 : default
@@ -103,7 +100,8 @@
     tutorialSet.d1.step.add([
       {
         'content' : 'step1',
-        'pos'     : ['center', 'center']
+        'pos'     : ['center', 'center'],
+        'target'  : $('#d1Target')
       }
     ]);
     // =========================================================================
