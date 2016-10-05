@@ -35,32 +35,34 @@ class Tutorial{
   * Change overall behavior of Tutorial.js.  
   * **You are able to use it, As far as Tutorial.js instance is not exist.**
   *
-  * | Key                   | Type              | Default val.         |
-  * |-----------------------|-------------------|----------------------|
-  * | resizeInterval        | Number            | 250                  |
-  * | scrollInterval        | Number            | 100                  |
-  * | showSpeed             | Number            | 300                  |
-  * | hideSpeed             | Number            | 300                  |
-  * | scrollSpeed           | Number            | 500                  |
-  * | posFitSpeed           | Number            | 300                  |
-  * | targetFocusSpeed      | Number            | 300                  |
-  * | animation             | Boolean / Object  | Object               |
-  * | animation.show        | Boolean           | true                 |
-  * | animation.hide        | Boolean           | true                 |
-  * | animation.scroll      | Boolean           | true                 |
-  * | animation.posFit      | Boolean           | true                 |
-  * | animation.targetFocus | Boolean           | true                 |
-  * | skipLabel             | String            | 'Skip'               |
-  * | prevLabel             | String            | 'Prev'               |
-  * | nextLabel             | String            | 'Next'               |
-  * | endLabel              | String            | 'End'                |
-  * | $                     | jQuery            | $                    |
-  * | $window               | jQuery            | $(window)            |
-  * | $parent               | jQuery            | $('body')            |
-  * | $scroll               | jQuery            | $('body')            |
-  * | zIndex                | Number            | 9000                 |
-  * | bgColor               | String            | 'rgba(0, 0, 0, 0.5)' |
-  * | theme                 | String            | 'default'            |
+  * | Key               | Type              | Default val.         |
+  * |-------------------|-------------------|----------------------|
+  * | resizeInterval    | Number            | 250                  |
+  * | scrollInterval    | Number            | 100                  |
+  * | showSpeed         | Number            | 300                  |
+  * | hideSpeed         | Number            | 300                  |
+  * | scrollSpeed       | Number            | 500                  |
+  * | posFitSpeed       | Number            | 300                  |
+  * | focusSpeed        | Number            | 300                  |
+  * | unfocusSpeed      | Number            | 300                  |
+  * | animation         | Boolean / Object  | Object               |
+  * | animation.show    | Boolean           | true                 |
+  * | animation.hide    | Boolean           | true                 |
+  * | animation.scroll  | Boolean           | true                 |
+  * | animation.posFit  | Boolean           | true                 |
+  * | animation.focus   | Boolean           | true                 |
+  * | animation.unfocus | Boolean           | true                 |
+  * | skipLabel         | String            | 'Skip'               |
+  * | prevLabel         | String            | 'Prev'               |
+  * | nextLabel         | String            | 'Next'               |
+  * | endLabel          | String            | 'End'                |
+  * | $                 | jQuery            | $                    |
+  * | $window           | jQuery            | $(window)            |
+  * | $parent           | jQuery            | $('body')            |
+  * | $scroll           | jQuery            | $('body')            |
+  * | zIndex            | Number            | 9000                 |
+  * | bgColor           | String            | 'rgba(0, 0, 0, 0.5)' |
+  * | theme             | String            | 'default'            |
   *
   * @function changeConfig
   * @memberof Tutorial

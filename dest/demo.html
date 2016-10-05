@@ -99,9 +99,15 @@
     tutorialSet.d1 = new Tutorial();
     tutorialSet.d1.step.add([
       {
-        'content' : 'step1',
-        'pos'     : ['center', 'center'],
-        'target'  : $('#d1Target')
+        'content'   : 'step1',
+        'pos'       : ['center', 'center'],
+        'target'    : $('.wrap > section:nth-child(2) > div'),
+        'targetPos' : ['center', 'center']
+      },{
+        'content'   : 'step2',
+        'pos'       : ['center', 'center'],
+        'target'    : $('#d1Target span'),
+        'targetPos' : ['left', 'top']
       }
     ]);
     // =========================================================================

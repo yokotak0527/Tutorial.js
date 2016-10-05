@@ -40,6 +40,6 @@ class BGCanvas{
     this.ctx.fillStyle = this.bgColor;
     this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
     this.ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
-    if(rect) rect.forEach((val)=> ctx.clearRect(val[0], val[1], val[2], val[3]) );
+    if(rect) rect.forEach((val)=> this.ctx.clearRect(val[0], val[1], val[2], val[3]) );
   }
 }

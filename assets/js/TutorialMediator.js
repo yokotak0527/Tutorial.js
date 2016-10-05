@@ -149,19 +149,18 @@ class TutorialMediator{
 // 表示処理
 // =============================================================================
 let proposalOfShowing = function(tutorial, def, step){
-  let minSpeed         = 10;
-  let conf             = this.conf;
-  let showSpeed        = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
-  let scrollSpeed      = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
-  let posFitSpeed      = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
-  let targetFocusSpeed = conf.animation === true || conf.animation.targetFocus ? conf.targetFocusSpeed : minSpeed;
-  if(showSpeed <= 0) showSpeed = minSpeed;
-  if(scrollSpeed <= 0) scrollSpeed = minSpeed;
+  let minSpeed     = 10;
+  let conf         = this.conf;
+  let showSpeed    = ( conf.animation === true || conf.animation.show    ) ? ( conf.showSpeed    > minSpeed ) ? conf.showSpeed    : minSpeed : minSpeed;
+  let scrollSpeed  = ( conf.animation === true || conf.animation.scroll  ) ? ( conf.scrollSpeed  > minSpeed ) ? conf.scrollSpeed  : minSpeed : minSpeed;
+  let posFitSpeed  = ( conf.animation === true || conf.animation.posFit  ) ? ( conf.posFitSpeed  > minSpeed ) ? conf.posFitSpeed  : minSpeed : minSpeed;
+  let focusSpeed   = ( conf.animation === true || conf.animation.focus   ) ? ( conf.focusSpeed   > minSpeed ) ? conf.focusSpeed   : minSpeed : minSpeed;
+  let unfocusSpeed = ( conf.animation === true || conf.animation.unfocus ) ? ( conf.unfocusSpeed > minSpeed ) ? conf.unfocusSpeed : minSpeed : minSpeed;
   // ---------------------------------------------------------------------------
   // アクティブな状態なtutorialがない
   // ---------------------------------------------------------------------------
   if(!this.hasActive()){
-    let count = 0; // show, scroll, target
+    let count = 0; // show, scroll, pos.
 
     this.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
 
@@ -185,7 +184,7 @@ let proposalOfShowing = function(tutorial, def, step){
         if(count === 3 && conf.mode === 'focus'){
           let step = this.active.getActiveStep();
           if(step.target){
-            let endPromise = this.animation.targeFocus(step.target, targetFocusSpeed);
+            let endPromise = this.animation.focus(step.target, step.targetPos, focusSpeed);
             endPromise.then( ()=> d.resolve() );
           }else{
             d.resolve();

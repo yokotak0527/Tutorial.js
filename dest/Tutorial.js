@@ -56,32 +56,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       * Change overall behavior of Tutorial.js.  
       * **You are able to use it, As far as Tutorial.js instance is not exist.**
       *
-      * | Key                   | Type              | Default val.         |
-      * |-----------------------|-------------------|----------------------|
-      * | resizeInterval        | Number            | 250                  |
-      * | scrollInterval        | Number            | 100                  |
-      * | showSpeed             | Number            | 300                  |
-      * | hideSpeed             | Number            | 300                  |
-      * | scrollSpeed           | Number            | 500                  |
-      * | posFitSpeed           | Number            | 300                  |
-      * | targetFocusSpeed      | Number            | 300                  |
-      * | animation             | Boolean / Object  | Object               |
-      * | animation.show        | Boolean           | true                 |
-      * | animation.hide        | Boolean           | true                 |
-      * | animation.scroll      | Boolean           | true                 |
-      * | animation.posFit      | Boolean           | true                 |
-      * | animation.targetFocus | Boolean           | true                 |
-      * | skipLabel             | String            | 'Skip'               |
-      * | prevLabel             | String            | 'Prev'               |
-      * | nextLabel             | String            | 'Next'               |
-      * | endLabel              | String            | 'End'                |
-      * | $                     | jQuery            | $                    |
-      * | $window               | jQuery            | $(window)            |
-      * | $parent               | jQuery            | $('body')            |
-      * | $scroll               | jQuery            | $('body')            |
-      * | zIndex                | Number            | 9000                 |
-      * | bgColor               | String            | 'rgba(0, 0, 0, 0.5)' |
-      * | theme                 | String            | 'default'            |
+      * | Key               | Type              | Default val.         |
+      * |-------------------|-------------------|----------------------|
+      * | resizeInterval    | Number            | 250                  |
+      * | scrollInterval    | Number            | 100                  |
+      * | showSpeed         | Number            | 300                  |
+      * | hideSpeed         | Number            | 300                  |
+      * | scrollSpeed       | Number            | 500                  |
+      * | posFitSpeed       | Number            | 300                  |
+      * | focusSpeed        | Number            | 300                  |
+      * | unfocusSpeed      | Number            | 300                  |
+      * | animation         | Boolean / Object  | Object               |
+      * | animation.show    | Boolean           | true                 |
+      * | animation.hide    | Boolean           | true                 |
+      * | animation.scroll  | Boolean           | true                 |
+      * | animation.posFit  | Boolean           | true                 |
+      * | animation.focus   | Boolean           | true                 |
+      * | animation.unfocus | Boolean           | true                 |
+      * | skipLabel         | String            | 'Skip'               |
+      * | prevLabel         | String            | 'Prev'               |
+      * | nextLabel         | String            | 'Next'               |
+      * | endLabel          | String            | 'End'                |
+      * | $                 | jQuery            | $                    |
+      * | $window           | jQuery            | $(window)            |
+      * | $parent           | jQuery            | $('body')            |
+      * | $scroll           | jQuery            | $('body')            |
+      * | zIndex            | Number            | 9000                 |
+      * | bgColor           | String            | 'rgba(0, 0, 0, 0.5)' |
+      * | theme             | String            | 'default'            |
       *
       * @function changeConfig
       * @memberof Tutorial
@@ -489,18 +491,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       var minSpeed = 10;
       var conf = this.conf;
-      var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed : minSpeed;
-      var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed : minSpeed;
-      var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed : minSpeed;
-      var targetFocusSpeed = conf.animation === true || conf.animation.targetFocus ? conf.targetFocusSpeed : minSpeed;
-      if (showSpeed <= 0) showSpeed = minSpeed;
-      if (scrollSpeed <= 0) scrollSpeed = minSpeed;
+      var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed > minSpeed ? conf.showSpeed : minSpeed : minSpeed;
+      var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed > minSpeed ? conf.scrollSpeed : minSpeed : minSpeed;
+      var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed > minSpeed ? conf.posFitSpeed : minSpeed : minSpeed;
+      var focusSpeed = conf.animation === true || conf.animation.focus ? conf.focusSpeed > minSpeed ? conf.focusSpeed : minSpeed : minSpeed;
+      var unfocusSpeed = conf.animation === true || conf.animation.unfocus ? conf.unfocusSpeed > minSpeed ? conf.unfocusSpeed : minSpeed : minSpeed;
       // ---------------------------------------------------------------------------
       // アクティブな状態なtutorialがない
       // ---------------------------------------------------------------------------
       if (!this.hasActive()) {
         (function () {
-          var count = 0; // show, scroll, target
+          var count = 0; // show, scroll, pos.
 
           _this7.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
 
@@ -524,7 +525,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             if (count === 3 && conf.mode === 'focus') {
               var _step = _this7.active.getActiveStep();
               if (_step.target) {
-                var endPromise = _this7.animation.targeFocus(_step.target, targetFocusSpeed);
+                var endPromise = _this7.animation.focus(_step.target, _step.targetPos, focusSpeed);
                 endPromise.then(function () {
                   return d.resolve();
                 });
@@ -1589,6 +1590,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$scroll = tm.$scroll;
         this.Deferred = tm.Deferred;
         this.bgCanvas = param.bgCanvas;
+        if (this.bgCanvas) {
+          // [0] x / [1] y / [2] width / [3] height
+          // this.focusRect  = [];
+          // this.targetRect = [];
+        }
       }
       /*
       * @param {jQuery} $target
@@ -1701,17 +1707,48 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return def.promise();
         }
         /**
-        * @param {jQuery[]} target
+        * @param {} target
         * @param {Number}   speed
         */
 
       }, {
-        key: 'targeFocus',
-        value: function targeFocus(target, speed) {
+        key: 'focus',
+        value: function focus(target, speed) {
+          var _this14 = this;
+
+          this.focusTargetRectArr = [];
           var def = new this.Deferred();
+          var scrollX = this.$scroll.scrollLeft();
+          var scrollY = this.$scroll.scrollTop();
+          target.forEach(function (val, i) {
+            var rect = [];
+            var left = $(val).offset().left;
+            var top = $(val).offset().top;
+            var offsetX = left - scrollX;
+            var offsetY = top - scrollY;
+            rect[0] = offsetX;
+            rect[1] = offsetY;
+            rect[2] = $(val).innerWidth();
+            rect[3] = $(val).innerHeight();
+            if (rect[0] + rect[2] > 0 && rect[1] + rect[3] > 0) _this14.focusTargetRectArr.push(rect);
+          });
+
+          // Animation
+          console.log(this.focusTargetRectArr);
+          // this.bgCanvas.draw(this.targetRect);
+          // setTimeout(()=>{
+          //   def.resolve();
+          // }, 10);
 
           return def.promise();
         }
+        /**
+        *
+        */
+
+      }, {
+        key: 'unfocus',
+        value: function unfocus() {}
         /**
         * @param {String[] | number[]} orderPos
         * @param {jQuery}              $target
@@ -1816,13 +1853,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'draw',
         value: function draw() {
+          var _this15 = this;
+
           var rect = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
           this.ctx.fillStyle = this.bgColor;
           this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
           this.ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
           if (rect) rect.forEach(function (val) {
-            return ctx.clearRect(val[0], val[1], val[2], val[3]);
+            return _this15.ctx.clearRect(val[0], val[1], val[2], val[3]);
           });
         }
       }]);
@@ -1846,14 +1885,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.showSpeed = 300;
     __conf.hideSpeed = 300;
     __conf.posFitSpeed = 300;
-    __conf.targetFocusSpeed = 300;
+    __conf.focusSpeed = 300;
+    __conf.unfocusSpeed = 300;
     __conf.theme = 'default';
     __conf.animation = Object.create(null);
     __conf.animation.show = true;
     __conf.animation.hide = true;
     __conf.animation.scroll = true;
     __conf.animation.posFit = true;
-    __conf.animation.targetFocus = true;
+    __conf.animation.focus = true;
+    __conf.animation.unfocus = true;
     __conf.skipLabel = 'Skip';
     __conf.prevLabel = 'Prev';
     __conf.nextLabel = 'Next';

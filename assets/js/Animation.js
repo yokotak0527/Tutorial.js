@@ -17,6 +17,11 @@ class Animation{
     this.$scroll  = tm.$scroll;
     this.Deferred = tm.Deferred;
     this.bgCanvas = param.bgCanvas;
+    if(this.bgCanvas){
+      // [0] x / [1] y / [2] width / [3] height
+      // this.focusRect  = [];
+      // this.targetRect = [];
+    }
   }
   /*
   * @param {jQuery} $target
@@ -109,13 +114,41 @@ class Animation{
     return def.promise();
   }
   /**
-  * @param {jQuery[]} target
+  * @param {} target
   * @param {Number}   speed
   */
-  targeFocus(target, speed){
-    let def = new this.Deferred();
-    
+  focus(target, speed){
+    this.focusTargetRectArr = [];
+    let def     = new this.Deferred();
+    let scrollX = this.$scroll.scrollLeft();
+    let scrollY = this.$scroll.scrollTop();
+    target.forEach((val, i)=>{
+      let rect    = [];
+      let left    = $(val).offset().left;
+      let top     = $(val).offset().top;
+      let offsetX = left - scrollX;
+      let offsetY = top - scrollY;
+      rect[0] = offsetX;
+      rect[1] = offsetY;
+      rect[2] = $(val).innerWidth();
+      rect[3] = $(val).innerHeight();
+      if(rect[0] + rect[2] > 0 && rect[1] + rect[3] > 0) this.focusTargetRectArr.push(rect);
+    });
+
+    // Animation
+    console.log(this.focusTargetRectArr);
+    // this.bgCanvas.draw(this.targetRect);
+    // setTimeout(()=>{
+    //   def.resolve();
+    // }, 10);
+
     return def.promise();
+  }
+  /**
+  *
+  */
+  unfocus(){
+    
   }
   /**
   * @param {String[] | number[]} orderPos
