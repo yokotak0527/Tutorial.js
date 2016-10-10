@@ -39,6 +39,28 @@ class Animation{
       dist             = dist * v;
       return (start_val - elapsed_time * dist) * v;
     };
+    // =========================================================================
+    // Resize Event
+    // =========================================================================
+    this.tm.eventCtnr.addEventListener('resize', (size)=>{
+      if(!this.tm.active) return false;
+      let activeStep = this.tm.getActiveStep();
+      let bgCvs      = this.bgCanvas;
+      if(!this.state.focus){
+        console.log(bgCvs.checkClearRect());
+        if(this.bgCanvas.clearRect[2] !== 0 && this.bgCanvas.clearRect[3] !== 0){
+          this.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
+          bgCvs.clearRect = this.focusTargetRect.map((val)=>{ return val });
+          bgCvs.draw();
+        }
+      }
+    });
+    // =========================================================================
+    // scroll Event
+    // =========================================================================
+    this.tm.eventCtnr.addEventListener('scroll', ()=>{
+      if(!this.tm.active) return false;
+    });
   }
   /**
   * @function show

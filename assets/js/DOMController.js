@@ -82,7 +82,15 @@ class DOMController{
         if(!tm.hasActive()) return false;
         this.setCanvasSize(size.width, size.height);
         
-        // if(this.)
+        // // if(this.)
+        // if(this.bgCanvas){
+        //   let bgCvs = this.bgCanvas;
+        //   if(!bgCvs.state.focus){
+        //     if(clearRect[2] !== 0 && clearRect[3] !== 0){
+        //       
+        //     }
+        //   }
+        // }
       });
       tm.eventCtnr.addEventListener('scroll', ()=>{
         

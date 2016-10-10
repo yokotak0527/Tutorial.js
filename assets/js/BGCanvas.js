@@ -45,4 +45,10 @@ class BGCanvas{
     // this.ctx.clearRect(rect[0], rect[1], rect[2], rect[3] );
     // if(rect) rect.forEach((val)=> this.ctx.clearRect(val[0], val[1], val[2], val[3]) );
   }
+  /**
+  *
+  */
+  checkClearRect(){
+    return !this.clearRect || (this.clearRect[2] === 0 && this.clearRect[3] === 0) ? false : true;
+  }
 }

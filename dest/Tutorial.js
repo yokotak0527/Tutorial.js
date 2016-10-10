@@ -471,6 +471,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function hasActive() {
           return this.active ? true : false;
         }
+        /*
+        * @return Boolean
+        */
+
+      }, {
+        key: 'getActive',
+        value: function getActive() {
+          return this.active ? this.active : false;
+        }
+        /*
+        * @return Boolean
+        */
+
+      }, {
+        key: 'getActiveStep',
+        value: function getActiveStep() {
+          return this.active ? this.active.getActiveStep() : false;
+        }
       }]);
 
       return TutorialMediator;
@@ -1259,7 +1277,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (!tm.hasActive()) return false;
           _this13.setCanvasSize(size.width, size.height);
 
-          // if(this.)
+          // // if(this.)
+          // if(this.bgCanvas){
+          //   let bgCvs = this.bgCanvas;
+          //   if(!bgCvs.state.focus){
+          //     if(clearRect[2] !== 0 && clearRect[3] !== 0){
+          //       
+          //     }
+          //   }
+          // }
         });
         tm.eventCtnr.addEventListener('scroll', function () {});
 
@@ -1573,6 +1599,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }]);
 
       function Animation(param) {
+        var _this14 = this;
+
         _classCallCheck(this, Animation);
 
         if (Animation.instance) return Animation.instance;
@@ -1604,6 +1632,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           dist = dist * v;
           return (start_val - elapsed_time * dist) * v;
         };
+        // =========================================================================
+        // Resize Event
+        // =========================================================================
+        this.tm.eventCtnr.addEventListener('resize', function (size) {
+          if (!_this14.tm.active) return false;
+          var activeStep = _this14.tm.getActiveStep();
+          var bgCvs = _this14.bgCanvas;
+          if (!_this14.state.focus) {
+            console.log(bgCvs.checkClearRect());
+            if (_this14.bgCanvas.clearRect[2] !== 0 && _this14.bgCanvas.clearRect[3] !== 0) {
+              _this14.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
+              bgCvs.clearRect = _this14.focusTargetRect.map(function (val) {
+                return val;
+              });
+              bgCvs.draw();
+            }
+          }
+        });
+        // =========================================================================
+        // scroll Event
+        // =========================================================================
+        this.tm.eventCtnr.addEventListener('scroll', function () {
+          if (!_this14.tm.active) return false;
+        });
       }
       /**
       * @function show
@@ -1615,14 +1667,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(Animation, [{
         key: 'show',
         value: function show($target, speed) {
-          var _this14 = this;
+          var _this15 = this;
 
           var def = new this.Deferred();
           this.state.show = true;
           $target.stop().css('display', 'block').animate({
             'opacity': 1
           }, speed, function () {
-            _this14.state.show = false;
+            _this15.state.show = false;
             def.resolve();
           });
           return def.promise();
@@ -1636,7 +1688,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'hide',
         value: function hide($target, speed) {
-          var _this15 = this;
+          var _this16 = this;
 
           var def = new this.Deferred();
           this.state.hide = true;
@@ -1644,7 +1696,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             'opacity': 0
           }, speed, function () {
             $target.css('display', 'none');
-            _this15.state.hide = false;
+            _this16.state.hide = false;
             def.resolve();
           });
           return def.promise();
@@ -1661,7 +1713,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function scroll() {
           var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-          var _this16 = this;
+          var _this17 = this;
 
           var offset = arguments[1];
           var speed = arguments[2];
@@ -1726,7 +1778,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               scrollTop: y,
               scrollLeft: x
             }, speed, function () {
-              _this16.state.scroll = false;
+              _this17.state.scroll = false;
               def.resolve();
             });
           }
@@ -1740,7 +1792,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'focus',
         value: function focus($target, offset, speed) {
-          var _this17 = this;
+          var _this18 = this;
 
           var def = new this.Deferred();
           var frame = 60;
@@ -1756,20 +1808,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.state.focus = true;
           this.focusTimer = setInterval(function () {
             cssVal = [];
-            cssVal[0] = _this17.moving(currentTime, _this17.focusStartRect[0], _this17.focusTargetRect[0], speed);
-            cssVal[1] = _this17.moving(currentTime, _this17.focusStartRect[1], _this17.focusTargetRect[1], speed);
-            cssVal[2] = _this17.moving(currentTime, _this17.focusStartRect[2], _this17.focusTargetRect[2], speed);
-            cssVal[3] = _this17.moving(currentTime, _this17.focusStartRect[3], _this17.focusTargetRect[3], speed);
-            _this17.bgCanvas.clearRect = cssVal;
-            _this17.bgCanvas.draw();
+            cssVal[0] = _this18.moving(currentTime, _this18.focusStartRect[0], _this18.focusTargetRect[0], speed);
+            cssVal[1] = _this18.moving(currentTime, _this18.focusStartRect[1], _this18.focusTargetRect[1], speed);
+            cssVal[2] = _this18.moving(currentTime, _this18.focusStartRect[2], _this18.focusTargetRect[2], speed);
+            cssVal[3] = _this18.moving(currentTime, _this18.focusStartRect[3], _this18.focusTargetRect[3], speed);
+            _this18.bgCanvas.clearRect = cssVal;
+            _this18.bgCanvas.draw();
             currentTime += FPS;
             if (currentTime >= speed) {
-              clearInterval(_this17.focusTimer);
-              _this17.bgCanvas.clearRect = _this17.focusTargetRect.map(function (val) {
+              clearInterval(_this18.focusTimer);
+              _this18.bgCanvas.clearRect = _this18.focusTargetRect.map(function (val) {
                 return val;
               });
-              _this17.bgCanvas.draw();
-              _this17.state.focus = false;
+              _this18.bgCanvas.draw();
+              _this18.state.focus = false;
               def.resolve();
             }
           }, FPS);
@@ -1934,6 +1986,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (this.clearRect) this.ctx.clearRect(this.clearRect[0], this.clearRect[1], this.clearRect[2], this.clearRect[3]);
           // this.ctx.clearRect(rect[0], rect[1], rect[2], rect[3] );
           // if(rect) rect.forEach((val)=> this.ctx.clearRect(val[0], val[1], val[2], val[3]) );
+        }
+        /**
+        *
+        */
+
+      }, {
+        key: 'checkClearRect',
+        value: function checkClearRect() {
+          return !this.clearRect || this.clearRect[2] === 0 && this.clearRect[3] === 0 ? false : true;
         }
       }]);
 

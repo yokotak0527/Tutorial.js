@@ -52,12 +52,10 @@ class TutorialMediator{
       self.$window.on('resize', (e)=>{
         if(conf.resizeInterval === 0){
           self.eventCtnr.trigger('resize');
-          
         }else{
           if(resizeTimer) clearTimeout(resizeTimer);
           resizeTimer = setTimeout(()=>{
             self.eventCtnr.trigger('resize');
-            
           }, resizeInterval);
         }
       });
@@ -141,6 +139,18 @@ class TutorialMediator{
   */
   hasActive(){
     return this.active ? true : false;
+  }
+  /*
+  * @return Boolean
+  */
+  getActive(){
+    return this.active ? this.active : false;
+  }
+  /*
+  * @return Boolean
+  */
+  getActiveStep(){
+    return this.active ? this.active.getActiveStep() : false;
   }
 }
 
