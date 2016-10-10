@@ -339,27 +339,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               'bgCanvas': self.domCtlr.bgCanvas
             });
 
-            // if(self.domCtlr.bgCanvas){
-            //   self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
-            //   self.domCtlr.bgCanvas.draw();
-            // }
-
-            /* $ resize event listener */
+            // =======================================================================
+            // $ resize event listener
+            // =======================================================================
             var resizeInterval = conf.resizeInterval || 250;
+            // if(!conf.resizeInterval) conf.resizeInterval
             var resizeTimer = null;
             self.$window.on('resize', function (e) {
-              if (resizeTimer) clearTimeout(resizeTimer);
-              resizeTimer = setTimeout(function () {
+              if (conf.resizeInterval === 0) {
                 self.eventCtnr.trigger('resize');
-              }, resizeInterval);
+              } else {
+                if (resizeTimer) clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function () {
+                  self.eventCtnr.trigger('resize');
+                }, resizeInterval);
+              }
             });
-            // /* custom resize event listener */
-            // self.eventCtnr.addEventListener('resize', (size)=>{
-            //   if(self.domCtlr.bgCanvas){
-            //     self.domCtlr.bgCanvas.setSize(size.width, size.height);
-            //     self.domCtlr.bgCanvas.draw();
-            //   }
-            // });
+
+            // let scrollInterval = conf.scrollInterval || 
 
             self.active = false; /* active tutorial */
             self.list = Object.create(null);
@@ -489,13 +486,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var proposalOfShowing = function proposalOfShowing(tutorial, def, step) {
       var _this7 = this;
 
-      var minSpeed = 10;
       var conf = this.conf;
-      var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed > minSpeed ? conf.showSpeed : minSpeed : minSpeed;
-      var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed > minSpeed ? conf.scrollSpeed : minSpeed : minSpeed;
-      var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed > minSpeed ? conf.posFitSpeed : minSpeed : minSpeed;
-      var focusSpeed = conf.animation === true || conf.animation.focus ? conf.focusSpeed > minSpeed ? conf.focusSpeed : minSpeed : minSpeed;
-      var unfocusSpeed = conf.animation === true || conf.animation.unfocus ? conf.unfocusSpeed > minSpeed ? conf.unfocusSpeed : minSpeed : minSpeed;
+      var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed > conf.minSpeed ? conf.showSpeed : conf.minSpeed : conf.minSpeed;
+      var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed > conf.minSpeed ? conf.scrollSpeed : conf.minSpeed : conf.minSpeed;
+      var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed > conf.minSpeed ? conf.posFitSpeed : conf.minSpeed : conf.minSpeed;
+      var focusSpeed = conf.animation === true || conf.animation.focus ? conf.focusSpeed > conf.minSpeed ? conf.focusSpeed : conf.minSpeed : conf.minSpeed;
+      var unfocusSpeed = conf.animation === true || conf.animation.unfocus ? conf.unfocusSpeed > conf.minSpeed ? conf.unfocusSpeed : conf.minSpeed : conf.minSpeed;
       // ---------------------------------------------------------------------------
       // アクティブな状態なtutorialがない
       // ---------------------------------------------------------------------------
@@ -525,7 +521,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             if (count === 3 && conf.mode === 'focus') {
               var _step = _this7.active.getActiveStep();
               if (_step.target) {
-                var endPromise = _this7.animation.focus(_step.target, _step.targetPos, focusSpeed);
+                var endPromise = _this7.animation.focus(_step.target, _step.targetPosOffset, focusSpeed);
                 endPromise.then(function () {
                   return d.resolve();
                 });
@@ -1142,7 +1138,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             step.name = 'step-#{Step.id}';
             Step.id++;
           }
+          if (step.target) step.target = $(step.target[0]);
           if (step.target && !step.targetPos) step.targetPos = ['left', 'top'];
+          if (step.target && !step.targetPosOffset) step.targetPosOffset = [0, 0];
           return step;
         }
         /**
@@ -1158,16 +1156,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'setPropertiesFormat',
         value: function setPropertiesFormat(step, $) {
-          if (step.target) {
-            step.target = Array.isArray(step.target) ? step.target : [step.target];
-            step.target.map(function (v, i, arr) {
-              if (typeof v === 'string') {
-                return $(v);
-              } else {
-                return v;
-              }
-            });
-          }
+          if (step.target && typeof step.target === 'string') step.target = $(step.target);
           return step;
         }
       }]);
@@ -1269,7 +1258,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         tm.eventCtnr.addEventListener('resize', function (size) {
           if (!tm.hasActive()) return false;
           _this13.setCanvasSize(size.width, size.height);
+
+          // if(this.)
         });
+        tm.eventCtnr.addEventListener('scroll', function () {});
 
         this.$parent.append(this.$template);
         DOMController.instance = this;
@@ -1585,18 +1577,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         if (Animation.instance) return Animation.instance;
         var tm = param.tutorialMediator;
+        this.tm = tm;
         this.$ = tm.$;
         this.$window = tm.$window;
         this.$scroll = tm.$scroll;
         this.Deferred = tm.Deferred;
         this.bgCanvas = param.bgCanvas;
+        this.focusTimer = null;
+        this.unfocusTimer = null;
+        this.state = {
+          'show': false,
+          'hide': false,
+          'focus': false,
+          'scroll': false,
+          'unfocus': false
+        };
         if (this.bgCanvas) {
           // [0] x / [1] y / [2] width / [3] height
-          // this.focusRect  = [];
-          // this.targetRect = [];
+          this.focusStartRect = [];
+          this.focusTargetRect = [];
         }
+        this.moving = function (current_time, start_val, end_val, total_time) {
+          var elapsed_time = Math.round(current_time / total_time * 1000) / 1000;
+          var dist = start_val - end_val;
+          var v = dist < 0 ? -1 : 1;
+          dist = dist * v;
+          return (start_val - elapsed_time * dist) * v;
+        };
       }
-      /*
+      /**
+      * @function show
       * @param {jQuery} $target
       * @param {Number} speed
       */
@@ -1605,31 +1615,42 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(Animation, [{
         key: 'show',
         value: function show($target, speed) {
+          var _this14 = this;
+
           var def = new this.Deferred();
+          this.state.show = true;
           $target.stop().css('display', 'block').animate({
             'opacity': 1
           }, speed, function () {
-            return def.resolve();
-          });
-          return def.promise();
-        }
-        /**
-        *
-        */
-
-      }, {
-        key: 'hide',
-        value: function hide($target, speed) {
-          var def = new this.Deferred();
-          $target.stop().animate({
-            'opacity': 0
-          }, speed, function () {
-            $target.css('display', 'none');
+            _this14.state.show = false;
             def.resolve();
           });
           return def.promise();
         }
         /**
+        * @function hide
+        * @param {jQuery} $target
+        * @param {Number} Speed
+        */
+
+      }, {
+        key: 'hide',
+        value: function hide($target, speed) {
+          var _this15 = this;
+
+          var def = new this.Deferred();
+          this.state.hide = true;
+          $target.stop().animate({
+            'opacity': 0
+          }, speed, function () {
+            $target.css('display', 'none');
+            _this15.state.hide = false;
+            def.resolve();
+          });
+          return def.promise();
+        }
+        /**
+        * @function scroll
         * @param {jQuery[]}            target
         * @param {String[] | Number[]} offset
         * @param {Number}              speed
@@ -1639,6 +1660,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         key: 'scroll',
         value: function scroll() {
           var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+          var _this16 = this;
+
           var offset = arguments[1];
           var speed = arguments[2];
 
@@ -1697,11 +1721,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                   break;
               }
             }
+            this.state.scroll = true;
             this.$scroll.animate({
               scrollTop: y,
               scrollLeft: x
             }, speed, function () {
-              return def.resolve();
+              _this16.state.scroll = false;
+              def.resolve();
             });
           }
           return def.promise();
@@ -1713,32 +1739,40 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       }, {
         key: 'focus',
-        value: function focus(target, speed) {
-          var _this14 = this;
+        value: function focus($target, offset, speed) {
+          var _this17 = this;
 
-          this.focusTargetRectArr = [];
           var def = new this.Deferred();
-          var scrollX = this.$scroll.scrollLeft();
-          var scrollY = this.$scroll.scrollTop();
-          target.forEach(function (val, i) {
-            var rect = [];
-            var left = $(val).offset().left;
-            var top = $(val).offset().top;
-            var offsetX = left - scrollX;
-            var offsetY = top - scrollY;
-            rect[0] = offsetX;
-            rect[1] = offsetY;
-            rect[2] = $(val).innerWidth();
-            rect[3] = $(val).innerHeight();
-            if (rect[0] + rect[2] > 0 && rect[1] + rect[3] > 0) _this14.focusTargetRectArr.push(rect);
+          var frame = 60;
+          var FPS = 1000 / frame;
+          var currentTime = 0;
+          var cssVal = [];
+          this.setFocusTargetRect($target, offset);
+          this.setFocusDisplayRect();
+          this.focusStartRect = this.bgCanvas.clearRect.map(function (val) {
+            return val;
           });
 
-          // Animation
-          console.log(this.focusTargetRectArr);
-          // this.bgCanvas.draw(this.targetRect);
-          // setTimeout(()=>{
-          //   def.resolve();
-          // }, 10);
+          this.state.focus = true;
+          this.focusTimer = setInterval(function () {
+            cssVal = [];
+            cssVal[0] = _this17.moving(currentTime, _this17.focusStartRect[0], _this17.focusTargetRect[0], speed);
+            cssVal[1] = _this17.moving(currentTime, _this17.focusStartRect[1], _this17.focusTargetRect[1], speed);
+            cssVal[2] = _this17.moving(currentTime, _this17.focusStartRect[2], _this17.focusTargetRect[2], speed);
+            cssVal[3] = _this17.moving(currentTime, _this17.focusStartRect[3], _this17.focusTargetRect[3], speed);
+            _this17.bgCanvas.clearRect = cssVal;
+            _this17.bgCanvas.draw();
+            currentTime += FPS;
+            if (currentTime >= speed) {
+              clearInterval(_this17.focusTimer);
+              _this17.bgCanvas.clearRect = _this17.focusTargetRect.map(function (val) {
+                return val;
+              });
+              _this17.bgCanvas.draw();
+              _this17.state.focus = false;
+              def.resolve();
+            }
+          }, FPS);
 
           return def.promise();
         }
@@ -1747,8 +1781,48 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         */
 
       }, {
+        key: 'setFocusTargetRect',
+        value: function setFocusTargetRect($target, offset) {
+          if (!this.bgCanvas) return this;
+          this.focusTargetRect = [];
+          var scrollX = this.$scroll.scrollLeft();
+          var scrollY = this.$scroll.scrollTop();
+
+          var left = $target.offset().left;
+          var top = $target.offset().top;
+          var offsetX = left - scrollX;
+          var offsetY = top - scrollY;
+          this.focusTargetRect = [offsetX - offset[0], offsetY - offset[1], $target.innerWidth() + offset[0] * 2, $target.innerHeight() + offset[1] * 2];
+          return this;
+        }
+        /**
+        *
+        */
+
+      }, {
+        key: 'setFocusDisplayRect',
+        value: function setFocusDisplayRect() {
+          if (!this.bgCanvas) return this;
+          var displayRect = this.bgCanvas.clearRect;
+          if (!displayRect) {
+            displayRect = [];
+            displayRect[0] = this.focusTargetRect[0] + this.focusTargetRect[2] / 2;
+            displayRect[1] = this.focusTargetRect[1] + this.focusTargetRect[3] / 2;
+            displayRect[2] = 0;
+            displayRect[3] = 0;
+          }
+          this.bgCanvas.clearRect = displayRect;
+          return this;
+        }
+        /**
+        *
+        */
+
+      }, {
         key: 'unfocus',
-        value: function unfocus() {}
+        value: function unfocus(target, speed) {}
+        // return this.focus(target, speed);
+
         /**
         * @param {String[] | number[]} orderPos
         * @param {jQuery}              $target
@@ -1826,6 +1900,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$cvs = $('<canvas>');
         this.cvs = this.$cvs[0];
         this.ctx = this.cvs.getContext('2d');
+        this.clearRect = false;
         $parent.append(this.$cvs);
         if (!BGCanvas.instance) BGCanvas.instance = this;
       }
@@ -1853,16 +1928,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'draw',
         value: function draw() {
-          var _this15 = this;
-
-          var rect = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
           this.ctx.fillStyle = this.bgColor;
           this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
           this.ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
-          if (rect) rect.forEach(function (val) {
-            return _this15.ctx.clearRect(val[0], val[1], val[2], val[3]);
-          });
+          if (this.clearRect) this.ctx.clearRect(this.clearRect[0], this.clearRect[1], this.clearRect[2], this.clearRect[3]);
+          // this.ctx.clearRect(rect[0], rect[1], rect[2], rect[3] );
+          // if(rect) rect.forEach((val)=> this.ctx.clearRect(val[0], val[1], val[2], val[3]) );
         }
       }]);
 
@@ -1879,13 +1950,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     var __conf = Object.create(null);
     __conf.mode = 'focus'; // focus | arrow
-    __conf.resizeInterval = 250;
+    // __conf.resizeInterval    = 250;
+    __conf.resizeInterval = 0;
     __conf.scrollInterval = 100;
+    __conf.minSpeed = 10;
     __conf.scrollSpeed = 500;
-    __conf.showSpeed = 300;
-    __conf.hideSpeed = 300;
+    __conf.showSpeed = 375;
+    __conf.hideSpeed = 375;
     __conf.posFitSpeed = 300;
-    __conf.focusSpeed = 300;
+    // __conf.focusSpeed        = 375;
+    __conf.focusSpeed = 5000;
     __conf.unfocusSpeed = 300;
     __conf.theme = 'default';
     __conf.animation = Object.create(null);

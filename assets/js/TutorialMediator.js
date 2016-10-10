@@ -42,28 +42,27 @@ class TutorialMediator{
         'tutorialMediator' : self,
         'bgCanvas'         : self.domCtlr.bgCanvas
       });
-
-      // if(self.domCtlr.bgCanvas){
-      //   self.domCtlr.bgCanvas.setSize(self.$window.innerWidth(), self.$window.innerHeight());
-      //   self.domCtlr.bgCanvas.draw();
-      // }
-
-      /* $ resize event listener */
+      
+      // =======================================================================
+      // $ resize event listener
+      // =======================================================================
       let resizeInterval = conf.resizeInterval || 250;
+      // if(!conf.resizeInterval) conf.resizeInterval
       let resizeTimer    = null;
       self.$window.on('resize', (e)=>{
-        if(resizeTimer) clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(()=>{
+        if(conf.resizeInterval === 0){
           self.eventCtnr.trigger('resize');
-        }, resizeInterval);
+          
+        }else{
+          if(resizeTimer) clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(()=>{
+            self.eventCtnr.trigger('resize');
+            
+          }, resizeInterval);
+        }
       });
-      // /* custom resize event listener */
-      // self.eventCtnr.addEventListener('resize', (size)=>{
-      //   if(self.domCtlr.bgCanvas){
-      //     self.domCtlr.bgCanvas.setSize(size.width, size.height);
-      //     self.domCtlr.bgCanvas.draw();
-      //   }
-      // });
+      
+      // let scrollInterval = conf.scrollInterval || 
 
       self.active = false; /* active tutorial */
       self.list   = Object.create(null);
@@ -149,13 +148,12 @@ class TutorialMediator{
 // 表示処理
 // =============================================================================
 let proposalOfShowing = function(tutorial, def, step){
-  let minSpeed     = 10;
   let conf         = this.conf;
-  let showSpeed    = ( conf.animation === true || conf.animation.show    ) ? ( conf.showSpeed    > minSpeed ) ? conf.showSpeed    : minSpeed : minSpeed;
-  let scrollSpeed  = ( conf.animation === true || conf.animation.scroll  ) ? ( conf.scrollSpeed  > minSpeed ) ? conf.scrollSpeed  : minSpeed : minSpeed;
-  let posFitSpeed  = ( conf.animation === true || conf.animation.posFit  ) ? ( conf.posFitSpeed  > minSpeed ) ? conf.posFitSpeed  : minSpeed : minSpeed;
-  let focusSpeed   = ( conf.animation === true || conf.animation.focus   ) ? ( conf.focusSpeed   > minSpeed ) ? conf.focusSpeed   : minSpeed : minSpeed;
-  let unfocusSpeed = ( conf.animation === true || conf.animation.unfocus ) ? ( conf.unfocusSpeed > minSpeed ) ? conf.unfocusSpeed : minSpeed : minSpeed;
+  let showSpeed    = ( conf.animation === true || conf.animation.show    ) ? ( conf.showSpeed    > conf.minSpeed ) ? conf.showSpeed    : conf.minSpeed : conf.minSpeed;
+  let scrollSpeed  = ( conf.animation === true || conf.animation.scroll  ) ? ( conf.scrollSpeed  > conf.minSpeed ) ? conf.scrollSpeed  : conf.minSpeed : conf.minSpeed;
+  let posFitSpeed  = ( conf.animation === true || conf.animation.posFit  ) ? ( conf.posFitSpeed  > conf.minSpeed ) ? conf.posFitSpeed  : conf.minSpeed : conf.minSpeed;
+  let focusSpeed   = ( conf.animation === true || conf.animation.focus   ) ? ( conf.focusSpeed   > conf.minSpeed ) ? conf.focusSpeed   : conf.minSpeed : conf.minSpeed;
+  let unfocusSpeed = ( conf.animation === true || conf.animation.unfocus ) ? ( conf.unfocusSpeed > conf.minSpeed ) ? conf.unfocusSpeed : conf.minSpeed : conf.minSpeed;
   // ---------------------------------------------------------------------------
   // アクティブな状態なtutorialがない
   // ---------------------------------------------------------------------------
@@ -184,7 +182,7 @@ let proposalOfShowing = function(tutorial, def, step){
         if(count === 3 && conf.mode === 'focus'){
           let step = this.active.getActiveStep();
           if(step.target){
-            let endPromise = this.animation.focus(step.target, step.targetPos, focusSpeed);
+            let endPromise = this.animation.focus(step.target, step.targetPosOffset, focusSpeed);
             endPromise.then( ()=> d.resolve() );
           }else{
             d.resolve();

@@ -81,6 +81,11 @@ class DOMController{
       tm.eventCtnr.addEventListener('resize', (size)=>{
         if(!tm.hasActive()) return false;
         this.setCanvasSize(size.width, size.height);
+        
+        // if(this.)
+      });
+      tm.eventCtnr.addEventListener('scroll', ()=>{
+        
       });
 
       this.$parent.append(this.$template);

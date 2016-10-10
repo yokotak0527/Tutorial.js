@@ -34,7 +34,9 @@ class Step{
       step.name = `step-#{Step.id}`;
       Step.id++;
     }
+    if(step.target) step.target = $(step.target[0]);
     if(step.target && !step.targetPos) step.targetPos = ['left', 'top'];
+    if(step.target && !step.targetPosOffset) step.targetPosOffset = [0, 0];
     return step;
   }
   /**
@@ -47,16 +49,7 @@ class Step{
   * @return Step
   */
   static setPropertiesFormat(step, $){
-    if(step.target){
-      step.target = Array.isArray(step.target) ? step.target : [step.target];
-      step.target.map((v, i, arr)=>{
-        if(typeof v === 'string'){
-          return $(v);
-        }else{
-          return v;
-        }
-      });
-    }
+    if(step.target && typeof step.target === 'string') step.target = $(step.target);
     return step;
   }
   /**
