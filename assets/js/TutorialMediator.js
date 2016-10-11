@@ -44,19 +44,37 @@ class TutorialMediator{
       });
       
       // =======================================================================
-      // $ resize event listener
+      // resize event
       // =======================================================================
-      let resizeInterval = conf.resizeInterval || 250;
+      let resizeInterval = conf.resizeInterval === 0 ? conf.resizeInterval : conf.resizeInterval ? conf.resizeInterval : 250;
+      // let resizeInterval = conf.resizeInterval || 250;
       // if(!conf.resizeInterval) conf.resizeInterval
       let resizeTimer    = null;
       self.$window.on('resize', (e)=>{
-        if(conf.resizeInterval === 0){
+        if(!self.active) return false;
+        if(resizeInterval === 0){
           self.eventCtnr.trigger('resize');
         }else{
           if(resizeTimer) clearTimeout(resizeTimer);
           resizeTimer = setTimeout(()=>{
             self.eventCtnr.trigger('resize');
           }, resizeInterval);
+        }
+      });
+      // =======================================================================
+      // scroll event
+      // =======================================================================
+      let scrollInterval = conf.scrollInterval === 0 ? conf.scrollInterval : conf.scrollInterval ? conf.scrollInterval : 250;
+      let scrollTimer    = null;
+      self.$window.on('scroll', (e)=>{
+        if(!self.active) return false;
+        if(scrollInterval === 0){
+          self.eventCtnr.trigger('scroll');
+        }else{
+          if(scrollTimer) clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(()=>{
+            self.eventCtnr.trigger('scroll');
+          }, scrollInterval);
         }
       });
       

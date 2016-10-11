@@ -46,9 +46,9 @@ class Animation{
       if(!this.tm.active) return false;
       let activeStep = this.tm.getActiveStep();
       let bgCvs      = this.bgCanvas;
-      if(!this.state.focus){
-        console.log(bgCvs.checkClearRect());
-        if(this.bgCanvas.clearRect[2] !== 0 && this.bgCanvas.clearRect[3] !== 0){
+      // .BGCanvas
+      if(!this.state.focus && this.bgCanvas){
+        if(bgCvs.checkClearRect()){
           this.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
           bgCvs.clearRect = this.focusTargetRect.map((val)=>{ return val });
           bgCvs.draw();
@@ -60,6 +60,15 @@ class Animation{
     // =========================================================================
     this.tm.eventCtnr.addEventListener('scroll', ()=>{
       if(!this.tm.active) return false;
+      let activeStep = this.tm.getActiveStep();
+      let bgCvs      = this.bgCanvas;
+      if(!this.state.focus && this.bgCanvas){
+          if(bgCvs.checkClearRect()){
+            this.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
+            bgCvs.clearRect = this.focusTargetRect.map((val)=>{ return val });
+            bgCvs.draw();
+          }
+      }
     });
   }
   /**

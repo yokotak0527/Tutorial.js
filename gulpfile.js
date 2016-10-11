@@ -38,6 +38,7 @@ gulp.task('build:js', ()=>{
       'minified' : false,
       'comments' : true,
       'presets'  : ['es2015', 'stage-0', 'stage-1', 'stage-2']
+      // 'presets'  : ['es2015-ie', 'stage-0', 'stage-1', 'stage-2']
     }))
     .pipe(plumber.stop())
     .pipe(gulp.dest('dest'));

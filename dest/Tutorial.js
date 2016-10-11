@@ -340,19 +340,37 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             });
 
             // =======================================================================
-            // $ resize event listener
+            // resize event
             // =======================================================================
-            var resizeInterval = conf.resizeInterval || 250;
+            var resizeInterval = conf.resizeInterval === 0 ? conf.resizeInterval : conf.resizeInterval ? conf.resizeInterval : 250;
+            // let resizeInterval = conf.resizeInterval || 250;
             // if(!conf.resizeInterval) conf.resizeInterval
             var resizeTimer = null;
             self.$window.on('resize', function (e) {
-              if (conf.resizeInterval === 0) {
+              if (!self.active) return false;
+              if (resizeInterval === 0) {
                 self.eventCtnr.trigger('resize');
               } else {
                 if (resizeTimer) clearTimeout(resizeTimer);
                 resizeTimer = setTimeout(function () {
                   self.eventCtnr.trigger('resize');
                 }, resizeInterval);
+              }
+            });
+            // =======================================================================
+            // scroll event
+            // =======================================================================
+            var scrollInterval = conf.scrollInterval === 0 ? conf.scrollInterval : conf.scrollInterval ? conf.scrollInterval : 250;
+            var scrollTimer = null;
+            self.$window.on('scroll', function (e) {
+              if (!self.active) return false;
+              if (scrollInterval === 0) {
+                self.eventCtnr.trigger('scroll');
+              } else {
+                if (scrollTimer) clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(function () {
+                  self.eventCtnr.trigger('scroll');
+                }, scrollInterval);
               }
             });
 
@@ -1639,9 +1657,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (!_this14.tm.active) return false;
           var activeStep = _this14.tm.getActiveStep();
           var bgCvs = _this14.bgCanvas;
-          if (!_this14.state.focus) {
-            console.log(bgCvs.checkClearRect());
-            if (_this14.bgCanvas.clearRect[2] !== 0 && _this14.bgCanvas.clearRect[3] !== 0) {
+          // .BGCanvas
+          if (!_this14.state.focus && _this14.bgCanvas) {
+            if (bgCvs.checkClearRect()) {
               _this14.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
               bgCvs.clearRect = _this14.focusTargetRect.map(function (val) {
                 return val;
@@ -1655,6 +1673,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // =========================================================================
         this.tm.eventCtnr.addEventListener('scroll', function () {
           if (!_this14.tm.active) return false;
+          var activeStep = _this14.tm.getActiveStep();
+          var bgCvs = _this14.bgCanvas;
+          if (!_this14.state.focus && _this14.bgCanvas) {
+            if (bgCvs.checkClearRect()) {
+              _this14.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
+              bgCvs.clearRect = _this14.focusTargetRect.map(function (val) {
+                return val;
+              });
+              bgCvs.draw();
+            }
+          }
         });
       }
       /**

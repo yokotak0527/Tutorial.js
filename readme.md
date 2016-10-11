@@ -10,10 +10,18 @@ Tutorial.js provides introduction function on your WEB site, service, and so on.
 
 ## Support browsers
 
-* iE9+
+* iE10+
 * Chrome
 * safari
 * Firefox
+
+## Support IE9
+
+```
+<!--[if IE 9]>
+<script src="./polyfill.min.js"></script>
+<![endif]-->
+```
 
 ## Usage
 
