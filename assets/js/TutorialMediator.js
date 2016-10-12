@@ -182,13 +182,14 @@ let proposalOfShowing = function(tutorial, def, step){
   let posFitSpeed  = ( conf.animation === true || conf.animation.posFit  ) ? ( conf.posFitSpeed  > conf.minSpeed ) ? conf.posFitSpeed  : conf.minSpeed : conf.minSpeed;
   let focusSpeed   = ( conf.animation === true || conf.animation.focus   ) ? ( conf.focusSpeed   > conf.minSpeed ) ? conf.focusSpeed   : conf.minSpeed : conf.minSpeed;
   let unfocusSpeed = ( conf.animation === true || conf.animation.unfocus ) ? ( conf.unfocusSpeed > conf.minSpeed ) ? conf.unfocusSpeed : conf.minSpeed : conf.minSpeed;
+  let domCtlr      = this.domCtlr;
   // ---------------------------------------------------------------------------
   // アクティブな状態なtutorialがない
   // ---------------------------------------------------------------------------
   if(!this.hasActive()){
     let count = 0; // show, scroll, pos.
 
-    this.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
+    domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
 
     if(!tutorial.controller) this.domCtlr.disable('controller');
     if(!tutorial.pager)      this.domCtlr.disable('pager');
@@ -199,11 +200,11 @@ let proposalOfShowing = function(tutorial, def, step){
     }
 
     let pointer = tutorial.pointer;
-    this.domCtlr.addTutorialID(tutorial.id);
-    this.domCtlr.addStepID(tutorial.step.list[pointer].name);
+    domCtlr.addTutorialID(tutorial.id);
+    domCtlr.addStepID(tutorial.step.list[pointer].name);
     this.active = tutorial;
 
-    this.domCtlr.setCanvasSize(this.$window.innerWidth(), this.$window.innerHeight());
+    if(domCtlr.hasBGCanvas()) domCtlr.bgCanvas.setSize(this.$window.innerWidth(), this.$window.innerHeight());
     // 表示＆移動アニメーション
     let check = (d)=>{
         count++;
@@ -235,9 +236,7 @@ let proposalOfShowing = function(tutorial, def, step){
       if(tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
     }
 
-    // 表示＆移動アニメーション
-    // ここ
-    this.domCtlr
+    domCtlr
       .content(step.content || '')
       .pagerActive(tutorial.pointer)
       .removeStepID()
@@ -250,13 +249,13 @@ let proposalOfShowing = function(tutorial, def, step){
   // アクティブな状態な別のtutorialがある
   // ---------------------------------------------------------------------------
   else{
-    this.domCtlr.enable('nextBtn');
-    this.domCtlr.enable('prevBtn');
-    this.domCtlr.enable('controller');
-    this.domCtlr.enable('pager');
-    this.domCtlr.enable('skipBtn');
-    this.domCtlr.enable('endBtn');
-    this.domCtlr.removeTutorialID().removeStepID();
+    domCtlr.enable('nextBtn');
+    domCtlr.enable('prevBtn');
+    domCtlr.enable('controller');
+    domCtlr.enable('pager');
+    domCtlr.enable('skipBtn');
+    domCtlr.enable('endBtn');
+    domCtlr.removeTutorialID().removeStepID();
     this.active = undefined;
     showFunc(def, step);
   }

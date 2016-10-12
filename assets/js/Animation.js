@@ -1,12 +1,12 @@
 class Animation{
   static instance;
-  /*
+  /**
   *
   */
   static getInstance(){
     return Animation.instance ? Animation.instance : false;
   }
-  /*
+  /**
   *
   */
   constructor(param){

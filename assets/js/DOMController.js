@@ -58,7 +58,7 @@ class DOMController{
           '$parent' : this.$bg,
           'bgColor' : bgColor
         });
-        this.setCanvasSize(this.$window.innerWidth(), this.$window.innerHeight());
+        this.bgCanvas.setSize(this.$window.innerWidth(), this.$window.innerHeight());
       }
       this.$posFit.css('z-index', zIndex+2);
       this.$bg.css('z-index', zIndex+1);
@@ -80,17 +80,7 @@ class DOMController{
       // resize
       tm.eventCtnr.addEventListener('resize', (size)=>{
         if(!tm.hasActive()) return false;
-        this.setCanvasSize(size.width, size.height);
-        
-        // // if(this.)
-        // if(this.bgCanvas){
-        //   let bgCvs = this.bgCanvas;
-        //   if(!bgCvs.state.focus){
-        //     if(clearRect[2] !== 0 && clearRect[3] !== 0){
-        //       
-        //     }
-        //   }
-        // }
+        if(this.hasBGCanvas()) this.bgCanvas.setSize(size.width, size.height).draw();
       });
       tm.eventCtnr.addEventListener('scroll', ()=>{
         
@@ -133,26 +123,6 @@ class DOMController{
           return this.$bg;
       }
     }
-    /**
-    * @function get$obj
-    * @memberof DOMController
-    * @instance
-    *
-    */
-    // addMode(mode, color, interval){
-    //   if(mode === 'focus'){
-    //     this.$template.addClass('focus');
-    //     let bgCvs = new BGCanvas({
-    //       '$'              : this.$,
-    //       '$window'        : this.$window,
-    //       '$parent'        : this.$bg,
-    //       'bgColor'        : color,
-    //       'resizeInterval' : interval
-    //     });
-    //     bgCvs.draw();
-    //   }
-    //   return this;
-    // }
     /**
     * @param {String} name
     */
@@ -224,10 +194,7 @@ class DOMController{
     /**
     *
     */
-    setCanvasSize(w, h){
-      if(!this.bgCanvas) return this;
-      this.bgCanvas.setSize(w, h);
-      this.bgCanvas.draw();
-      return this;
+    hasBGCanvas(){
+      return this.bgCanvas ? true : false;
     }
 }

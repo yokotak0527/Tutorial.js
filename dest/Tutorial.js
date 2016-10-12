@@ -202,6 +202,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function hide() {
           var _this5 = this;
 
+          if (this.fire) return false;
           this.fire = true;
           var def = new this.Deferred();
           var promise = this.mediator.offer(this, 'hide');
@@ -528,6 +529,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed > conf.minSpeed ? conf.posFitSpeed : conf.minSpeed : conf.minSpeed;
       var focusSpeed = conf.animation === true || conf.animation.focus ? conf.focusSpeed > conf.minSpeed ? conf.focusSpeed : conf.minSpeed : conf.minSpeed;
       var unfocusSpeed = conf.animation === true || conf.animation.unfocus ? conf.unfocusSpeed > conf.minSpeed ? conf.unfocusSpeed : conf.minSpeed : conf.minSpeed;
+      var domCtlr = this.domCtlr;
       // ---------------------------------------------------------------------------
       // アクティブな状態なtutorialがない
       // ---------------------------------------------------------------------------
@@ -535,7 +537,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         (function () {
           var count = 0; // show, scroll, pos.
 
-          _this7.domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
+          domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
 
           if (!tutorial.controller) _this7.domCtlr.disable('controller');
           if (!tutorial.pager) _this7.domCtlr.disable('pager');
@@ -546,11 +548,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           }
 
           var pointer = tutorial.pointer;
-          _this7.domCtlr.addTutorialID(tutorial.id);
-          _this7.domCtlr.addStepID(tutorial.step.list[pointer].name);
+          domCtlr.addTutorialID(tutorial.id);
+          domCtlr.addStepID(tutorial.step.list[pointer].name);
           _this7.active = tutorial;
 
-          _this7.domCtlr.setCanvasSize(_this7.$window.innerWidth(), _this7.$window.innerHeight());
+          if (domCtlr.hasBGCanvas()) domCtlr.bgCanvas.setSize(_this7.$window.innerWidth(), _this7.$window.innerHeight());
           // 表示＆移動アニメーション
           var check = function check(d) {
             count++;
@@ -591,9 +593,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             if (tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
           }
 
-          // 表示＆移動アニメーション
-          // ここ
-          this.domCtlr.content(step.content || '').pagerActive(tutorial.pointer).removeStepID().addStepID(tutorial.step.list[tutorial.pointer].name);
+          domCtlr.content(step.content || '').pagerActive(tutorial.pointer).removeStepID().addStepID(tutorial.step.list[tutorial.pointer].name);
 
           var _posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
           def.resolve();
@@ -602,13 +602,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // アクティブな状態な別のtutorialがある
         // ---------------------------------------------------------------------------
         else {
-            this.domCtlr.enable('nextBtn');
-            this.domCtlr.enable('prevBtn');
-            this.domCtlr.enable('controller');
-            this.domCtlr.enable('pager');
-            this.domCtlr.enable('skipBtn');
-            this.domCtlr.enable('endBtn');
-            this.domCtlr.removeTutorialID().removeStepID();
+            domCtlr.enable('nextBtn');
+            domCtlr.enable('prevBtn');
+            domCtlr.enable('controller');
+            domCtlr.enable('pager');
+            domCtlr.enable('skipBtn');
+            domCtlr.enable('endBtn');
+            domCtlr.removeTutorialID().removeStepID();
             this.active = undefined;
             showFunc(def, step);
           }
@@ -1263,7 +1263,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             '$parent': this.$bg,
             'bgColor': bgColor
           });
-          this.setCanvasSize(this.$window.innerWidth(), this.$window.innerHeight());
+          this.bgCanvas.setSize(this.$window.innerWidth(), this.$window.innerHeight());
         }
         this.$posFit.css('z-index', zIndex + 2);
         this.$bg.css('z-index', zIndex + 1);
@@ -1293,17 +1293,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // resize
         tm.eventCtnr.addEventListener('resize', function (size) {
           if (!tm.hasActive()) return false;
-          _this13.setCanvasSize(size.width, size.height);
-
-          // // if(this.)
-          // if(this.bgCanvas){
-          //   let bgCvs = this.bgCanvas;
-          //   if(!bgCvs.state.focus){
-          //     if(clearRect[2] !== 0 && clearRect[3] !== 0){
-          //       
-          //     }
-          //   }
-          // }
+          if (_this13.hasBGCanvas()) _this13.bgCanvas.setSize(size.width, size.height).draw();
         });
         tm.eventCtnr.addEventListener('scroll', function () {});
 
@@ -1348,26 +1338,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               return this.$bg;
           }
         }
-        /**
-        * @function get$obj
-        * @memberof DOMController
-        * @instance
-        *
-        */
-        // addMode(mode, color, interval){
-        //   if(mode === 'focus'){
-        //     this.$template.addClass('focus');
-        //     let bgCvs = new BGCanvas({
-        //       '$'              : this.$,
-        //       '$window'        : this.$window,
-        //       '$parent'        : this.$bg,
-        //       'bgColor'        : color,
-        //       'resizeInterval' : interval
-        //     });
-        //     bgCvs.draw();
-        //   }
-        //   return this;
-        // }
         /**
         * @param {String} name
         */
@@ -1469,12 +1439,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         */
 
       }, {
-        key: 'setCanvasSize',
-        value: function setCanvasSize(w, h) {
-          if (!this.bgCanvas) return this;
-          this.bgCanvas.setSize(w, h);
-          this.bgCanvas.draw();
-          return this;
+        key: 'hasBGCanvas',
+        value: function hasBGCanvas() {
+          return this.bgCanvas ? true : false;
         }
       }]);
 
@@ -1604,13 +1571,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(Animation, null, [{
         key: 'getInstance',
 
-        /*
+        /**
         *
         */
         value: function getInstance() {
           return Animation.instance ? Animation.instance : false;
         }
-        /*
+        /**
         *
         */
 
@@ -2042,14 +2009,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     __conf.mode = 'focus'; // focus | arrow
     // __conf.resizeInterval    = 250;
     __conf.resizeInterval = 0;
-    __conf.scrollInterval = 100;
+    __conf.scrollInterval = 0;
     __conf.minSpeed = 10;
     __conf.scrollSpeed = 500;
     __conf.showSpeed = 375;
     __conf.hideSpeed = 375;
     __conf.posFitSpeed = 300;
     // __conf.focusSpeed        = 375;
-    __conf.focusSpeed = 5000;
+    __conf.focusSpeed = 300;
     __conf.unfocusSpeed = 300;
     __conf.theme = 'default';
     __conf.animation = Object.create(null);
