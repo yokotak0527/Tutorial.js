@@ -156,7 +156,6 @@ class Tutorial{
   * @instance
   */
   hide(){
-    if(this.fire) return false;
     this.fire   = true;
     let def     = new this.Deferred();
     let promise = this.mediator.offer(this, 'hide');

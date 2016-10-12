@@ -202,7 +202,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function hide() {
           var _this5 = this;
 
-          if (this.fire) return false;
           this.fire = true;
           var def = new this.Deferred();
           var promise = this.mediator.offer(this, 'hide');
@@ -321,24 +320,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             self.$ = conf.$;
             conf.$window = conf.$window || $(window);
             conf.$parent = conf.$parent || $('body');
+            // [task] change scroll elm. when use IE9;
             conf.$scroll = conf.$scroll || $('body');
             self.$window = conf.$window;
             self.$parent = conf.$parent;
             self.$scroll = conf.$scroll;
             self.Deferred = conf.Deferred;
+
+            var speed = Object.create(null);
+            speed.show = self.conf.animation === true || self.conf.animation.show ? self.conf.showSpeed > self.conf.minSpeed ? self.conf.showSpeed : self.conf.minSpeed : self.conf.minSpeed;
+            speed.scroll = self.conf.animation === true || self.conf.animation.scroll ? self.conf.scrollSpeed > self.conf.minSpeed ? self.conf.scrollSpeed : self.conf.minSpeed : self.conf.minSpeed;
+            speed.posFit = self.conf.animation === true || self.conf.animation.posFit ? self.conf.posFitSpeed > self.conf.minSpeed ? self.conf.posFitSpeed : self.conf.minSpeed : self.conf.minSpeed;
+            speed.focus = self.conf.animation === true || self.conf.animation.focus ? self.conf.focusSpeed > self.conf.minSpeed ? self.conf.focusSpeed : self.conf.minSpeed : self.conf.minSpeed;
+            speed.unFocus = self.conf.animation === true || self.conf.animation.unfocus ? self.conf.unfocusSpeed > self.conf.minSpeed ? self.conf.unfocusSpeed : self.conf.minSpeed : self.conf.minSpeed;
+
             self.domCtlr = new conf.DOMController({
               '$template': self.$(conf.template()),
               'zIndex': conf.zIndex,
               'mode': conf.mode,
               'theme': conf.theme,
               'BGCanvas': conf.BGCanvas,
+              'Animation': conf.Animation,
               'bgColor': conf.bgColor,
-              'tutorialMediator': self
-            });
-            self.animation = new conf.Animation({
+              'Deferred': conf.Deferred,
               'tutorialMediator': self,
-              'bgCanvas': self.domCtlr.bgCanvas
+              'speed': speed
             });
+            self.animation = self.domCtlr.animation;
 
             // =======================================================================
             // resize event
@@ -374,8 +382,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }, scrollInterval);
               }
             });
-
-            // let scrollInterval = conf.scrollInterval || 
 
             self.active = false; /* active tutorial */
             self.list = Object.create(null);
@@ -523,94 +529,43 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var proposalOfShowing = function proposalOfShowing(tutorial, def, step) {
       var _this7 = this;
 
-      var conf = this.conf;
-      var showSpeed = conf.animation === true || conf.animation.show ? conf.showSpeed > conf.minSpeed ? conf.showSpeed : conf.minSpeed : conf.minSpeed;
-      var scrollSpeed = conf.animation === true || conf.animation.scroll ? conf.scrollSpeed > conf.minSpeed ? conf.scrollSpeed : conf.minSpeed : conf.minSpeed;
-      var posFitSpeed = conf.animation === true || conf.animation.posFit ? conf.posFitSpeed > conf.minSpeed ? conf.posFitSpeed : conf.minSpeed : conf.minSpeed;
-      var focusSpeed = conf.animation === true || conf.animation.focus ? conf.focusSpeed > conf.minSpeed ? conf.focusSpeed : conf.minSpeed : conf.minSpeed;
-      var unfocusSpeed = conf.animation === true || conf.animation.unfocus ? conf.unfocusSpeed > conf.minSpeed ? conf.unfocusSpeed : conf.minSpeed : conf.minSpeed;
-      var domCtlr = this.domCtlr;
       // ---------------------------------------------------------------------------
       // アクティブな状態なtutorialがない
       // ---------------------------------------------------------------------------
       if (!this.hasActive()) {
-        (function () {
-          var count = 0; // show, scroll, pos.
-
-          domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
-
-          if (!tutorial.controller) _this7.domCtlr.disable('controller');
-          if (!tutorial.pager) _this7.domCtlr.disable('pager');
-          if (!tutorial.skipBtn) _this7.domCtlr.disable('skipBtn');
-          if (!tutorial.roop) {
-            if (tutorial.step.length - 1 <= tutorial.pointer) _this7.domCtlr.disable('nextBtn');
-            if (tutorial.pointer === 0) _this7.domCtlr.disable('prevBtn');
-          }
-
-          var pointer = tutorial.pointer;
-          domCtlr.addTutorialID(tutorial.id);
-          domCtlr.addStepID(tutorial.step.list[pointer].name);
+        this.domCtlr.open(tutorial).then(function () {
           _this7.active = tutorial;
-
-          if (domCtlr.hasBGCanvas()) domCtlr.bgCanvas.setSize(_this7.$window.innerWidth(), _this7.$window.innerHeight());
-          // 表示＆移動アニメーション
-          var check = function check(d) {
-            count++;
-            if (count === 3 && conf.mode === 'focus') {
-              var _step = _this7.active.getActiveStep();
-              if (_step.target) {
-                var endPromise = _this7.animation.focus(_step.target, _step.targetPosOffset, focusSpeed);
-                endPromise.then(function () {
-                  return d.resolve();
-                });
-              } else {
-                d.resolve();
-              }
-            }
-          };
-          var showAnimPromise = _this7.animation.show(_this7.domCtlr.get$obj('all'), showSpeed);
-          showAnimPromise.then(function () {
-            return check(def);
-          });
-          var scrollAnimPromise = _this7.animation.scroll(step.target, step.targetPos, scrollSpeed);
-          scrollAnimPromise.then(function () {
-            return check(def);
-          });
-          var posAnimationPromise = _this7.animation.tooltipPosFit(step.pos, _this7.domCtlr.get$obj('content-wrap'), _this7.domCtlr.get$obj('pos-fit'), posFitSpeed);
-          posAnimationPromise.then(function () {
-            return check(def);
-          });
-        })();
+          def.resolve();
+        });
       }
       // ---------------------------------------------------------------------------
       // アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由)
       // ---------------------------------------------------------------------------
-      else if (this.hasActive() && tutorial === this.active) {
-          this.domCtlr.enable('nextBtn');
-          this.domCtlr.enable('prevBtn');
-          if (!tutorial.roop) {
-            if (tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
-            if (tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
-          }
+      else if (this.hasActive() && tutorial === this.active) {}
+        // this.domCtlr.enable('nextBtn');
+        // this.domCtlr.enable('prevBtn');
+        // if(!tutorial.roop){
+        //   if(tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
+        //   if(tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
+        // }
+        // 
+        // domCtlr
+        //   .content(step.content || '')
+        //   .pagerActive(tutorial.pointer)
+        //   .removeStepID()
+        //   .addStepID(tutorial.step.list[tutorial.pointer].name);
+        // 
+        // let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
+        // def.resolve();
 
-          domCtlr.content(step.content || '').pagerActive(tutorial.pointer).removeStepID().addStepID(tutorial.step.list[tutorial.pointer].name);
-
-          var _posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
-          def.resolve();
-        }
         // ---------------------------------------------------------------------------
         // アクティブな状態な別のtutorialがある
         // ---------------------------------------------------------------------------
         else {
-            domCtlr.enable('nextBtn');
-            domCtlr.enable('prevBtn');
-            domCtlr.enable('controller');
-            domCtlr.enable('pager');
-            domCtlr.enable('skipBtn');
-            domCtlr.enable('endBtn');
-            domCtlr.removeTutorialID().removeStepID();
-            this.active = undefined;
-            showFunc(def, step);
+            this.domCtlr.close().then(function () {
+              _this7.active = undefined;
+              showFunc(def, step);
+            });
           }
     };
 
@@ -1171,7 +1126,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           step.pos = Array.isArray(step.pos) ? step.pos : ['center', 'center'];
           if (!step.name) {
-            step.name = 'step-#{Step.id}';
+            step.name = 'step-' + Step.id;
             Step.id++;
           }
           if (step.target) step.target = $(step.target[0]);
@@ -1231,11 +1186,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var mode = param.mode;
         var theme = param.theme;
         var BGCanvas = param.BGCanvas;
+        var Animation = param.Animation;
+        var Deferred = param.Deferred;
         var bgColor = param.bgColor;
         var tutorialMediator = param.tutorialMediator;
+        var speed = param.speed;
 
 
         var tm = tutorialMediator;
+        // this.tm           = tm;
         this.$ = tm.$;
         this.$window = tm.$window;
         this.$parent = tm.$parent;
@@ -1250,12 +1209,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.$prevBtn = $('.prev span', this.$controller);
         this.$nextBtn = $('.next span', this.$controller);
         this.$endBtn = $('.end span', this.$controller);
+        this.mode = mode;
+        this.Deferred = Deferred;
+        this.speed = speed;
+        this.bgCanvas = false;
         $template.css({
           'z-index': zIndex,
           'display': 'none',
           'opacity': 0
         });
-
         this.$template.addClass(mode).addClass(theme);
         if (mode === 'focus') {
           this.bgCanvas = new BGCanvas({
@@ -1265,6 +1227,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           });
           this.bgCanvas.setSize(this.$window.innerWidth(), this.$window.innerHeight());
         }
+        this.animation = new Animation({
+          'tutorialMediator': tm,
+          'bgCanvas': this.bgCanvas
+        });
         this.$posFit.css('z-index', zIndex + 2);
         this.$bg.css('z-index', zIndex + 1);
         // =======================================================================
@@ -1272,23 +1238,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // =======================================================================
         // pager
         this.$pager.on('click', 'li span', function (e) {
-          if (!$(this).hasClass('active')) tm.active.show($(this).text() * 1);
+          if (!$(this).hasClass('active')) tm.getActive().show($(this).text() * 1);
         });
         // skip
         this.$skipBtn.on('click', function () {
-          return tm.active.skip();
+          return tm.getActive().skip();
         });
         // next
         this.$nextBtn.on('click', function () {
-          return tm.active.next();
+          return tm.getActive().next();
         });
         // prev
         this.$prevBtn.on('click', function () {
-          return tm.active.prev();
+          return tm.getActive().prev();
         });
         // end
         this.$endBtn.on('click', function () {
-          return tm.active.end();
+          return tm.getActive().end();
         });
         // resize
         tm.eventCtnr.addEventListener('resize', function (size) {
@@ -1443,6 +1409,86 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function hasBGCanvas() {
           return this.bgCanvas ? true : false;
         }
+        /**
+        * @param {Tutorial} tutorial - active tutorial instance.
+        */
+
+      }, {
+        key: 'open',
+        value: function open(tutorial) {
+          var _this14 = this;
+
+          var count = 0; // show, scroll, pos.
+          var activeStep = tutorial.getActiveStep();
+          var stepNum = tutorial.step.length;
+          var i = tutorial.pointer;
+          var ID = tutorial.id;
+          var name = activeStep.name;
+          var $window = this.$window;
+          var def = new this.Deferred();
+          var speed = this.speed;
+          this.content(activeStep.content || '').pager(stepNum).pagerActive(i);
+
+          if (!tutorial.controller) this.disable('controller');
+          if (!tutorial.pager) this.disable('pager');
+          if (!tutorial.skipBtn) this.disable('skipBtn');
+          if (!tutorial.roop) {
+            if (stepNum - 1 <= i) this.disable('nextBtn');
+            if (i === 0) this.disable('prevBtn');
+          }
+
+          this.addTutorialID(ID).addStepID(name);
+
+          if (this.hasBGCanvas()) this.bgCanvas.setSize($window.innerWidth(), $window.innerHeight()).draw();
+          // 表示＆移動アニメーション
+          var check = function check() {
+            count++;
+            if (count === 3 && _this14.mode === 'focus') {
+              // let step = this.active.getActiveStep();
+              if (activeStep.target) {
+                var endPromise = _this14.animation.focus(activeStep.target, activeStep.targetPosOffset, speed.focus);
+                endPromise.then(function () {
+                  return def.resolve();
+                });
+              } else {
+                def.resolve();
+              }
+            }
+          };
+          var showAnimPromise = this.animation.show(this.get$obj('all'), speed.show);
+          showAnimPromise.then(function () {
+            return check();
+          });
+          var scrollAnimPromise = this.animation.scroll(activeStep.target, activeStep.targetPos, speed.scroll);
+          scrollAnimPromise.then(function () {
+            return check();
+          });
+          var posAnimationPromise = this.animation.tooltipPosFit(activeStep.pos, this.get$obj('content-wrap'), this.get$obj('pos-fit'), speed.posFit);
+          posAnimationPromise.then(function () {
+            return check();
+          });
+          return def.promise();
+        }
+        /**
+        *
+        */
+
+      }, {
+        key: 'close',
+        value: function close() {
+          var def = new this.Deferred();
+          this.enable('nextBtn');
+          this.enable('prevBtn');
+          this.enable('controller');
+          this.enable('pager');
+          this.enable('skipBtn');
+          this.enable('endBtn');
+          this.removeTutorialID().removeStepID();
+          setTimeout(function () {
+            return def.resolve();
+          }, 10);
+          return def.promise();
+        }
       }]);
 
       return DOMController;
@@ -1584,7 +1630,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }]);
 
       function Animation(param) {
-        var _this14 = this;
+        var _this15 = this;
 
         _classCallCheck(this, Animation);
 
@@ -1621,14 +1667,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // Resize Event
         // =========================================================================
         this.tm.eventCtnr.addEventListener('resize', function (size) {
-          if (!_this14.tm.active) return false;
-          var activeStep = _this14.tm.getActiveStep();
-          var bgCvs = _this14.bgCanvas;
+          if (!_this15.tm.active) return false;
+          var activeStep = _this15.tm.getActiveStep();
+          var bgCvs = _this15.bgCanvas;
           // .BGCanvas
-          if (!_this14.state.focus && _this14.bgCanvas) {
+          if (!_this15.state.focus && _this15.bgCanvas) {
             if (bgCvs.checkClearRect()) {
-              _this14.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
-              bgCvs.clearRect = _this14.focusTargetRect.map(function (val) {
+              _this15.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
+              bgCvs.clearRect = _this15.focusTargetRect.map(function (val) {
                 return val;
               });
               bgCvs.draw();
@@ -1639,13 +1685,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // scroll Event
         // =========================================================================
         this.tm.eventCtnr.addEventListener('scroll', function () {
-          if (!_this14.tm.active) return false;
-          var activeStep = _this14.tm.getActiveStep();
-          var bgCvs = _this14.bgCanvas;
-          if (!_this14.state.focus && _this14.bgCanvas) {
+          if (!_this15.tm.active) return false;
+          var activeStep = _this15.tm.getActiveStep();
+          var bgCvs = _this15.bgCanvas;
+          if (!_this15.state.focus && _this15.bgCanvas) {
             if (bgCvs.checkClearRect()) {
-              _this14.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
-              bgCvs.clearRect = _this14.focusTargetRect.map(function (val) {
+              _this15.setFocusTargetRect(activeStep.target, activeStep.targetPosOffset);
+              bgCvs.clearRect = _this15.focusTargetRect.map(function (val) {
                 return val;
               });
               bgCvs.draw();
@@ -1663,14 +1709,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(Animation, [{
         key: 'show',
         value: function show($target, speed) {
-          var _this15 = this;
+          var _this16 = this;
 
           var def = new this.Deferred();
           this.state.show = true;
           $target.stop().css('display', 'block').animate({
             'opacity': 1
           }, speed, function () {
-            _this15.state.show = false;
+            _this16.state.show = false;
             def.resolve();
           });
           return def.promise();
@@ -1684,7 +1730,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'hide',
         value: function hide($target, speed) {
-          var _this16 = this;
+          var _this17 = this;
 
           var def = new this.Deferred();
           this.state.hide = true;
@@ -1692,7 +1738,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             'opacity': 0
           }, speed, function () {
             $target.css('display', 'none');
-            _this16.state.hide = false;
+            _this17.state.hide = false;
             def.resolve();
           });
           return def.promise();
@@ -1709,7 +1755,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function scroll() {
           var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-          var _this17 = this;
+          var _this18 = this;
 
           var offset = arguments[1];
           var speed = arguments[2];
@@ -1774,7 +1820,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               scrollTop: y,
               scrollLeft: x
             }, speed, function () {
-              _this17.state.scroll = false;
+              _this18.state.scroll = false;
               def.resolve();
             });
           }
@@ -1788,7 +1834,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: 'focus',
         value: function focus($target, offset, speed) {
-          var _this18 = this;
+          var _this19 = this;
 
           var def = new this.Deferred();
           var frame = 60;
@@ -1804,20 +1850,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.state.focus = true;
           this.focusTimer = setInterval(function () {
             cssVal = [];
-            cssVal[0] = _this18.moving(currentTime, _this18.focusStartRect[0], _this18.focusTargetRect[0], speed);
-            cssVal[1] = _this18.moving(currentTime, _this18.focusStartRect[1], _this18.focusTargetRect[1], speed);
-            cssVal[2] = _this18.moving(currentTime, _this18.focusStartRect[2], _this18.focusTargetRect[2], speed);
-            cssVal[3] = _this18.moving(currentTime, _this18.focusStartRect[3], _this18.focusTargetRect[3], speed);
-            _this18.bgCanvas.clearRect = cssVal;
-            _this18.bgCanvas.draw();
+            cssVal[0] = _this19.moving(currentTime, _this19.focusStartRect[0], _this19.focusTargetRect[0], speed);
+            cssVal[1] = _this19.moving(currentTime, _this19.focusStartRect[1], _this19.focusTargetRect[1], speed);
+            cssVal[2] = _this19.moving(currentTime, _this19.focusStartRect[2], _this19.focusTargetRect[2], speed);
+            cssVal[3] = _this19.moving(currentTime, _this19.focusStartRect[3], _this19.focusTargetRect[3], speed);
+            _this19.bgCanvas.clearRect = cssVal;
+            _this19.bgCanvas.draw();
             currentTime += FPS;
             if (currentTime >= speed) {
-              clearInterval(_this18.focusTimer);
-              _this18.bgCanvas.clearRect = _this18.focusTargetRect.map(function (val) {
+              clearInterval(_this19.focusTimer);
+              _this19.bgCanvas.clearRect = _this19.focusTargetRect.map(function (val) {
                 return val;
               });
-              _this18.bgCanvas.draw();
-              _this18.state.focus = false;
+              _this19.bgCanvas.draw();
+              _this19.state.focus = false;
               def.resolve();
             }
           }, FPS);

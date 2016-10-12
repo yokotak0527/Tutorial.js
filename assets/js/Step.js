@@ -31,7 +31,7 @@ class Step{
   static setDefaultProperties(step, name = ''){
     step.pos = Array.isArray(step.pos) ? step.pos : ['center', 'center'];
     if(!step.name){
-      step.name = `step-#{Step.id}`;
+      step.name = `step-${Step.id}`;
       Step.id++;
     }
     if(step.target) step.target = $(step.target[0]);

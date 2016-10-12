@@ -24,24 +24,33 @@ class TutorialMediator{
       self.$         = conf.$;
       conf.$window   = conf.$window || $(window);
       conf.$parent   = conf.$parent || $('body');
+      // [task] change scroll elm. when use IE9;
       conf.$scroll   = conf.$scroll || $('body');
       self.$window   = conf.$window;
       self.$parent   = conf.$parent;
       self.$scroll   = conf.$scroll;
       self.Deferred  = conf.Deferred;
+
+      let speed     = Object.create(null);
+      speed.show    = ( self.conf.animation === true || self.conf.animation.show    ) ? ( self.conf.showSpeed    > self.conf.minSpeed ) ? self.conf.showSpeed    : self.conf.minSpeed : self.conf.minSpeed;
+      speed.scroll  = ( self.conf.animation === true || self.conf.animation.scroll  ) ? ( self.conf.scrollSpeed  > self.conf.minSpeed ) ? self.conf.scrollSpeed  : self.conf.minSpeed : self.conf.minSpeed;
+      speed.posFit  = ( self.conf.animation === true || self.conf.animation.posFit  ) ? ( self.conf.posFitSpeed  > self.conf.minSpeed ) ? self.conf.posFitSpeed  : self.conf.minSpeed : self.conf.minSpeed;
+      speed.focus   = ( self.conf.animation === true || self.conf.animation.focus   ) ? ( self.conf.focusSpeed   > self.conf.minSpeed ) ? self.conf.focusSpeed   : self.conf.minSpeed : self.conf.minSpeed;
+      speed.unFocus = ( self.conf.animation === true || self.conf.animation.unfocus ) ? ( self.conf.unfocusSpeed > self.conf.minSpeed ) ? self.conf.unfocusSpeed : self.conf.minSpeed : self.conf.minSpeed;
+
       self.domCtlr = new conf.DOMController({
         '$template'        : self.$(conf.template()),
         'zIndex'           : conf.zIndex,
         'mode'             : conf.mode,
         'theme'            : conf.theme,
         'BGCanvas'         : conf.BGCanvas,
+        'Animation'        : conf.Animation,
         'bgColor'          : conf.bgColor,
-        'tutorialMediator' : self
-      });
-      self.animation = new conf.Animation({
+        'Deferred'         : conf.Deferred,
         'tutorialMediator' : self,
-        'bgCanvas'         : self.domCtlr.bgCanvas
+        'speed'            : speed
       });
+      self.animation = self.domCtlr.animation;
       
       // =======================================================================
       // resize event
@@ -77,8 +86,6 @@ class TutorialMediator{
           }, scrollInterval);
         }
       });
-      
-      // let scrollInterval = conf.scrollInterval || 
 
       self.active = false; /* active tutorial */
       self.list   = Object.create(null);
@@ -176,88 +183,43 @@ class TutorialMediator{
 // 表示処理
 // =============================================================================
 let proposalOfShowing = function(tutorial, def, step){
-  let conf         = this.conf;
-  let showSpeed    = ( conf.animation === true || conf.animation.show    ) ? ( conf.showSpeed    > conf.minSpeed ) ? conf.showSpeed    : conf.minSpeed : conf.minSpeed;
-  let scrollSpeed  = ( conf.animation === true || conf.animation.scroll  ) ? ( conf.scrollSpeed  > conf.minSpeed ) ? conf.scrollSpeed  : conf.minSpeed : conf.minSpeed;
-  let posFitSpeed  = ( conf.animation === true || conf.animation.posFit  ) ? ( conf.posFitSpeed  > conf.minSpeed ) ? conf.posFitSpeed  : conf.minSpeed : conf.minSpeed;
-  let focusSpeed   = ( conf.animation === true || conf.animation.focus   ) ? ( conf.focusSpeed   > conf.minSpeed ) ? conf.focusSpeed   : conf.minSpeed : conf.minSpeed;
-  let unfocusSpeed = ( conf.animation === true || conf.animation.unfocus ) ? ( conf.unfocusSpeed > conf.minSpeed ) ? conf.unfocusSpeed : conf.minSpeed : conf.minSpeed;
-  let domCtlr      = this.domCtlr;
   // ---------------------------------------------------------------------------
   // アクティブな状態なtutorialがない
   // ---------------------------------------------------------------------------
   if(!this.hasActive()){
-    let count = 0; // show, scroll, pos.
-
-    domCtlr.content(step.content || '').pager(tutorial.step.length).pagerActive(tutorial.pointer);
-
-    if(!tutorial.controller) this.domCtlr.disable('controller');
-    if(!tutorial.pager)      this.domCtlr.disable('pager');
-    if(!tutorial.skipBtn)    this.domCtlr.disable('skipBtn');
-    if(!tutorial.roop){
-      if(tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
-      if(tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
-    }
-
-    let pointer = tutorial.pointer;
-    domCtlr.addTutorialID(tutorial.id);
-    domCtlr.addStepID(tutorial.step.list[pointer].name);
-    this.active = tutorial;
-
-    if(domCtlr.hasBGCanvas()) domCtlr.bgCanvas.setSize(this.$window.innerWidth(), this.$window.innerHeight());
-    // 表示＆移動アニメーション
-    let check = (d)=>{
-        count++;
-        if(count === 3 && conf.mode === 'focus'){
-          let step = this.active.getActiveStep();
-          if(step.target){
-            let endPromise = this.animation.focus(step.target, step.targetPosOffset, focusSpeed);
-            endPromise.then( ()=> d.resolve() );
-          }else{
-            d.resolve();
-          }
-        }
-    }
-    let showAnimPromise = this.animation.show(this.domCtlr.get$obj('all'), showSpeed);
-    showAnimPromise.then( ()=> check(def) );
-    let scrollAnimPromise = this.animation.scroll(step.target, step.targetPos, scrollSpeed);
-    scrollAnimPromise.then( ()=> check(def) );
-    let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
-    posAnimationPromise.then( ()=> check(def) );
+    this.domCtlr.open(tutorial).then(()=>{
+      this.active = tutorial;
+      def.resolve();
+    });
   }
   // ---------------------------------------------------------------------------
   // アクティブな状態なtutorialがあるが同じtutorialである(nextやprev経由)
   // ---------------------------------------------------------------------------
   else if(this.hasActive() && tutorial === this.active){
-    this.domCtlr.enable('nextBtn');
-    this.domCtlr.enable('prevBtn');
-    if(!tutorial.roop){
-      if(tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
-      if(tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
-    }
-
-    domCtlr
-      .content(step.content || '')
-      .pagerActive(tutorial.pointer)
-      .removeStepID()
-      .addStepID(tutorial.step.list[tutorial.pointer].name);
-
-    let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
-    def.resolve();
+    // this.domCtlr.enable('nextBtn');
+    // this.domCtlr.enable('prevBtn');
+    // if(!tutorial.roop){
+    //   if(tutorial.step.length - 1 <= tutorial.pointer) this.domCtlr.disable('nextBtn');
+    //   if(tutorial.pointer === 0) this.domCtlr.disable('prevBtn');
+    // }
+    // 
+    // domCtlr
+    //   .content(step.content || '')
+    //   .pagerActive(tutorial.pointer)
+    //   .removeStepID()
+    //   .addStepID(tutorial.step.list[tutorial.pointer].name);
+    // 
+    // let posAnimationPromise = this.animation.tooltipPosFit(step.pos, this.domCtlr.get$obj('content-wrap'), this.domCtlr.get$obj('pos-fit'), posFitSpeed);
+    // def.resolve();
   }
   // ---------------------------------------------------------------------------
   // アクティブな状態な別のtutorialがある
   // ---------------------------------------------------------------------------
   else{
-    domCtlr.enable('nextBtn');
-    domCtlr.enable('prevBtn');
-    domCtlr.enable('controller');
-    domCtlr.enable('pager');
-    domCtlr.enable('skipBtn');
-    domCtlr.enable('endBtn');
-    domCtlr.removeTutorialID().removeStepID();
-    this.active = undefined;
-    showFunc(def, step);
+    this.domCtlr.close().then(()=>{
+      this.active = undefined;
+      showFunc(def, step);
+    });
   }
 }
 
